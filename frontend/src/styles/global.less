@@ -1,0 +1,122 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: @color-background;
+}
+
+body {
+    font-family: @font-primary;
+    font-weight: @font-weight-light;
+    color: @color-ink;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+    background: @color-accent-soft;
+    color: @color-ink;
+}
+
+a {
+    color: @color-primary;
+    text-decoration: none;
+    transition: color @duration-fast ease;
+
+    &:hover {
+        color: @color-ink;
+    }
+}
+
+img {
+    max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+    font-family: @font-primary;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: @color-primary;
+}
+
+:focus-visible {
+    outline: 2px solid @color-primary;
+    outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+    font-family: @font-display;
+    font-weight: @font-weight-light;
+    margin: 0;
+    text-wrap: pretty;
+}
+
+p,
+figure,
+blockquote {
+    margin: 0;
+}
+
+@keyframes jFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(26px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes jFade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes jGradient {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes jZoom {
+    from {
+        transform: scale(1.12);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

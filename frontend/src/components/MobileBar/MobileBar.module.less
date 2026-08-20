@@ -1,0 +1,48 @@
+.bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: @z-mobile-bar;
+    display: flex;
+    gap: 1px;
+    background: @color-border;
+    border-top: 1px solid @color-border;
+
+    &__cta,
+    &__call {
+        min-height: @mobile-bar-height;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: @spacing-xs;
+        font-size: @font-size-xxs;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    &__cta {
+        flex: 1.4;
+        background: @color-primary;
+        color: @color-on-dark;
+
+        &:hover {
+            color: @color-on-dark;
+        }
+    }
+
+    &__call {
+        flex: 1;
+        background: @color-surface;
+        color: @color-ink;
+
+        &:hover {
+            color: @color-ink;
+        }
+    }
+}
+
+.spacer {
+    height: @mobile-bar-height;
+    background: @color-ink;
+}

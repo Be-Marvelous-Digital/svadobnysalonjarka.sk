@@ -1,0 +1,131 @@
+.footer {
+    background: @color-ink;
+    color: @color-on-dark;
+    padding: 88px @layout-gutter @spacing-xl;
+
+    &__inner {
+        .container();
+        display: flex;
+        flex-direction: column;
+        gap: 64px;
+    }
+
+    &__columns {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 48px;
+    }
+
+    &__column {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        font-size: 14px;
+    }
+
+    &__brand {
+        font-family: @font-display;
+        font-size: 25px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    &__about {
+        max-width: 34ch;
+        font-size: @font-size-base;
+        line-height: 1.8;
+        color: rgba(253, 252, 250, 0.7);
+    }
+
+    &__heading {
+        font-size: @font-size-xxs;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: @color-primary-light;
+    }
+
+    &__link {
+        color: rgba(253, 252, 250, 0.78);
+        transition: color @duration-fast ease;
+
+        &:hover {
+            color: @color-on-dark;
+        }
+
+        &--quiet {
+            color: @color-on-dark-faint;
+
+            &:hover {
+                color: @color-primary-light;
+            }
+        }
+    }
+
+    &__contactRow {
+        display: inline-flex;
+        align-items: flex-start;
+        gap: 9px;
+        color: rgba(253, 252, 250, 0.78);
+    }
+
+    &__social {
+        display: flex;
+        gap: @spacing-md;
+        margin-top: 6px;
+        font-size: @font-size-xxs;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+
+        a {
+            color: @color-primary-light;
+        }
+    }
+
+    &__bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+        border-top: 1px solid rgba(253, 252, 250, 0.14);
+        padding-top: @spacing-lg;
+        font-size: @font-size-xs;
+        letter-spacing: 0.12em;
+        color: @color-on-dark-faint;
+    }
+
+    &__legal {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: @spacing-md;
+    }
+
+    &__consent {
+        border: 0;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        font-family: @font-primary;
+        font-size: inherit;
+        letter-spacing: inherit;
+        color: @color-on-dark-faint;
+        transition: color @duration-fast ease;
+
+        &:hover {
+            color: @color-primary-light;
+        }
+    }
+
+    @media (max-width: @breakpoint-tablet) {
+        padding: 64px @layout-gutter 32px;
+
+        &__inner {
+            gap: 44px;
+        }
+
+        &__columns {
+            gap: 32px;
+        }
+    }
+}

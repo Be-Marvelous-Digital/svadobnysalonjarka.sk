@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.local
+*.tsbuildinfo
+.DS_Store
+.deploy_history
+.design
+
+# Source photos handed over by the client, not shipped with the app.
+foto/
+
+# Playwright MCP scratch output.
+.playwright-mcp/

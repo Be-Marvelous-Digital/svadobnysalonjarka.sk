@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+    <rect width="32" height="32" fill="#1b1815" />
+    <text
+        x="16"
+        y="22"
+        font-family="Cormorant Garamond, Times New Roman, serif"
+        font-size="18"
+        fill="#a9834f"
+        text-anchor="middle"
+    >
+        J
+    </text>
+</svg>

@@ -1,0 +1,77 @@
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: @z-lightbox;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    background: rgba(19, 17, 15, 0.96);
+    animation: jFade @duration-fast ease both;
+
+    &__image {
+        max-width: 92vw;
+        max-height: 76vh;
+        object-fit: contain;
+        display: block;
+        .reveal-up();
+    }
+
+    &__close,
+    &__nav {
+        position: absolute;
+        border: 0;
+        background: none;
+        cursor: pointer;
+        color: rgba(253, 252, 250, 0.72);
+    }
+
+    &__close {
+        top: 28px;
+        right: 36px;
+        font-size: @font-size-xs;
+        letter-spacing: @letter-spacing-wider;
+        text-transform: uppercase;
+        color: rgba(253, 252, 250, 0.75);
+    }
+
+    &__nav {
+        font-size: 26px;
+        padding: 20px;
+
+        &--prev {
+            left: 36px;
+        }
+
+        &--next {
+            right: 36px;
+        }
+    }
+
+    &__label {
+        position: absolute;
+        bottom: 30px;
+        font-size: @font-size-xxs;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: rgba(253, 252, 250, 0.55);
+    }
+
+    @media (max-width: @breakpoint-tablet) {
+        padding: 72px @spacing-sm;
+
+        &__nav {
+            bottom: @spacing-md;
+            font-size: 30px;
+            padding: @spacing-sm 22px;
+
+            &--prev {
+                left: @spacing-sm;
+            }
+
+            &--next {
+                right: @spacing-sm;
+            }
+        }
+    }
+}

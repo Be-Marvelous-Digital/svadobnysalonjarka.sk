@@ -1,0 +1,67 @@
+.drawer {
+    position: fixed;
+    inset: 0;
+    z-index: @z-drawer;
+    display: flex;
+    flex-direction: column;
+    padding: @spacing-lg 24px @spacing-xl;
+    background: @color-background;
+    overflow-y: auto;
+    animation: jFade 0.25s ease both;
+
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    &__brand {
+        font-family: @font-display;
+        font-size: 20px;
+        letter-spacing: @letter-spacing-wide;
+        text-transform: uppercase;
+        color: @color-ink;
+    }
+
+    &__close {
+        border: 0;
+        background: none;
+        cursor: pointer;
+        font-size: @font-size-xs;
+        letter-spacing: @letter-spacing-wider;
+        text-transform: uppercase;
+        color: @color-text-secondary;
+    }
+
+    &__links {
+        display: flex;
+        flex-direction: column;
+        margin-top: 34px;
+        font-family: @font-display;
+        font-weight: @font-weight-light;
+    }
+
+    &__link {
+        padding: @spacing-md 0;
+        border-bottom: 1px solid @color-border;
+        font-size: @font-size-xl;
+        color: @color-ink;
+
+        &:last-child {
+            border-bottom: 0;
+        }
+
+        &--accent {
+            color: @color-primary;
+        }
+    }
+
+    &__actions {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding-top: 30px;
+    }
+}

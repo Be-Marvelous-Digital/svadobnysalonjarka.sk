@@ -1,0 +1,69 @@
+# docker-compose.yml — Svadobný salón Jarka
+#
+# MongoDB is not a service here: the project uses MongoDB Atlas, configured
+# through MONGODB_URI in backend/.env.
+#
+# Both services run the SAME image (built once, from the repo root Dockerfile) —
+# only `command` and `user` differ. `web` has no `build:` of its own; it just
+# references the tag `api` builds or pulls.
+#
+# CI (.github/workflows/ci.yml) builds and pushes this image to GHCR on every
+# push to main, tagged `latest` and the commit sha. A deploy host only ever needs
+# `docker compose pull && docker compose up -d` — `build:` below is kept for
+# local development, where there is no registry to pull from.
+
+name: svadobnysalonjarka
+
+services:
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: ghcr.io/be-marvelous-digital/svadobnysalonjarka.sk:${TAG:-latest}
+        command: ['node', 'dist/index.js']
+        user: node
+        restart: unless-stopped
+        env_file:
+            - ./backend/.env
+        environment:
+            NODE_ENV: production
+            PORT: 4000
+            UPLOAD_DIR: /var/lib/jarka/uploads
+        volumes:
+            - gallery-uploads:/var/lib/jarka/uploads
+        expose:
+            - '4000'
+        logging:
+            driver: json-file
+            options:
+                max-size: '5m'
+                max-file: '2'
+        networks: [jarka]
+
+    web:
+        image: ghcr.io/be-marvelous-digital/svadobnysalonjarka.sk:${TAG:-latest}
+        command: ['nginx', '-g', 'daemon off;']
+        user: nginx
+        restart: unless-stopped
+        depends_on:
+            - api
+        ports:
+            - '${WEB_PORT:-8080}:8080'
+        volumes:
+            # Read-only: nginx serves these, only the API may write them.
+            - gallery-uploads:/srv/uploads:ro
+        logging:
+            driver: json-file
+            options:
+                max-size: '5m'
+                max-file: '2'
+        networks: [jarka]
+
+volumes:
+    # Gallery photos uploaded through the admin. Survives container rebuilds;
+    # back this up alongside Atlas, it is the only state not held in the database.
+    gallery-uploads:
+
+networks:
+    jarka:
+        driver: bridge

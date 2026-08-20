@@ -1,0 +1,12 @@
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+        opacity @duration-slow ease,
+        transform @duration-slow @ease-out-expo;
+
+    &[data-revealed='true'] {
+        opacity: 1;
+        transform: none;
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "plugins": ["typescript", "oxc"],
+    "env": { "node": true, "es2023": true },
+    "ignorePatterns": ["dist"],
+    "rules": {
+        "no-unused-vars": "warn"
+    }
+}

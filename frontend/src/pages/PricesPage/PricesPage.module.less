@@ -1,0 +1,118 @@
+.prices {
+    .page-shell();
+
+    &__inner {
+        .container(@layout-max-width-narrow);
+        display: flex;
+        flex-direction: column;
+        gap: 64px;
+    }
+
+    &__intro {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-md;
+        .reveal-up();
+    }
+
+    &__kicker {
+        .kicker();
+    }
+
+    &__title {
+        font-size: clamp(38px, 5vw, 76px);
+        line-height: 1;
+        color: @color-ink;
+    }
+
+    &__lead {
+        max-width: 60ch;
+        font-size: @font-size-md;
+        line-height: 1.8;
+        color: @color-text-secondary;
+    }
+
+    &__table {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        border-top: 1px solid @color-border;
+    }
+
+    &__item {
+        padding: 34px 32px 34px 0;
+        border-bottom: 1px solid @color-border;
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-xs;
+    }
+
+    &__itemName {
+        font-family: @font-display;
+        font-size: @font-size-xl;
+        color: @color-ink;
+    }
+
+    &__itemNote {
+        font-size: 14px;
+        color: @color-text-secondary;
+    }
+
+    &__price {
+        padding: 34px 0;
+        border-bottom: 1px solid @color-border;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        font-family: @font-display;
+        font-size: 30px;
+        color: @color-primary;
+    }
+
+    &__notes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: @spacing-xl;
+    }
+
+    &__note {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-sm;
+    }
+
+    &__noteTitle {
+        font-size: @font-size-xxs;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: @color-primary;
+    }
+
+    &__noteBody {
+        font-size: @font-size-base;
+        line-height: 1.8;
+        color: @color-text-secondary;
+    }
+
+    &__cta {
+        align-self: flex-start;
+    }
+
+    @media (max-width: @breakpoint-tablet) {
+        &__inner {
+            gap: 44px;
+        }
+
+        &__table {
+            grid-template-columns: 1fr auto;
+        }
+
+        &__item {
+            padding: 24px 20px 24px 0;
+        }
+
+        &__price {
+            padding: 24px 0;
+            font-size: 24px;
+        }
+    }
+}

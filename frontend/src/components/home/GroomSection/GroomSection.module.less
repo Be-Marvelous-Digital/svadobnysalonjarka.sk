@@ -1,0 +1,70 @@
+.groom {
+    position: relative;
+    background: @color-ink;
+    color: @color-on-dark;
+    overflow: hidden;
+
+    &__inner {
+        .container();
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        align-items: stretch;
+    }
+
+    &__copy {
+        padding: @spacing-section 60px @spacing-section @layout-gutter;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: @spacing-lg;
+    }
+
+    &__kicker {
+        font-size: @font-size-xxs;
+        letter-spacing: @letter-spacing-widest;
+        text-transform: uppercase;
+        color: @color-primary-light;
+    }
+
+    &__title {
+        font-size: clamp(32px, 3.6vw, 56px);
+        line-height: 1.06;
+    }
+
+    &__body {
+        max-width: 46ch;
+        font-size: @font-size-md;
+        line-height: 1.85;
+        color: @color-on-dark-muted;
+    }
+
+    &__cta {
+        align-self: flex-start;
+    }
+
+    &__frame {
+        min-height: 460px;
+        overflow: hidden;
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    @media (max-width: @breakpoint-tablet) {
+        &__inner {
+            grid-template-columns: 1fr;
+        }
+
+        &__copy {
+            padding: 72px @layout-gutter;
+        }
+
+        &__frame {
+            min-height: 320px;
+        }
+    }
+}

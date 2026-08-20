@@ -1,0 +1,121 @@
+.bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: @z-cookie-bar;
+    background: @color-ink;
+    color: @color-on-dark;
+    border-top: 1px solid rgba(253, 252, 250, 0.14);
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: jFadeUp @duration-fast @ease-out-expo both;
+
+    &__inner {
+        .container(@layout-max-width-narrow);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: @spacing-lg @spacing-xl;
+        padding: @spacing-lg @layout-gutter;
+    }
+
+    &__copy {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-xs;
+    }
+
+    &__title {
+        font-size: @font-size-xxs;
+        letter-spacing: @letter-spacing-widest;
+        text-transform: uppercase;
+        color: @color-primary-light;
+    }
+
+    &__text {
+        max-width: 74ch;
+        font-size: 14px;
+        line-height: 1.7;
+        color: @color-on-dark-muted;
+
+        a {
+            color: @color-primary-light;
+            border-bottom: 1px solid rgba(198, 169, 123, 0.45);
+
+            &:hover {
+                color: @color-on-dark;
+                border-bottom-color: @color-on-dark;
+            }
+        }
+    }
+
+    // Both choices are one click, same size, same layer — refusing must cost no more than agreeing.
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: @spacing-sm;
+        flex: 0 0 auto;
+    }
+
+    &__button {
+        min-width: 152px;
+        min-height: 44px;
+        padding: 13px 26px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-family: @font-primary;
+        font-size: @font-size-xxs;
+        letter-spacing: @letter-spacing-wide;
+        text-transform: uppercase;
+        transition:
+            background @duration-fast ease,
+            border-color @duration-fast ease,
+            color @duration-fast ease;
+
+        &--ghost {
+            background: transparent;
+            border-color: @color-on-dark-border;
+            color: @color-on-dark;
+
+            &:hover {
+                background: rgba(253, 252, 250, 0.12);
+                border-color: @color-on-dark;
+            }
+        }
+
+        &--solid {
+            background: @color-on-dark;
+            color: @color-ink;
+
+            &:hover {
+                background: @color-primary-light;
+                color: @color-ink;
+            }
+        }
+    }
+
+    @media (max-width: @breakpoint-tablet) {
+        // Clears the sticky call/booking bar so neither covers the other.
+        bottom: @mobile-bar-height;
+
+        &__inner {
+            flex-direction: column;
+            align-items: stretch;
+            gap: @spacing-md;
+            padding: @spacing-md @layout-gutter;
+        }
+
+        &__text {
+            font-size: @font-size-sm;
+        }
+
+        &__actions {
+            flex-wrap: nowrap;
+        }
+
+        &__button {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+}
