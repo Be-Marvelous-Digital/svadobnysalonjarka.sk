@@ -13,7 +13,9 @@ WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci
 
-COPY frontend/tsconfig*.json frontend/vite.config.ts frontend/index.html ./
+# sitemap.plugin.ts is referenced by both vite.config.ts and tsconfig.node.json,
+# so leaving it out fails the build at `tsc -b`, not at runtime.
+COPY frontend/tsconfig*.json frontend/vite.config.ts frontend/sitemap.plugin.ts frontend/index.html ./
 COPY frontend/public ./public
 COPY frontend/src ./src
 

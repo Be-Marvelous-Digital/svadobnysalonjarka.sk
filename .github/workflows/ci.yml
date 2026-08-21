@@ -71,6 +71,10 @@ jobs:
     e2e:
         name: End-to-end tests
         runs-on: ubuntu-latest
+        # Only worth ~2 minutes of browser time once lint, format, typecheck and
+        # build have already passed. A formatting slip should fail in 40 seconds.
+        needs: [frontend]
+        timeout-minutes: 15
         defaults:
             run:
                 working-directory: frontend
@@ -85,10 +89,26 @@ jobs:
 
             - run: npm ci
 
+            # The browsers are ~180 MB and change only when @playwright/test does,
+            # so the lockfile hash is the right cache key.
+            - name: Cache browsers
+              id: playwright-cache
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: playwright-${{ runner.os }}-${{ hashFiles('frontend/package-lock.json') }}
+
             # Chromium and WebKit only: the suite covers a desktop and an iPhone
             # profile, and Firefox would add install time for no extra coverage.
+            # System libraries live outside the cached directory, so --with-deps
+            # runs on every job either way; only the download is skipped.
             - name: Install browsers
+              if: steps.playwright-cache.outputs.cache-hit != 'true'
               run: npx playwright install --with-deps chromium webkit
+
+            - name: Install browser system dependencies
+              if: steps.playwright-cache.outputs.cache-hit == 'true'
+              run: npx playwright install-deps chromium webkit
 
             - name: Run Playwright
               run: npm run e2e
