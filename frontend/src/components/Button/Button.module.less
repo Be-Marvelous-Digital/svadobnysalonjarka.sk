@@ -45,6 +45,7 @@
         &:hover:not(:disabled) {
             background: @color-primary-dark;
             box-shadow: @shadow-cta;
+            color: @color-on-dark;
         }
     }
 
@@ -66,6 +67,7 @@
         &:hover:not(:disabled) {
             background: @color-surface-muted;
             border-color: @color-primary;
+            color: @color-ink;
         }
     }
 
@@ -77,6 +79,8 @@
         &:hover:not(:disabled) {
             background: rgba(253, 252, 250, 0.14);
             border-color: @color-on-dark;
+            // Without this the global `a:hover` turns it near-black on a dark panel.
+            color: @color-on-dark;
         }
     }
 

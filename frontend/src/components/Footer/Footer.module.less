@@ -75,6 +75,13 @@
     a&__contactRow {
         align-items: center;
         min-height: @touch-target-min;
+        transition: color @duration-fast ease;
+
+        // Without this the global `a:hover` applies, and its colour is this
+        // footer's exact background.
+        &:hover {
+            color: @color-on-dark;
+        }
     }
 
     &__social {
@@ -90,6 +97,11 @@
             align-items: center;
             min-height: @touch-target-min;
             color: @color-primary-light;
+            transition: color @duration-fast ease;
+
+            &:hover {
+                color: @color-on-dark;
+            }
         }
     }
 

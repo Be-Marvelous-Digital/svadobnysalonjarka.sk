@@ -18,6 +18,11 @@
 
     &:focus-visible {
         transform: none;
+    }
+
+    // It sits on a dark chip, so it has to hold its colour in both states.
+    &:hover,
+    &:focus-visible {
         color: @color-on-dark;
     }
 }
