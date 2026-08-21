@@ -18,7 +18,7 @@ import {
     reservationPatchSchema,
     settingsSchema,
 } from '../schemas.js';
-import { removePhotoFile, storePhoto } from '../services/photoStorage.js';
+import { removePhotoFile, storePhoto, UnsupportedImageError } from '../services/photoStorage.js';
 import { generateSlots, isSlotFree } from '../services/slots.js';
 
 export const adminRouter = Router();
@@ -31,9 +31,12 @@ const loginLimiter = rateLimit({
     message: { error: 'Príliš veľa pokusov. Skúste to o chvíľu znova.' },
 });
 
+const MAX_FILES = 10;
+
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 12 * 1024 * 1024, files: 20 },
+    limits: { fileSize: 12 * 1024 * 1024, files: MAX_FILES },
+    // A first cheap filter only; storePhoto decides for real, from the decoded bytes.
     fileFilter: (_req, file, cb) => cb(null, file.mimetype.startsWith('image/')),
 });
 
@@ -187,7 +190,7 @@ async function nextOrder(category: CategoryKey): Promise<number> {
     return (last?.order ?? -1) + 1;
 }
 
-adminRouter.post('/photos/:category', requireAdmin, upload.array('photos', 20), async (req, res) => {
+adminRouter.post('/photos/:category', requireAdmin, upload.array('photos', MAX_FILES), async (req, res) => {
     const parsed = categoryParamSchema.safeParse(req.params);
     if (!parsed.success) {
         res.status(400).json({ error: 'Neznáma kategória.' });
@@ -202,7 +205,16 @@ adminRouter.post('/photos/:category', requireAdmin, upload.array('photos', 20), 
     let order = await nextOrder(category);
     const created = [];
     for (const file of files) {
-        const url = await storePhoto(category, file.buffer);
+        let url: string;
+        try {
+            url = await storePhoto(category, file.buffer);
+        } catch (error) {
+            if (error instanceof UnsupportedImageError) {
+                res.status(400).json({ error: error.message });
+                return;
+            }
+            throw error;
+        }
         try {
             const doc = await Photo.create({ category, url, order: order++ });
             created.push({ id: String(doc._id), category, url });
@@ -231,7 +243,16 @@ adminRouter.put('/photos/:id', requireAdmin, upload.single('photo'), async (req,
     }
 
     const previousUrl = photo.url;
-    const url = await storePhoto(photo.category as CategoryKey, req.file.buffer);
+    let url: string;
+    try {
+        url = await storePhoto(photo.category as CategoryKey, req.file.buffer);
+    } catch (error) {
+        if (error instanceof UnsupportedImageError) {
+            res.status(400).json({ error: error.message });
+            return;
+        }
+        throw error;
+    }
     try {
         photo.url = url;
         await photo.save();

@@ -11,7 +11,10 @@
         "format": "prettier --write \"src/**/*.{ts,tsx,less}\"",
         "format:check": "prettier --check \"src/**/*.{ts,tsx,less}\"",
         "check": "npm run lint && npm run format:check && npm run typecheck && npm run build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "e2e": "playwright test",
+        "e2e:ui": "playwright test --ui",
+        "e2e:report": "playwright show-report"
     },
     "dependencies": {
         "react": "^19.2.7",
@@ -19,6 +22,7 @@
         "react-router-dom": "^7.18.2"
     },
     "devDependencies": {
+        "@playwright/test": "^1.62.1",
         "@types/node": "^24.13.2",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",

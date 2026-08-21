@@ -8,11 +8,15 @@
 @color-ink: #1b1815;
 @color-ink-deep: #13110f;
 @color-text-secondary: #6e6660;
-@color-text-tertiary: #8c8378;
+@color-text-tertiary: #7a7168; // 4.67:1 on the page background
 @color-text-disabled: #a39a90;
+// #a9834f is the brand gold, but it only reaches 3.39:1 on the cream background —
+// fine for rules, borders and fills sitting behind dark text, not for text itself.
 @color-primary: #a9834f;
 @color-primary-dark: #8f6c3d;
 @color-primary-light: #c6a97b;
+/** The gold allowed to carry text: 5.08:1 on cream, 4.67:1 on the muted surface. */
+@color-primary-text: #8a6739;
 @color-border: #ede6dc;
 @color-border-strong: #ded4c7;
 @color-accent-soft: #e8d9cf;
@@ -50,6 +54,8 @@
 @font-size-md: 16px;
 @font-size-lg: 21px;
 @font-size-xl: 27px;
+/** Floor for anything focusable on touch: below 16px iOS Safari zooms the viewport. */
+@font-size-safe-touch: 16px;
 
 @letter-spacing-tight: 0.1em;
 @letter-spacing-wide: 0.16em;
@@ -74,6 +80,8 @@
 @layout-gutter: clamp(20px, 3vw, 40px);
 @header-height: 60px;
 @mobile-bar-height: 57px;
+/** WCAG 2.5.5 / platform HIG floor for anything tappable. */
+@touch-target-min: 44px;
 
 // Radii, shadows, borders
 @border-radius-none: 0;
@@ -95,6 +103,7 @@
 @z-cookie-bar: 75;
 @z-drawer: 80;
 @z-lightbox: 90;
+@z-skip-link: 100;
 
 // Breakpoints
 @breakpoint-mobile: 640px;

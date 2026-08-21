@@ -15,7 +15,11 @@ export const AdminPage = () => {
     const { login } = session;
     const handleLogin = useCallback((username: string, password: string) => void login(username, password), [login]);
 
-    usePageMeta({ title: 'Správa obsahu — Svadobný salón Jarka', description: 'Interná správa rezervácií a galérie.' });
+    usePageMeta({
+        title: 'Správa obsahu — Svadobný salón Jarka',
+        description: 'Interná správa rezervácií a galérie.',
+        noIndex: true,
+    });
 
     if (session.checking) return <section className={styles.admin} />;
 

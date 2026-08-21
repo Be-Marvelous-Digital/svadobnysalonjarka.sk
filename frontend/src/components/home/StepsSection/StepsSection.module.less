@@ -11,7 +11,7 @@
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
         gap: 44px;
     }
 
@@ -49,14 +49,14 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__number {
         font-family: @font-display;
         font-size: @font-size-base;
         letter-spacing: @letter-spacing-tight;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__title {

@@ -8,6 +8,7 @@ import { MobileDrawer } from '@/components/MobileDrawer';
 import { MOBILE_QUERY, useMediaQuery } from '@/hooks/useMediaQuery';
 import { useScrollState } from '@/hooks/useScrollState';
 import { ROUTES } from '@/utils/routes';
+import styles from './Layout.module.less';
 
 export const Layout = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -22,8 +23,16 @@ export const Layout = () => {
 
     return (
         <>
-            <Header transparent={onHomeHero} hidden={navHidden && !drawerOpen} onOpenDrawer={openDrawer} />
-            <main>
+            <a href="#obsah" className={styles.skipLink}>
+                Preskočiť na obsah
+            </a>
+            <Header
+                transparent={onHomeHero}
+                hidden={navHidden && !drawerOpen}
+                drawerOpen={drawerOpen}
+                onOpenDrawer={openDrawer}
+            />
+            <main id="obsah">
                 <Outlet />
             </main>
             <Footer />

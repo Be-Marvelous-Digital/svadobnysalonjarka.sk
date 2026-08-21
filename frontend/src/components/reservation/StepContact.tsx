@@ -8,10 +8,9 @@ interface StepContactProps {
     valid: boolean;
     onChange: (changes: Partial<ReservationDraft>) => void;
     onBack: () => void;
-    onNext: () => void;
 }
 
-export const StepContact = ({ draft, valid, onChange, onBack, onNext }: StepContactProps) => (
+export const StepContact = ({ draft, valid, onChange, onBack }: StepContactProps) => (
     <div className={styles.step}>
         <div className={styles.step__contactGrid}>
             <Field label="Meno a priezvisko" className={styles.step__wide}>
@@ -51,7 +50,7 @@ export const StepContact = ({ draft, valid, onChange, onBack, onNext }: StepCont
             <button type="button" className={styles.step__back} onClick={onBack}>
                 ← Späť
             </button>
-            <Button variant="dark" onClick={onNext} disabled={!valid}>
+            <Button type="submit" variant="dark" disabled={!valid}>
                 Skontrolovať
             </Button>
         </div>

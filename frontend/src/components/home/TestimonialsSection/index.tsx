@@ -25,7 +25,9 @@ export const TestimonialsSection = () => (
             <div className={styles.testimonials__grid}>
                 {QUOTES.map((quote) => (
                     <figure key={quote.author} className={styles.quote}>
-                        <span className={styles.quote__mark}>”</span>
+                        <span className={styles.quote__mark} aria-hidden="true">
+                            ”
+                        </span>
                         <blockquote className={styles.quote__text}>{quote.text}</blockquote>
                         <figcaption className={styles.quote__author}>{quote.author}</figcaption>
                     </figure>

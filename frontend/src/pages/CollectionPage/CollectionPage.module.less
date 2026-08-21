@@ -42,7 +42,7 @@
         font-style: italic;
         font-size: clamp(19px, 1.6vw, 24px);
         line-height: 1.55;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__description {
@@ -68,7 +68,7 @@
 
     &__facts {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
         gap: 28px @spacing-xl;
     }
 
@@ -88,7 +88,7 @@
         height: 20px;
         border-radius: @border-radius-circle;
         background: @color-surface-muted;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__factText {
@@ -112,7 +112,7 @@
         font-size: @font-size-xxs;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__emptyText {
@@ -132,6 +132,9 @@
     }
 
     &__chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: @touch-target-min;
         padding: @spacing-sm 22px;
         border: 1px solid @color-border;
         font-size: @font-size-xxs;
@@ -149,7 +152,7 @@
         }
 
         &--accent {
-            color: @color-primary;
+            color: @color-primary-text;
         }
     }
 

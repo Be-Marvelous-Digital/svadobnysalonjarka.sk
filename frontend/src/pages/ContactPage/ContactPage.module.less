@@ -27,7 +27,7 @@
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
         gap: @spacing-xxl;
         align-items: start;
     }
@@ -48,19 +48,20 @@
         font-size: @font-size-xxs;
         letter-spacing: 0.24em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__value {
         display: inline-flex;
         align-items: center;
+        min-height: @touch-target-min;
         gap: @spacing-sm;
         font-family: @font-display;
         font-size: @font-size-lg + 5px;
         color: @color-ink;
 
         &:hover {
-            color: @color-primary;
+            color: @color-primary-text;
         }
 
         &--email {
@@ -91,7 +92,7 @@
         color: @color-text-secondary;
 
         &--closed {
-            color: @color-primary;
+            color: @color-primary-text;
         }
     }
 
@@ -113,6 +114,9 @@
 
     &__mapLink {
         align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        min-height: @touch-target-min;
         font-size: @font-size-xs;
         letter-spacing: 0.2em;
         text-transform: uppercase;
@@ -132,6 +136,12 @@
         font-size: @font-size-xs;
         letter-spacing: 0.2em;
         text-transform: uppercase;
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            min-height: @touch-target-min;
+        }
     }
 
     @media (max-width: @breakpoint-tablet) {

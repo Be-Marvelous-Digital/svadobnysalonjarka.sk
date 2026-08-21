@@ -8,7 +8,7 @@ export const HeroSection = () => (
         <div className={styles.hero__image} />
         <div className={styles.hero__scrim} />
         <div className={styles.hero__vignette} />
-        <div className={styles.hero__copy}>
+        <div className={styles.hero__copy} data-over-media="true">
             <span className={styles.hero__kicker}>Svadobný salón · Galanta</span>
             <h1 className={styles.hero__title}>
                 Šaty, v ktorých

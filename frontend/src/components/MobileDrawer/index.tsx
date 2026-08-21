@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ButtonAnchor, ButtonLink } from '@/components/Button';
 import { PhoneIcon } from '@/components/Icon';
 import { COLLECTIONS } from '@/data/collections';
 import { CONTACT } from '@/data/contact';
+import { useDialog } from '@/hooks/useDialog';
 import { collectionPath, ROUTES } from '@/utils/routes';
 import styles from './MobileDrawer.module.less';
 
@@ -12,16 +12,10 @@ interface MobileDrawerProps {
 }
 
 export const MobileDrawer = ({ onClose }: MobileDrawerProps) => {
-    useEffect(() => {
-        const previous = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = previous;
-        };
-    }, []);
+    const ref = useDialog<HTMLDivElement>(onClose);
 
     return (
-        <div className={styles.drawer}>
+        <div ref={ref} className={styles.drawer} role="dialog" aria-modal="true" aria-label="Menu">
             <div className={styles.drawer__top}>
                 <span className={styles.drawer__brand}>{CONTACT.salonName}</span>
                 <button type="button" className={styles.drawer__close} onClick={onClose}>

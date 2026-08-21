@@ -28,7 +28,7 @@
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
         gap: @spacing-xxl 72px;
         align-items: center;
     }
@@ -69,11 +69,11 @@
     &__statValue {
         font-family: @font-display;
         font-size: 36px;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__statLabel {
-        font-size: 10.5px;
+        font-size: @font-size-xs;
         letter-spacing: @letter-spacing-wide;
         text-transform: uppercase;
         color: @color-text-secondary;
@@ -95,6 +95,20 @@
 
         &__grid {
             gap: @spacing-xl;
+        }
+    }
+
+    @media (max-width: @breakpoint-mobile) {
+        &__stats {
+            grid-template-columns: 1fr;
+            gap: @spacing-md;
+        }
+
+        &__stat {
+            flex-direction: row;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: @spacing-md;
         }
     }
 }

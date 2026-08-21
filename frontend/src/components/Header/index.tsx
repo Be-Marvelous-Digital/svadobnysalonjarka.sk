@@ -9,10 +9,11 @@ import styles from './Header.module.less';
 interface HeaderProps {
     transparent: boolean;
     hidden: boolean;
+    drawerOpen: boolean;
     onOpenDrawer: () => void;
 }
 
-export const Header = ({ transparent, hidden, onOpenDrawer }: HeaderProps) => {
+export const Header = ({ transparent, hidden, drawerOpen, onOpenDrawer }: HeaderProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const openMenu = useCallback(() => setMenuOpen(true), []);
@@ -24,7 +25,7 @@ export const Header = ({ transparent, hidden, onOpenDrawer }: HeaderProps) => {
         .join(' ');
 
     return (
-        <header className={className}>
+        <header className={className} data-over-media={transparent || undefined}>
             <div className={styles.header__inner}>
                 <Link to={ROUTES.home} className={styles.header__brand}>
                     <span className={styles.header__brandName}>{CONTACT.salonName}</span>
@@ -81,7 +82,13 @@ export const Header = ({ transparent, hidden, onOpenDrawer }: HeaderProps) => {
                     Objednať skúšku
                 </ButtonLink>
 
-                <button type="button" className={styles.header__burger} onClick={onOpenDrawer} aria-label="Otvoriť menu">
+                <button
+                    type="button"
+                    className={styles.header__burger}
+                    onClick={onOpenDrawer}
+                    aria-label="Otvoriť menu"
+                    aria-expanded={drawerOpen}
+                >
                     <span />
                     <span />
                 </button>

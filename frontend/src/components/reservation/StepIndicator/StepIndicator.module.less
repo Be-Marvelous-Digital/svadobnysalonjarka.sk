@@ -1,6 +1,9 @@
 .steps {
     display: flex;
     align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 
     &__item {
         flex: 1;
@@ -23,11 +26,11 @@
         justify-content: center;
         font-size: @font-size-xs;
         background: @color-surface;
-        color: @color-primary;
+        color: @color-primary-text;
         transition: background 0.4s ease;
 
         &--active {
-            background: @color-primary;
+            background: @color-primary-text;
             color: @color-on-dark;
         }
     }

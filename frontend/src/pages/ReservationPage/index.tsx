@@ -1,3 +1,4 @@
+import { useCallback, type FormEvent } from 'react';
 import { ReservationDone } from '@/components/reservation/ReservationDone';
 import formStyles from '@/components/reservation/ReservationForm.module.less';
 import { StepContact } from '@/components/reservation/StepContact';
@@ -10,6 +11,16 @@ import styles from './ReservationPage.module.less';
 
 export const ReservationPage = () => {
     const form = useReservationForm();
+
+    // Enter now does what the visible primary button does on whichever step is showing.
+    const handleSubmit = useCallback(
+        (event: FormEvent) => {
+            event.preventDefault();
+            if (form.step === 3) void form.submit();
+            else form.next();
+        },
+        [form],
+    );
 
     usePageMeta({
         title: 'Rezervácia termínu — Svadobný salón Jarka Galanta',
@@ -32,33 +43,27 @@ export const ReservationPage = () => {
                 {form.done && form.confirmed ? (
                     <ReservationDone reservation={form.confirmed} onReset={form.reset} />
                 ) : (
-                    <div className={formStyles.form}>
+                    <form className={formStyles.form} onSubmit={handleSubmit} noValidate>
                         <StepIndicator current={form.step} />
 
+                        {form.error ? (
+                            <p className={formStyles.form__error} role="alert">
+                                {form.error}
+                            </p>
+                        ) : null}
+
                         {form.step === 1 ? (
-                            <StepSchedule draft={form.draft} valid={form.stepValid} onChange={form.patch} onNext={form.next} />
+                            <StepSchedule draft={form.draft} valid={form.stepValid} onChange={form.patch} />
                         ) : null}
 
                         {form.step === 2 ? (
-                            <StepContact
-                                draft={form.draft}
-                                valid={form.stepValid}
-                                onChange={form.patch}
-                                onBack={form.back}
-                                onNext={form.next}
-                            />
+                            <StepContact draft={form.draft} valid={form.stepValid} onChange={form.patch} onBack={form.back} />
                         ) : null}
 
                         {form.step === 3 ? (
-                            <StepReview
-                                draft={form.draft}
-                                submitting={form.submitting}
-                                error={form.error}
-                                onBack={form.back}
-                                onSubmit={form.submit}
-                            />
+                            <StepReview draft={form.draft} submitting={form.submitting} onBack={form.back} />
                         ) : null}
-                    </div>
+                    </form>
                 )}
             </div>
         </section>

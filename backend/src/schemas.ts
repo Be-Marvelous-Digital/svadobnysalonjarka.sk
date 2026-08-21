@@ -51,5 +51,9 @@ export const availabilityQuerySchema = z.object({
 });
 
 export const photoUrlSchema = z.object({
-    url: z.url().max(600),
+    // z.url() alone accepts javascript: and data:, which have no business in an <img src>.
+    url: z
+        .url()
+        .max(600)
+        .refine((value) => /^https?:\/\//i.test(value), 'Odkaz musí začínať http:// alebo https://'),
 });

@@ -15,30 +15,38 @@
     }
 
     &__more {
+        display: inline-flex;
+        align-items: flex-end;
+        min-height: @touch-target-min;
         font-size: @font-size-xs;
         letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
         border-bottom: 1px solid @color-accent-soft;
         padding-bottom: 6px;
         white-space: nowrap;
         transition: border-color 0.4s ease;
 
         &:hover {
-            color: @color-primary;
+            color: @color-primary-text;
             border-bottom-color: @color-primary;
         }
     }
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
         gap: @spacing-md;
     }
 
     @media (max-width: @breakpoint-mobile) {
         &__grid {
             grid-template-columns: repeat(2, 1fr);
+        }
+
+        // An odd count would otherwise strand the last card in a half-empty row.
+        &__grid > :last-child:nth-child(odd) {
+            grid-column: ~'1 / -1'; // escaped: LESS math:always would fold the slash into a division
         }
     }
 }

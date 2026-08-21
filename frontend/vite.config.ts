@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
+import { sitemapPlugin } from './sitemap.plugin.ts';
 
 // Less resolves @import against the importing file, not Vite's aliases, so the shared
 // tokens are prepended by absolute path instead.
 const stylesDir = path.resolve(import.meta.dirname, './src/styles').replace(/\\/g, '/');
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [react(), sitemapPlugin()],
     resolve: {
         alias: {
             '@': path.resolve(import.meta.dirname, './src'),

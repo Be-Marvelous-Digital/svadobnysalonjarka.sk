@@ -25,6 +25,9 @@
     }
 
     &__close {
+        display: inline-flex;
+        align-items: center;
+        min-height: @touch-target-min;
         border: 0;
         background: none;
         cursor: pointer;
@@ -53,7 +56,7 @@
         }
 
         &--accent {
-            color: @color-primary;
+            color: @color-primary-text;
         }
     }
 

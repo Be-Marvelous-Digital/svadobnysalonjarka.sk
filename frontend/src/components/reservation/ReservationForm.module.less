@@ -7,6 +7,15 @@
     gap: @spacing-xl;
 }
 
+.form__error {
+    border: 1px solid @color-accent-soft;
+    background: @color-surface-muted;
+    padding: @spacing-md 20px;
+    font-size: @font-size-base;
+    line-height: 1.6;
+    color: @color-primary-text;
+}
+
 .step {
     display: flex;
     flex-direction: column;
@@ -24,7 +33,7 @@
         font-size: @font-size-xxs;
         letter-spacing: 0.24em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__chips {
@@ -41,18 +50,18 @@
 
     &__columns {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
         gap: 34px;
     }
 
     &__contactGrid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
         gap: @spacing-lg;
     }
 
     &__wide {
-        grid-column: 1 / -1;
+        grid-column: ~'1 / -1'; // escaped: LESS math:always would fold the slash into a division
     }
 
     &__note {
@@ -87,7 +96,7 @@
 
     &__error {
         font-size: @font-size-sm;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__recap {
@@ -102,7 +111,7 @@
         font-size: @font-size-xxs;
         letter-spacing: @letter-spacing-wider;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__recapValue {
@@ -159,7 +168,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: @color-primary;
+        color: @color-primary-text;
         font-size: 22px;
     }
 

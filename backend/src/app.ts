@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import pinoHttp from 'pino-http';
+import rateLimit from 'express-rate-limit';
 import { env } from './env.js';
 import { logger } from './logger.js';
 import { adminRouter } from './routes/admin.js';
@@ -23,6 +24,20 @@ export function createApp() {
         const dbUp = mongoose.connection.readyState === 1;
         res.status(dbUp ? 200 : 503).json({ status: dbUp ? 'ok' : 'degraded' });
     });
+
+    // Backstop only. The reservation and login routes keep their own far tighter limits;
+    // this one exists so /availability and /gallery cannot be hammered for free.
+    app.use(
+        '/api',
+        rateLimit({
+            windowMs: 60 * 1000,
+            limit: 120,
+            standardHeaders: 'draft-7',
+            legacyHeaders: false,
+            skip: (req) => req.path === '/health',
+            message: { error: 'Príliš veľa požiadaviek. Skúste to o chvíľu znova.' },
+        }),
+    );
 
     app.use('/api', publicRouter);
     app.use('/api/admin', adminRouter);

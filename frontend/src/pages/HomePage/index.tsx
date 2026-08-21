@@ -1,3 +1,4 @@
+import { StructuredData } from '@/components/StructuredData';
 import { CollectionsSection } from '@/components/home/CollectionsSection';
 import { CtaSection } from '@/components/home/CtaSection';
 import { GroomSection } from '@/components/home/GroomSection';
@@ -6,6 +7,7 @@ import { SocialSection } from '@/components/home/SocialSection';
 import { StepsSection } from '@/components/home/StepsSection';
 import { StorySection } from '@/components/home/StorySection';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
+import { LOCAL_BUSINESS_SCHEMA } from '@/data/schema';
 import { usePageMeta } from '@/hooks/usePageMeta';
 
 export const HomePage = () => {
@@ -17,6 +19,7 @@ export const HomePage = () => {
 
     return (
         <>
+            <StructuredData id="schema-salon" schema={LOCAL_BUSINESS_SCHEMA} />
             <HeroSection />
             <CollectionsSection />
             <StorySection />

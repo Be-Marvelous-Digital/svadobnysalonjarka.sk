@@ -1,0 +1,23 @@
+// Off-screen until focused, rather than display:none, so it stays in the tab order.
+.skipLink {
+    position: fixed;
+    top: @spacing-xs;
+    left: @spacing-xs;
+    z-index: @z-skip-link;
+    transform: translateY(calc(-100% - @spacing-lg));
+    padding: @spacing-sm @spacing-lg;
+    min-height: @touch-target-min;
+    display: inline-flex;
+    align-items: center;
+    background: @color-ink;
+    color: @color-on-dark;
+    font-size: @font-size-xs;
+    letter-spacing: @letter-spacing-wide;
+    text-transform: uppercase;
+    transition: transform @duration-fast @ease-out-expo;
+
+    &:focus-visible {
+        transform: none;
+        color: @color-on-dark;
+    }
+}

@@ -2,7 +2,7 @@
     font-size: @font-size-xxs;
     letter-spacing: @letter-spacing-widest;
     text-transform: uppercase;
-    color: @color-primary;
+    color: @color-primary-text;
 }
 
 .section-shell() {
@@ -47,6 +47,10 @@
     }
 }
 
+// `both` holds the element at opacity 0 until the animation runs, so it is gated
+// on the same `js` class as the scroll reveals.
 .reveal-up(@delay: 0s) {
-    animation: jFadeUp @duration-slow @ease-out-expo @delay both;
+    :global(html.js) & {
+        animation: jFadeUp @duration-slow @ease-out-expo @delay both;
+    }
 }

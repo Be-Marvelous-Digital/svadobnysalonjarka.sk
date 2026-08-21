@@ -8,12 +8,10 @@ import styles from './ReservationForm.module.less';
 interface StepReviewProps {
     draft: ReservationDraft;
     submitting: boolean;
-    error: string;
     onBack: () => void;
-    onSubmit: () => void;
 }
 
-export const StepReview = ({ draft, submitting, error, onBack, onSubmit }: StepReviewProps) => {
+export const StepReview = ({ draft, submitting, onBack }: StepReviewProps) => {
     const rows = [
         { label: 'Typ šiat', value: draft.cat, plain: false },
         { label: 'Dátum a čas', value: `${formatLongDate(draft.date)} · ${draft.time}`, plain: false },
@@ -46,13 +44,11 @@ export const StepReview = ({ draft, submitting, error, onBack, onSubmit }: StepR
                 </p>
             </div>
 
-            {error ? <span className={styles.step__error}>{error}</span> : null}
-
             <div className={styles.step__actions}>
                 <button type="button" className={styles.step__back} onClick={onBack}>
                     ← Späť
                 </button>
-                <Button variant="dark" onClick={onSubmit} disabled={submitting}>
+                <Button type="submit" variant="dark" disabled={submitting}>
                     <MailIcon /> {submitting ? 'Odosielam…' : 'Odoslať žiadosť'}
                 </Button>
             </div>

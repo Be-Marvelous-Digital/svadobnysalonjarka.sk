@@ -4,8 +4,10 @@ import { ButtonAnchor, ButtonLink } from '@/components/Button';
 import { CheckIcon, PhoneIcon } from '@/components/Icon';
 import { Lightbox } from '@/components/Lightbox';
 import { PhotoMosaic } from '@/components/PhotoMosaic';
+import { StructuredData } from '@/components/StructuredData';
 import { COLLECTIONS, findCollection } from '@/data/collections';
 import { CONTACT } from '@/data/contact';
+import { breadcrumbSchema, collectionSchema } from '@/data/schema';
 import { photosOf, useGallery } from '@/hooks/useGallery';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { collectionPath, ROUTES } from '@/utils/routes';
@@ -22,14 +24,21 @@ export const CollectionPage = () => {
     usePageMeta({
         title: collection ? `${collection.label} — Svadobný salón Jarka Galanta` : 'Kolekcia — Svadobný salón Jarka',
         description: collection?.description ?? '',
+        image: collection?.cover,
     });
 
     if (!collection) return <Navigate to={ROUTES.home} replace />;
 
     const photos = photosOf(gallery, collection.key);
+    const trail = [
+        { name: 'Domov', path: ROUTES.home },
+        { name: collection.label, path: collectionPath(collection.key) },
+    ];
 
     return (
         <section className={styles.collection}>
+            <StructuredData id="schema-collection" schema={collectionSchema(collection, photos.length)} />
+            <StructuredData id="schema-breadcrumb" schema={breadcrumbSchema(trail)} />
             <div className={styles.collection__inner}>
                 <header className={styles.collection__header}>
                     <div className={styles.collection__intro}>

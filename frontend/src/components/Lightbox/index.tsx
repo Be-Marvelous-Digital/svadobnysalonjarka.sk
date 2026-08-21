@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, type MouseEvent, type TouchEvent } from 'react';
+import { useDialog } from '@/hooks/useDialog';
 import styles from './Lightbox.module.less';
 
 const SWIPE_THRESHOLD = 45;
+/** Ignore gestures that are mostly vertical, so scrolling never pages the gallery. */
+const SWIPE_MAX_DRIFT = 60;
 
 interface LightboxProps {
     photos: string[];
@@ -12,35 +15,39 @@ interface LightboxProps {
 }
 
 export const Lightbox = ({ photos, index, label, onClose, onNavigate }: LightboxProps) => {
-    const touchStartX = useRef(0);
+    const touchStart = useRef({ x: 0, y: 0 });
+    const ref = useDialog<HTMLDivElement>(onClose);
 
     const goNext = useCallback(() => onNavigate((index + 1) % photos.length), [index, photos.length, onNavigate]);
     const goPrev = useCallback(() => onNavigate((index - 1 + photos.length) % photos.length), [index, photos.length, onNavigate]);
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') onClose();
             if (event.key === 'ArrowRight') goNext();
             if (event.key === 'ArrowLeft') goPrev();
         };
         window.addEventListener('keydown', onKeyDown);
-        const previous = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-            window.removeEventListener('keydown', onKeyDown);
-            document.body.style.overflow = previous;
-        };
-    }, [onClose, goNext, goPrev]);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [goNext, goPrev]);
+
+    // Keeps the next and previous frames warm so a swipe does not wait on a cold fetch.
+    useEffect(() => {
+        for (const offset of [1, -1]) {
+            const neighbour = photos[(index + offset + photos.length) % photos.length];
+            if (neighbour) new Image().src = neighbour;
+        }
+    }, [index, photos]);
 
     const onTouchStart = useCallback((event: TouchEvent<HTMLDivElement>) => {
-        touchStartX.current = event.touches[0]?.clientX ?? 0;
+        touchStart.current = { x: event.touches[0]?.clientX ?? 0, y: event.touches[0]?.clientY ?? 0 };
     }, []);
 
     const onTouchEnd = useCallback(
         (event: TouchEvent<HTMLDivElement>) => {
-            const delta = (event.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
-            if (Math.abs(delta) < SWIPE_THRESHOLD) return;
-            if (delta < 0) goNext();
+            const deltaX = (event.changedTouches[0]?.clientX ?? 0) - touchStart.current.x;
+            const deltaY = (event.changedTouches[0]?.clientY ?? 0) - touchStart.current.y;
+            if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaY) > SWIPE_MAX_DRIFT) return;
+            if (deltaX < 0) goNext();
             else goPrev();
         },
         [goNext, goPrev],
@@ -53,11 +60,14 @@ export const Lightbox = ({ photos, index, label, onClose, onNavigate }: Lightbox
 
     return (
         <div
+            ref={ref}
             className={styles.lightbox}
             onClick={onClose}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
-            role="presentation"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${label} — fotografia ${index + 1} z ${photos.length}`}
         >
             <button type="button" className={styles.lightbox__close} onClick={onClose}>
                 Zavrieť ✕

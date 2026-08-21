@@ -7,7 +7,7 @@
         font-size: @font-size-xxs;
         letter-spacing: 0.24em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__hint {
@@ -17,7 +17,7 @@
 
     &__error {
         font-size: @font-size-sm;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 }
 
@@ -33,5 +33,15 @@
         padding: 13px 16px;
         border-color: @color-border-strong;
         font-size: 14px;
+    }
+
+    // Safari on iOS force-zooms the viewport for any focused field under 16px
+    // and never zooms back out. Nothing below this line is a style choice.
+    @media (max-width: @breakpoint-tablet) {
+        font-size: @font-size-safe-touch;
+
+        &--compact {
+            font-size: @font-size-safe-touch;
+        }
     }
 }

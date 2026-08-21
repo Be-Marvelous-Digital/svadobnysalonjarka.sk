@@ -1,5 +1,9 @@
 # UX audit — svadobnysalonjarka.sk
 
+> **Status: resolved.** Everything below was fixed on 21 Aug 2026 and is now guarded
+> by the Playwright suite in `frontend/e2e` (105 tests, Chromium desktop + WebKit
+> iPhone). `npm run e2e`. The findings are kept as the record of what was wrong.
+
 Method: static review of `frontend/src` plus live measurement in Chromium against the dev
 server (stub API) at 320 / 375 / 768 / 900 / 1024 / 1280 px. Contrast ratios computed from
 composited colours, WCAG 2.1 AA thresholds.

@@ -4,9 +4,14 @@ import { env } from '../env.js';
 
 export const SESSION_COOKIE = 'jarka_session';
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
+/** Pinned so a token can never talk the verifier into a different algorithm. */
+const ALGORITHM = 'HS256';
 
 export function issueSession(res: Response, userId: string): void {
-    const token = jwt.sign({ role: 'admin', sub: userId }, env.JWT_SECRET, { expiresIn: SESSION_TTL_SECONDS });
+    const token = jwt.sign({ role: 'admin', sub: userId }, env.JWT_SECRET, {
+        algorithm: ALGORITHM,
+        expiresIn: SESSION_TTL_SECONDS,
+    });
     res.cookie(SESSION_COOKIE, token, {
         httpOnly: true,
         secure: env.COOKIE_SECURE,
@@ -27,7 +32,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
         return;
     }
     try {
-        const payload = jwt.verify(token, env.JWT_SECRET) as { role?: string };
+        const payload = jwt.verify(token, env.JWT_SECRET, { algorithms: [ALGORITHM] }) as { role?: string };
         if (payload.role !== 'admin') throw new Error('wrong role');
         next();
     } catch {

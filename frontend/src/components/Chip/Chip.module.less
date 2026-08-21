@@ -1,4 +1,10 @@
 .chip {
+    // Slot picking is the highest-consequence tap in the booking flow; never let a
+    // variant's padding drop it under the 44px minimum.
+    min-height: @touch-target-min;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     border: 1px solid @color-border;
     background: @color-surface;

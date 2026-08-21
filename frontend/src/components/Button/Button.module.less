@@ -2,6 +2,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: @touch-target-min;
     gap: 10px;
     border: 1px solid transparent;
     cursor: pointer;
@@ -32,13 +33,13 @@
         color: @color-on-dark;
 
         &:hover:not(:disabled) {
-            background: @color-primary;
+            background: @color-primary-text;
             color: @color-on-dark;
         }
     }
 
     &--gold {
-        background: @color-primary;
+        background: @color-primary-text;
         color: @color-on-dark;
 
         &:hover:not(:disabled) {
@@ -52,7 +53,7 @@
         color: @color-ink;
 
         &:hover:not(:disabled) {
-            background: @color-primary;
+            background: @color-primary-text;
             color: @color-on-dark;
         }
     }
@@ -82,8 +83,8 @@
     &:disabled {
         cursor: not-allowed;
         background: @color-border;
-        border-color: @color-border;
-        color: @color-text-disabled;
+        border-color: @color-border-strong;
+        color: @color-text-secondary;
         box-shadow: none;
     }
 

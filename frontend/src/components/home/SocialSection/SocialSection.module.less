@@ -38,11 +38,17 @@
         font-size: @font-size-xs;
         letter-spacing: 0.2em;
         text-transform: uppercase;
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            min-height: @touch-target-min;
+        }
     }
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
         gap: @spacing-sm;
     }
 

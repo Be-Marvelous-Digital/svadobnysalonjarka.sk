@@ -9,16 +9,27 @@
             content="Svadobné, spoločenské a prijímacie šaty, obleky pre ženíchov aj doplnky. Salón v Galante od roku 2007. Objednajte si termín skúšky."
         />
         <meta name="theme-color" content="#fdfcfa" />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="Svadobný salón Jarka" />
+        <meta name="geo.region" content="SK-TA" />
+        <meta name="geo.placename" content="Galanta" />
+
+        <!-- usePageMeta rewrites canonical, description and the og:/twitter: pairs per route.
+             These are the values a crawler sees before the bundle runs. -->
         <link rel="canonical" href="https://svadobnysalonjarka.sk/" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Svadobný salón Jarka" />
+        <meta property="og:locale" content="sk_SK" />
         <meta property="og:title" content="Svadobný salón Jarka Galanta" />
         <meta
             property="og:description"
             content="Svadobné, spoločenské a prijímacie šaty, obleky pre ženíchov aj doplnky. Salón v Galante od roku 2007."
         />
         <meta property="og:image" content="https://svadobnysalonjarka.sk/assets/hero.webp" />
+        <meta property="og:image:alt" content="Nevesta vo svadobných šatách v salóne Jarka" />
         <meta property="og:url" content="https://svadobnysalonjarka.sk/" />
+        <meta name="twitter:card" content="summary_large_image" />
+
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,6 +37,8 @@
             href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap"
             rel="stylesheet"
         />
+        <!-- The hero is the LCP element on every first visit; without this it waits on the CSS. -->
+        <link rel="preload" as="image" href="/assets/hero.webp" fetchpriority="high" />
     </head>
     <body>
         <div id="root"></div>

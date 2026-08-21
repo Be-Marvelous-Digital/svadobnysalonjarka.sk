@@ -8,12 +8,30 @@ import type { CategoryKey } from '../constants.js';
 
 const GALLERY_DIR = () => path.join(env.UPLOAD_DIR, 'gallery');
 const MAX_EDGE = 1600;
+/** ~50 MP. A small file can still decode to a huge bitmap; this caps that before sharp allocates. */
+const MAX_INPUT_PIXELS = 50_000_000;
+const ACCEPTED_FORMATS = new Set(['jpeg', 'png', 'webp', 'avif', 'gif', 'tiff', 'heif']);
+
+export class UnsupportedImageError extends Error {
+    constructor() {
+        super('Nepodporovaný formát obrázka.');
+        this.name = 'UnsupportedImageError';
+    }
+}
 
 export async function storePhoto(category: CategoryKey, buffer: Buffer): Promise<string> {
+    const pipeline = sharp(buffer, { limitInputPixels: MAX_INPUT_PIXELS });
+
+    // Trust the decoded bytes, not the multipart Content-Type the client sent.
+    const { format } = await pipeline.metadata().catch(() => {
+        throw new UnsupportedImageError();
+    });
+    if (!format || !ACCEPTED_FORMATS.has(format)) throw new UnsupportedImageError();
+
     const dir = path.join(GALLERY_DIR(), category);
     await mkdir(dir, { recursive: true });
     const filename = `${Date.now().toString(36)}-${randomBytes(6).toString('hex')}.webp`;
-    await sharp(buffer)
+    await pipeline
         .rotate()
         .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
         .webp({ quality: 78 })

@@ -11,10 +11,9 @@ interface StepScheduleProps {
     draft: ReservationDraft;
     valid: boolean;
     onChange: (changes: Partial<ReservationDraft>) => void;
-    onNext: () => void;
 }
 
-export const StepSchedule = ({ draft, valid, onChange, onNext }: StepScheduleProps) => {
+export const StepSchedule = ({ draft, valid, onChange }: StepScheduleProps) => {
     const { slots, loading } = useAvailability(draft.date);
 
     const summary = valid ? `${draft.cat} · ${formatLongDate(draft.date)} · ${draft.time}` : 'Vyberte typ šiat, dátum a čas.';
@@ -59,14 +58,16 @@ export const StepSchedule = ({ draft, valid, onChange, onNext }: StepSchedulePro
                         ))}
                     </div>
                     {draft.date && !loading && slots.length === 0 ? (
-                        <span className={styles.step__error}>V tento deň nemáme voľný termín, vyberte, prosím, iný deň.</span>
+                        <span className={styles.step__error} role="status">
+                            V tento deň nemáme voľný termín, vyberte, prosím, iný deň.
+                        </span>
                     ) : null}
                 </div>
             </div>
 
             <div className={styles.step__actions}>
                 <span className={styles.step__summary}>{summary}</span>
-                <Button variant="dark" onClick={onNext} disabled={!valid}>
+                <Button type="submit" variant="dark" disabled={!valid}>
                     Pokračovať
                 </Button>
             </div>

@@ -6,7 +6,7 @@
 
 .card {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 32px 48px;
     align-items: start;
     background: @color-surface-muted;
@@ -40,7 +40,7 @@
         font-size: @font-size-xxs;
         letter-spacing: 0.24em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__chips {
@@ -82,7 +82,7 @@
         font-size: @font-size-xs;
         letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__empty {
@@ -99,7 +99,7 @@
     white-space: nowrap;
 
     &--pending {
-        color: @color-primary;
+        color: @color-primary-text;
         background: @color-surface-muted;
     }
 
@@ -133,7 +133,7 @@
 
     &__row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
         gap: @spacing-md;
         align-items: center;
     }
@@ -159,7 +159,7 @@
         color: @color-ink;
 
         &--when {
-            color: @color-primary;
+            color: @color-primary-text;
         }
     }
 
@@ -200,7 +200,7 @@
     }
 
     &--gold {
-        background: @color-primary;
+        background: @color-primary-text;
         color: @color-on-dark;
     }
 
@@ -220,7 +220,7 @@
 
     &--link {
         padding: 0;
-        color: @color-primary;
+        color: @color-primary-text;
         border-bottom: 1px solid @color-accent-soft;
         white-space: nowrap;
         font-size: 10.5px;
@@ -337,7 +337,7 @@
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
         gap: @spacing-sm;
     }
 
@@ -356,7 +356,7 @@
 
 .upcoming {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
     gap: @spacing-md;
     align-items: center;
     padding: @spacing-md 0;
@@ -380,7 +380,7 @@
 
     &__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
         gap: @spacing-md;
     }
 
@@ -426,7 +426,7 @@
         font-size: @font-size-xxs;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: @color-primary;
+        color: @color-primary-text;
     }
 
     &__urlRow {
