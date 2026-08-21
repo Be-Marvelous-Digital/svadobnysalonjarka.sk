@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { CATEGORY_KEYS, type CategoryKey } from '../constants.js';
+import { env } from '../env.js';
 import { Photo } from '../models/Photo.js';
 import { Reservation } from '../models/Reservation.js';
 import { readSettings } from '../models/Settings.js';
@@ -11,7 +12,7 @@ export const publicRouter = Router();
 
 const reservationLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
-    limit: 8,
+    limit: env.RESERVATION_RATE_LIMIT,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: { error: 'Príliš veľa žiadostí. Skúste to, prosím, neskôr alebo nám zavolajte.' },

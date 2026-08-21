@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import { isValidObjectId } from 'mongoose';
 import type { CategoryKey } from '../constants.js';
+import { env } from '../env.js';
 import { clearSession, issueSession, requireAdmin } from '../middleware/auth.js';
 import { Photo } from '../models/Photo.js';
 import { Reservation } from '../models/Reservation.js';
@@ -25,7 +26,7 @@ export const adminRouter = Router();
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 10,
+    limit: env.LOGIN_RATE_LIMIT,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: { error: 'Príliš veľa pokusov. Skúste to o chvíľu znova.' },

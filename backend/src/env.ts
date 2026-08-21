@@ -10,6 +10,11 @@ const schema = z.object({
     ADMIN_USERNAME: z.string().min(3).default('admin'),
     ADMIN_PASSWORD: z.string().min(8).default('JarkaAdmin123'),
     UPLOAD_DIR: z.string().default('/var/lib/jarka/uploads'),
+    // Requests allowed per window: 15 minutes for login, an hour for reservations,
+    // a minute for the catch-all.
+    LOGIN_RATE_LIMIT: z.coerce.number().int().positive().default(10),
+    RESERVATION_RATE_LIMIT: z.coerce.number().int().positive().default(8),
+    API_RATE_LIMIT: z.coerce.number().int().positive().default(120),
     PUBLIC_ORIGIN: z.string().default('https://svadobnysalonjarka.sk'),
     CORS_ORIGIN: z.string().optional(),
     COOKIE_SECURE: z

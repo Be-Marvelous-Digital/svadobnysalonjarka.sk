@@ -43,6 +43,43 @@ jobs:
             - name: Build
               run: npm run build
 
+    backend-api:
+        name: Backend API tests
+        runs-on: ubuntu-latest
+        # Same rule as the frontend e2e job: only spend a database on code that
+        # already passes lint, format, typecheck and build.
+        needs: [backend]
+        timeout-minutes: 10
+        defaults:
+            run:
+                working-directory: backend
+        # A throwaway MongoDB for the run. The suite gives every test file its own
+        # database inside it and drops them on teardown.
+        services:
+            mongo:
+                image: mongo:7
+                ports:
+                    - 27017:27017
+                options: >-
+                    --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 10
+        env:
+            MONGODB_URI: mongodb://127.0.0.1:27017/jarka_test
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+                  cache-dependency-path: backend/package-lock.json
+
+            - run: npm ci
+            - name: Run API tests
+              run: npm test
+
     frontend:
         name: Frontend checks
         runs-on: ubuntu-latest
@@ -124,7 +161,7 @@ jobs:
     images:
         name: Build and push image
         runs-on: ubuntu-latest
-        needs: [backend, frontend, e2e]
+        needs: [backend, backend-api, frontend, e2e]
         # Pushing a real, pullable image is only worth doing for real branch pushes.
         if: github.event_name == 'push'
         permissions:

@@ -31,7 +31,7 @@ export function createApp() {
         '/api',
         rateLimit({
             windowMs: 60 * 1000,
-            limit: 120,
+            limit: env.API_RATE_LIMIT,
             standardHeaders: 'draft-7',
             legacyHeaders: false,
             skip: (req) => req.path === '/health',

@@ -1,7 +1,7 @@
 {
     "name": "svadobnysalonjarka-backend",
     "version": "1.0.0",
-    "description": "REST API for Svadobný salón Jarka — rezervácie, galéria, admin",
+    "description": "REST API for Svadobn\u00fd sal\u00f3n Jarka \u2014 rezerv\u00e1cie, gal\u00e9ria, admin",
     "private": true,
     "type": "module",
     "main": "dist/index.js",
@@ -9,12 +9,13 @@
         "dev": "tsx watch src/index.ts",
         "build": "tsc -p tsconfig.json",
         "start": "node dist/index.js",
-        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "typecheck": "tsc -p tsconfig.test.json",
         "lint": "oxlint",
-        "format": "prettier --write \"src/**/*.ts\"",
-        "format:check": "prettier --check \"src/**/*.ts\"",
+        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+        "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
         "check": "npm run lint && npm run format:check && npm run typecheck && npm run build",
-        "seed": "tsx src/seed/run.ts"
+        "seed": "tsx src/seed/run.ts",
+        "test": "NODE_ENV=test COOKIE_SECURE=false JWT_SECRET=test-secret-that-is-long-enough-for-the-schema ADMIN_USERNAME=admin ADMIN_PASSWORD=JarkaAdmin123 MONGODB_URI=\"${MONGODB_URI:-mongodb://127.0.0.1:27017/jarka_test}\" UPLOAD_DIR=\"$(mktemp -d)\" LOGIN_RATE_LIMIT=1000 RESERVATION_RATE_LIMIT=1000 API_RATE_LIMIT=100000 node --import tsx --test test/*.test.ts"
     },
     "license": "UNLICENSED",
     "dependencies": {
