@@ -3,7 +3,8 @@ import { describe, it } from 'node:test';
 import { buildMergePayload } from '../src/services/mailchimp.js';
 
 const inquiry = {
-    name: 'Jana Nováková',
+    firstName: 'Jana',
+    lastName: 'Nováková',
     phone: '+421 900 111 222',
     email: 'jana@example.sk',
     cat: 'Svadobné šaty',
@@ -18,8 +19,10 @@ describe('the Mailchimp payload', () => {
         assert.deepEqual(Object.keys(payload).sort(), [
             'EMAIL',
             'FNAME',
+            'LNAME',
             'MERGE0',
             'MERGE1',
+            'MERGE2',
             'MERGE4',
             'PHONE',
             'REQDATE',
@@ -28,6 +31,7 @@ describe('the Mailchimp payload', () => {
         ]);
         assert.equal(payload.MERGE0, payload.EMAIL);
         assert.equal(payload.MERGE1, payload.FNAME);
+        assert.equal(payload.MERGE2, payload.LNAME);
         assert.equal(payload.MERGE4, payload.PHONE);
     });
 
@@ -41,10 +45,11 @@ describe('the Mailchimp payload', () => {
         assert.equal(payload.REQTIME, '11:15');
     });
 
-    it('sends only the first name in FNAME, so greetings read correctly', () => {
-        assert.equal(buildMergePayload(inquiry).FNAME, 'Jana');
-        assert.equal(buildMergePayload({ ...inquiry, name: 'Jana Mária Nováková' }).FNAME, 'Jana');
-        assert.equal(buildMergePayload({ ...inquiry, name: 'Jana' }).FNAME, 'Jana');
+    it('keeps the two names in their own fields', () => {
+        const payload = buildMergePayload(inquiry);
+
+        assert.equal(payload.FNAME, 'Jana');
+        assert.equal(payload.LNAME, 'Nováková');
     });
 
     it('sends the date as ISO 8601 and the time in 24h', () => {

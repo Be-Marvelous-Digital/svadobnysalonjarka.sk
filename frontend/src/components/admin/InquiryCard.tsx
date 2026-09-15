@@ -11,14 +11,15 @@ interface InquiryCardProps {
 }
 
 export const InquiryCard = ({ inquiry, onToggleHandled, onRemove }: InquiryCardProps) => {
+    const fullName = [inquiry.firstName, inquiry.lastName].filter(Boolean).join(' ').trim() || 'Bez mena';
     const toggle = useCallback(
         () => onToggleHandled(inquiry.id, !inquiry.handled),
         [inquiry.handled, inquiry.id, onToggleHandled],
     );
 
     const handleRemove = useCallback(() => {
-        if (window.confirm(`Zmazať dopyt od ${inquiry.name}? Nedá sa vrátiť späť.`)) onRemove(inquiry.id);
-    }, [inquiry.id, inquiry.name, onRemove]);
+        if (window.confirm(`Zmazať dopyt od ${fullName}? Nedá sa vrátiť späť.`)) onRemove(inquiry.id);
+    }, [fullName, inquiry.id, onRemove]);
 
     const className = [styles.request, inquiry.handled && styles['request--handled']].filter(Boolean).join(' ');
 
@@ -26,7 +27,7 @@ export const InquiryCard = ({ inquiry, onToggleHandled, onRemove }: InquiryCardP
         <div className={className}>
             <div className={styles.request__row}>
                 <div className={styles.request__person}>
-                    <span className={styles.request__name}>{inquiry.name}</span>
+                    <span className={styles.request__name}>{fullName}</span>
                     <span className={styles.request__contact}>
                         {inquiry.phone ? (
                             <a href={`tel:${inquiry.phone.replace(/\s+/g, '')}`} className={styles.request__link}>

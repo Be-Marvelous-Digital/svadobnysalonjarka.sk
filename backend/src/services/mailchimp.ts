@@ -2,7 +2,8 @@ import { env } from '../env.js';
 import { logger } from '../logger.js';
 
 export interface InquiryFields {
-    name: string;
+    firstName: string;
+    lastName: string;
     phone: string;
     email: string;
     cat: string;
@@ -26,20 +27,15 @@ export type MergePayload = Record<string, string>;
 const ALIASES: Record<string, string> = {
     EMAIL: 'MERGE0',
     FNAME: 'MERGE1',
+    LNAME: 'MERGE2',
     PHONE: 'MERGE4',
 };
 
-/**
- * The form collects a full name, but FNAME is a first-name field and Mailchimp
- * interpolates it into greetings. Putting the whole name there would make every
- * mail read "Dobrý deň, Jana Nováková".
- */
 export function buildMergePayload(inquiry: InquiryFields): MergePayload {
-    const firstName = inquiry.name.trim().split(/\s+/)[0] ?? '';
-
     const byTag: Record<string, string> = {
         EMAIL: inquiry.email,
-        FNAME: firstName,
+        FNAME: inquiry.firstName,
+        LNAME: inquiry.lastName,
         PHONE: inquiry.phone,
         TYPE: inquiry.cat,
         // ISO 8601 and 24h: unambiguous whichever way the Mailchimp fields are set

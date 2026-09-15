@@ -2,7 +2,10 @@ import { Schema, model, type InferSchemaType } from 'mongoose';
 
 const reservationSchema = new Schema(
     {
-        name: { type: String, required: true, trim: true, maxlength: 120 },
+        firstName: { type: String, required: true, trim: true, maxlength: 60 },
+        lastName: { type: String, default: '', trim: true, maxlength: 60 },
+        /** Pre-split records. Read-only; splitLegacyNames moves it into the pair above. */
+        name: { type: String, default: '', trim: true, maxlength: 120 },
         phone: { type: String, default: '', trim: true, maxlength: 40 },
         email: { type: String, default: '', trim: true, maxlength: 160 },
         cat: { type: String, default: '', trim: true, maxlength: 60 },

@@ -157,7 +157,8 @@ const server = createServer(async (req, res) => {
             return send(res, 200, [
                 {
                     id: 'r1',
-                    name: 'Jana Nováková',
+                    firstName: 'Jana',
+                    lastName: 'Nováková',
                     phone: '+421 900 111 222',
                     email: 'jana@example.sk',
                     cat: 'Svadobné šaty',
@@ -168,7 +169,8 @@ const server = createServer(async (req, res) => {
                 },
                 {
                     id: 'r2',
-                    name: 'Vybavena Klientka',
+                    firstName: 'Vybavena',
+                    lastName: 'Klientka',
                     phone: '+421 900 333 444',
                     email: 'vybavena@example.sk',
                     cat: 'Spoločenské šaty',

@@ -11,7 +11,7 @@ interface ReservationDoneProps {
 }
 
 export const ReservationDone = ({ reservation, onReset }: ReservationDoneProps) => {
-    const firstName = reservation.name.split(' ')[0] || 'tešíme sa';
+    const firstName = reservation.firstName?.trim() || 'tešíme sa';
 
     return (
         <div className={styles.done}>

@@ -5,7 +5,10 @@ const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Neplatný dátum');
 const timeString = z.string().regex(/^\d{1,2}:\d{2}$/, 'Neplatný čas');
 
 export const reservationRequestSchema = z.object({
-    name: z.string().trim().min(2).max(120),
+    // Split, because Mailchimp keeps the first and last name in separate merge
+    // fields and interpolates only the first one into greetings.
+    firstName: z.string().trim().min(2).max(60),
+    lastName: z.string().trim().min(2).max(60),
     phone: z.string().trim().min(6).max(40),
     email: z.email().max(160),
     cat: z.string().trim().min(1).max(60),

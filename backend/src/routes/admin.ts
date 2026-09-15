@@ -89,7 +89,7 @@ adminRouter.get('/reservations', requireAdmin, async (_req, res) => {
     res.json(
         list.map((r) => ({
             id: String(r._id),
-            name: r.name,
+            ...splitName(r),
             phone: r.phone,
             email: r.email,
             cat: r.cat,
@@ -128,6 +128,16 @@ adminRouter.get('/photos', requireAdmin, async (_req, res) => {
     const photos = await Photo.find().sort({ category: 1, order: 1, createdAt: 1 }).lean();
     res.json(photos.map((p) => ({ id: String(p._id), category: p.category, url: p.url })));
 });
+
+/** Tolerates records written before the name was split into two fields. */
+function splitName(record: { firstName?: string; lastName?: string; name?: string }): {
+    firstName: string;
+    lastName: string;
+} {
+    if (record.firstName) return { firstName: record.firstName, lastName: record.lastName ?? '' };
+    const [first = '', ...rest] = (record.name ?? '').trim().split(/\s+/);
+    return { firstName: first, lastName: rest.join(' ') };
+}
 
 async function nextOrder(category: CategoryKey): Promise<number> {
     const last = await Photo.findOne({ category }).sort({ order: -1 }).select('order').lean();

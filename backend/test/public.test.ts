@@ -82,7 +82,7 @@ describe('GET /api/availability', () => {
         assert.ok(target);
 
         // Nothing gets approved any more, so an inquiry holds its slot outright.
-        await Reservation.create({ name: 'Prvá', date: OPEN_DATE, time: target });
+        await Reservation.create({ firstName: 'Prvá', lastName: 'Testovacia', date: OPEN_DATE, time: target });
 
         const after = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
         assert.ok(!after.body.slots.includes(target));
@@ -91,7 +91,8 @@ describe('GET /api/availability', () => {
 
 describe('POST /api/reservations', () => {
     const valid = {
-        name: 'Jana Nováková',
+        firstName: 'Jana',
+        lastName: 'Nováková',
         phone: '+421 900 111 222',
         email: 'jana@example.sk',
         cat: 'Svadobné šaty',
@@ -105,13 +106,14 @@ describe('POST /api/reservations', () => {
 
         const stored = await Reservation.findOne({ email: valid.email }).lean();
         assert.equal(stored?.handled, false);
-        assert.equal(stored?.name, valid.name);
+        assert.equal(stored?.firstName, valid.firstName);
+        assert.equal(stored?.lastName, valid.lastName);
         assert.equal(stored?.cat, valid.cat);
     });
 
     for (const [label, patch] of [
-        ['a missing name', { name: '' }],
-        ['a one-character name', { name: 'J' }],
+        ['a missing first name', { firstName: '' }],
+        ['a one-character surname', { lastName: 'N' }],
         ['a malformed e-mail', { email: 'nie-je-email' }],
         ['a too-short phone', { phone: '123' }],
         ['a malformed date', { date: '10.03.2027' }],
@@ -140,7 +142,7 @@ describe('POST /api/reservations', () => {
     });
 
     it('refuses a slot already asked for by someone else', async () => {
-        await Reservation.create({ name: 'Iná', date: OPEN_DATE, time: '10:00' });
+        await Reservation.create({ firstName: 'Iná', lastName: 'Testovacia', date: OPEN_DATE, time: '10:00' });
 
         const response = await api<{ error: string }>(context, 'POST', '/api/reservations', { body: valid });
         assert.equal(response.status, 409);

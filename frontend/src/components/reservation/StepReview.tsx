@@ -17,7 +17,7 @@ export const StepReview = ({ draft, submitting, onBack }: StepReviewProps) => {
     const rows = [
         { label: 'Typ šiat', value: draft.cat, plain: false },
         { label: 'Dátum a čas', value: `${formatLongDate(draft.date)} · ${draft.time}`, plain: false },
-        { label: 'Meno', value: draft.name, plain: false },
+        { label: 'Meno', value: `${draft.firstName} ${draft.lastName}`, plain: false },
         { label: 'Kontakt', value: `${draft.phone} · ${draft.email}`, plain: true },
     ];
 

@@ -2,11 +2,6 @@ import type { Reservation } from '@/api/types';
 import { CONTACT } from '@/data/contact';
 import { formatLongDate } from '@/utils/date';
 
-/** First word of the name, for the greeting. */
-function firstName(name: string): string {
-    return name.trim().split(/\s+/)[0] ?? '';
-}
-
 /**
  * A reply the owner can send as-is. The date and time the client asked for are
  * already in the body, so answering an inquiry is one click and one send rather
@@ -16,7 +11,7 @@ function firstName(name: string): string {
  * the client directly, by phone or in this reply.
  */
 export function buildReplyMailto(inquiry: Reservation): string {
-    const greeting = firstName(inquiry.name);
+    const greeting = (inquiry.firstName ?? '').trim();
 
     const lines = [
         `Dobrý deň${greeting ? `, ${greeting}` : ''},`,

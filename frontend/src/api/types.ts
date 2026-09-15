@@ -5,7 +5,8 @@ export type Gallery = Record<CategoryKey, string[]>;
 /** An inquiry from the public form. The salon agrees the date off-site. */
 export interface Reservation {
     id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     phone: string;
     email: string;
     cat: string;

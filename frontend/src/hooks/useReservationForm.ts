@@ -7,7 +7,8 @@ export interface ReservationDraft {
     cat: string;
     date: string;
     time: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     phone: string;
     email: string;
 }
@@ -16,7 +17,8 @@ const EMPTY_DRAFT: ReservationDraft = {
     cat: BOOKABLE_COLLECTIONS[0]?.label ?? '',
     date: '',
     time: '',
-    name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
     email: '',
 };

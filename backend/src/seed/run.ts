@@ -3,6 +3,7 @@ import { connectDatabase, disconnectDatabase } from '../db.js';
 import type { CategoryKey } from '../constants.js';
 import { env } from '../env.js';
 import { Photo } from '../models/Photo.js';
+import { Reservation } from '../models/Reservation.js';
 import { readSettings } from '../models/Settings.js';
 import { User } from '../models/User.js';
 import { logger } from '../logger.js';
@@ -31,8 +32,19 @@ async function seedAdmin(): Promise<void> {
     logger.info(`Created admin user "${username}" — change the password before going live`);
 }
 
+/** Moves pre-split records onto firstName/lastName. Safe to run repeatedly. */
+async function splitLegacyNames(): Promise<void> {
+    const legacy = await Reservation.find({ firstName: { $in: [null, ''] }, name: { $nin: [null, ''] } }).lean();
+    for (const record of legacy) {
+        const [firstName = '', ...rest] = String(record.name).trim().split(/\s+/);
+        await Reservation.updateOne({ _id: record._id }, { $set: { firstName, lastName: rest.join(' ') }, $unset: { name: '' } });
+    }
+    if (legacy.length > 0) logger.info(`Split ${legacy.length} legacy name(s) into firstName/lastName`);
+}
+
 async function main(): Promise<void> {
     await connectDatabase();
+    await splitLegacyNames();
     await readSettings();
     await seedAdmin();
 

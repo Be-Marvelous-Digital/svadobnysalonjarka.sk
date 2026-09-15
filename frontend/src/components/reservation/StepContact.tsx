@@ -15,13 +15,22 @@ interface StepContactProps {
 export const StepContact = ({ draft, valid, errors, onChange, onBack }: StepContactProps) => (
     <div className={styles.step}>
         <div className={styles.step__contactGrid}>
-            <Field label="Meno a priezvisko" className={styles.step__wide} error={errors.name}>
+            <Field label="Meno" error={errors.firstName}>
                 <TextInput
                     type="text"
-                    value={draft.name}
-                    placeholder="Jana Nováková"
-                    autoComplete="name"
-                    onChange={(event) => onChange({ name: event.target.value })}
+                    value={draft.firstName}
+                    placeholder="Jana"
+                    autoComplete="given-name"
+                    onChange={(event) => onChange({ firstName: event.target.value })}
+                />
+            </Field>
+            <Field label="Priezvisko" error={errors.lastName}>
+                <TextInput
+                    type="text"
+                    value={draft.lastName}
+                    placeholder="Nováková"
+                    autoComplete="family-name"
+                    onChange={(event) => onChange({ lastName: event.target.value })}
                 />
             </Field>
             <Field label="Telefón" error={errors.phone}>

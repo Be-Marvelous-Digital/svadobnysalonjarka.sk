@@ -23,10 +23,13 @@ export function validateSchedule(draft: ReservationDraft): FieldErrors {
 export function validateContact(draft: ReservationDraft): FieldErrors {
     const errors: FieldErrors = {};
 
-    const name = draft.name.trim();
-    if (!name) errors.name = 'Vyplňte meno a priezvisko.';
-    else if (name.length < 3) errors.name = 'Meno je príliš krátke.';
-    else if (!name.includes(' ')) errors.name = 'Uveďte, prosím, meno aj priezvisko.';
+    const firstName = draft.firstName.trim();
+    if (!firstName) errors.firstName = 'Vyplňte meno.';
+    else if (firstName.length < 2) errors.firstName = 'Meno je príliš krátke.';
+
+    const lastName = draft.lastName.trim();
+    if (!lastName) errors.lastName = 'Vyplňte priezvisko.';
+    else if (lastName.length < 2) errors.lastName = 'Priezvisko je príliš krátke.';
 
     const digits = draft.phone.replace(/\D/g, '');
     if (!draft.phone.trim()) errors.phone = 'Vyplňte telefónne číslo.';

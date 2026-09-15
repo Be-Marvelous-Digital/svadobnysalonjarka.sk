@@ -17,7 +17,8 @@ test.describe('reservation flow', () => {
     }
 
     async function completeContact(page: import('@playwright/test').Page) {
-        await page.getByLabel('Meno a priezvisko').fill('Jana Nováková');
+        await page.getByLabel('Meno', { exact: true }).fill('Jana');
+        await page.getByLabel('Priezvisko').fill('Nováková');
         await page.getByLabel('Telefón').fill('+421 900 111 222');
         await page.getByLabel('E-mail').fill('jana@example.sk');
         await page.getByRole('button', { name: 'Skontrolovať' }).click();
@@ -25,7 +26,7 @@ test.describe('reservation flow', () => {
 
     test('books a fitting end to end', async ({ page }) => {
         await completeSchedule(page, dateFor(1, test.info().project.name));
-        await expect(page.getByLabel('Meno a priezvisko')).toBeVisible();
+        await expect(page.getByLabel('Meno', { exact: true })).toBeVisible();
 
         await completeContact(page);
         await expect(page.getByText('Jana Nováková')).toBeVisible();
@@ -52,7 +53,8 @@ test.describe('reservation flow', () => {
 
     test('rejects a malformed e-mail before the review step', async ({ page }) => {
         await completeSchedule(page, dateFor(3, test.info().project.name));
-        await page.getByLabel('Meno a priezvisko').fill('Jana Nováková');
+        await page.getByLabel('Meno', { exact: true }).fill('Jana');
+        await page.getByLabel('Priezvisko').fill('Nováková');
         await page.getByLabel('Telefón').fill('+421 900 111 222');
         await page.getByLabel('E-mail').fill('nie-je-email');
 
@@ -70,7 +72,15 @@ test.describe('reservation flow', () => {
 
         // Someone else takes the slot while this visitor is still filling in their details.
         await request.post('/api/reservations', {
-            data: { name: 'Iná', phone: '+421900000000', email: 'x@y.sk', cat: 'Svadobné šaty', date, time: '11:15' },
+            data: {
+                firstName: 'Iná',
+                lastName: 'Testovacia',
+                phone: '+421900000000',
+                email: 'x@y.sk',
+                cat: 'Svadobné šaty',
+                date,
+                time: '11:15',
+            },
         });
 
         await completeContact(page);
@@ -87,18 +97,19 @@ test.describe('reservation flow', () => {
         await page.getByRole('button', { name: '12:30' }).click();
 
         await page.locator('input[type="date"]').press('Enter');
-        await expect(page.getByLabel('Meno a priezvisko')).toBeVisible();
+        await expect(page.getByLabel('Meno', { exact: true })).toBeVisible();
     });
 
     test('Späť keeps what was already filled in', async ({ page }) => {
         const date = dateFor(6, test.info().project.name);
         await completeSchedule(page, date);
-        await page.getByLabel('Meno a priezvisko').fill('Jana Nováková');
+        await page.getByLabel('Meno', { exact: true }).fill('Jana');
+        await page.getByLabel('Priezvisko').fill('Nováková');
         await page.getByRole('button', { name: 'Späť' }).click();
 
         await expect(page.locator('input[type="date"]')).toHaveValue(date);
         await page.getByRole('button', { name: 'Pokračovať' }).click();
-        await expect(page.getByLabel('Meno a priezvisko')).toHaveValue('Jana Nováková');
+        await expect(page.getByLabel('Meno', { exact: true })).toHaveValue('Jana');
     });
 
     test('the step indicator names the current step for screen readers', async ({ page }) => {

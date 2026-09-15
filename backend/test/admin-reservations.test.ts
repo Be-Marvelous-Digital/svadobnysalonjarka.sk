@@ -15,7 +15,7 @@ beforeEach(resetData);
 
 interface ListedInquiry {
     id: string;
-    name: string;
+    firstName: string;
     cat: string;
     date: string;
     time: string;
@@ -28,7 +28,8 @@ const list = () => api<ListedInquiry[]>(context, 'GET', '/api/admin/reservations
 describe('the inquiry list', () => {
     it('returns the contact details and the handled flag', async () => {
         await Reservation.create({
-            name: 'Jana',
+            firstName: 'Jana',
+            lastName: 'Nováková',
             phone: '+421900111222',
             email: 'jana@example.sk',
             cat: 'Svadobné šaty',
@@ -40,19 +41,19 @@ describe('the inquiry list', () => {
 
         assert.equal(response.status, 200);
         assert.equal(response.body.length, 1);
-        assert.equal(response.body[0]?.name, 'Jana');
+        assert.equal(response.body[0]?.firstName, 'Jana');
         assert.equal(response.body[0]?.cat, 'Svadobné šaty');
         assert.equal(response.body[0]?.handled, false);
         assert.ok(response.body[0]?.createdAt);
     });
 
     it('puts the newest inquiry first', async () => {
-        await Reservation.create({ name: 'Prvá', date: OPEN_DATE, time: '10:00' });
+        await Reservation.create({ firstName: 'Prvá', lastName: 'Testovacia', date: OPEN_DATE, time: '10:00' });
         await new Promise((resolve) => setTimeout(resolve, 10));
-        await Reservation.create({ name: 'Druhá', date: OPEN_DATE, time: '11:15' });
+        await Reservation.create({ firstName: 'Druhá', lastName: 'Testovacia', date: OPEN_DATE, time: '11:15' });
 
         const response = await list();
-        assert.equal(response.body[0]?.name, 'Druhá');
+        assert.equal(response.body[0]?.firstName, 'Druhá');
     });
 
     it('requires a session', async () => {
@@ -63,7 +64,7 @@ describe('the inquiry list', () => {
 
 describe('marking an inquiry handled', () => {
     it('sets and clears the flag', async () => {
-        const created = await Reservation.create({ name: 'Jana', date: OPEN_DATE, time: '10:00' });
+        const created = await Reservation.create({ firstName: 'Jana', lastName: 'Nováková', date: OPEN_DATE, time: '10:00' });
 
         await api(context, 'PATCH', `/api/admin/reservations/${created._id}`, { cookie, body: { handled: true } });
         assert.equal((await Reservation.findById(created._id).lean())?.handled, true);
@@ -73,14 +74,14 @@ describe('marking an inquiry handled', () => {
     });
 
     it('is the only change the endpoint accepts', async () => {
-        const created = await Reservation.create({ name: 'Jana', date: OPEN_DATE, time: '10:00' });
+        const created = await Reservation.create({ firstName: 'Jana', lastName: 'Nováková', date: OPEN_DATE, time: '10:00' });
 
         const response = await api(context, 'PATCH', `/api/admin/reservations/${created._id}`, {
             cookie,
-            body: { name: 'Podvrhnuté' },
+            body: { firstName: 'Podvrhnuté' },
         });
         assert.equal(response.status, 400);
-        assert.equal((await Reservation.findById(created._id).lean())?.name, 'Jana');
+        assert.equal((await Reservation.findById(created._id).lean())?.firstName, 'Jana');
     });
 
     it('answers 404 for an inquiry that does not exist', async () => {
@@ -94,7 +95,7 @@ describe('marking an inquiry handled', () => {
 
 describe('deleting an inquiry', () => {
     it('removes it', async () => {
-        const created = await Reservation.create({ name: 'Jana', date: OPEN_DATE, time: '10:00' });
+        const created = await Reservation.create({ firstName: 'Jana', lastName: 'Nováková', date: OPEN_DATE, time: '10:00' });
 
         const response = await api(context, 'DELETE', `/api/admin/reservations/${created._id}`, { cookie });
         assert.equal(response.status, 200);
