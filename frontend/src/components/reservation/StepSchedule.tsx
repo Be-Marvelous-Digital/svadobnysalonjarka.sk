@@ -2,6 +2,7 @@ import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { Field, TextInput } from '@/components/Field';
 import { BOOKABLE_COLLECTIONS } from '@/data/collections';
+import { OPENING_SUMMARY } from '@/data/contact';
 import { useAvailability } from '@/hooks/useAvailability';
 import type { FieldErrors } from '@/hooks/reservationValidation';
 import type { ReservationDraft } from '@/hooks/useReservationForm';
@@ -64,7 +65,7 @@ export const StepSchedule = ({ draft, valid, errors, onChange }: StepSchedulePro
                     </div>
                     {draft.date && !loading && slots.length === 0 ? (
                         <span className={styles.step__error} role="status">
-                            V tento deň nemáme voľný termín, vyberte, prosím, iný deň.
+                            V tento deň máme zatvorené. Skúšame {OPENING_SUMMARY}.
                         </span>
                     ) : null}
                 </div>
