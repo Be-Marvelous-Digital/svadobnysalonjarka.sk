@@ -303,9 +303,7 @@ adminRouter.put('/photos/:category/order', requireAdmin, async (req, res) => {
         return;
     }
 
-    await Photo.bulkWrite(
-        ids.map((id, index) => ({ updateOne: { filter: { _id: id }, update: { $set: { order: index } } } })),
-    );
+    await Photo.bulkWrite(ids.map((id, index) => ({ updateOne: { filter: { _id: id }, update: { $set: { order: index } } } })));
     res.json({ ok: true });
 });
 

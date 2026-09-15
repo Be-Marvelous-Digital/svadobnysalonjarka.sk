@@ -123,3 +123,39 @@ test.describe('user management', () => {
         expect(asked).toContain('Stratí prístup');
     });
 });
+
+test.describe('replying to an inquiry', () => {
+    test.beforeEach(async ({ page }) => {
+        await acceptConsent(page);
+        await signIn(page, 'Rezervácie');
+    });
+
+    test('the phone and e-mail are links the owner can act on', async ({ page }) => {
+        await expect(page.locator('a[href="tel:+421900111222"]')).toBeVisible();
+        await expect(page.locator('a[href="mailto:jana@example.sk"]')).toBeVisible();
+    });
+
+    test('the reply button opens a mail client with the date already written', async ({ page }) => {
+        const reply = page.getByRole('link', { name: 'Odpovedať e-mailom' });
+        await expect(reply).toBeVisible();
+
+        const href = await reply.getAttribute('href');
+        expect(href).toBeTruthy();
+
+        const url = new URL(href as string);
+        expect(url.protocol).toBe('mailto:');
+        expect(decodeURIComponent(url.pathname)).toBe('jana@example.sk');
+
+        const params = new URLSearchParams(url.search);
+        expect(params.get('subject')).toContain('Potvrdenie termínu');
+
+        const body = params.get('body') ?? '';
+        expect(body).toContain('Dobrý deň, Jana');
+        // The whole point: the owner should not have to retype the date.
+        expect(body).toContain('10. marca 2027');
+        expect(body).toContain('11:15');
+        expect(body).toContain('Svadobné šaty');
+        expect(body).toContain('Salón Jarka');
+        expect(body).toContain('+421 948 416 066');
+    });
+});

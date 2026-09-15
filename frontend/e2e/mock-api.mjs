@@ -153,7 +153,24 @@ const server = createServer(async (req, res) => {
             photos = [...photos.filter((photo) => photo.category !== category), ...reordered];
             return send(res, 200, { ok: true });
         }
-        if (pathname === '/api/admin/reservations') return send(res, 200, []);
+        if (pathname === '/api/admin/reservations') {
+            return send(res, 200, [
+                {
+                    id: 'r1',
+                    name: 'Jana Nováková',
+                    phone: '+421 900 111 222',
+                    email: 'jana@example.sk',
+                    cat: 'Svadobné šaty',
+                    note: '',
+                    date: '2027-03-10',
+                    time: '11:15',
+                    status: 'pending',
+                    kind: 'klient',
+                    altDate: '',
+                    altTime: '',
+                },
+            ]);
+        }
         if (pathname === '/api/admin/settings') return send(res, 200, { duration: 60, buffer: 15 });
         if (pathname === '/api/admin/day') return send(res, 200, { date: '', duration: 60, slots: [] });
         return send(res, 200, { ok: true });

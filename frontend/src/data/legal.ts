@@ -56,13 +56,15 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
         bullets: [
             'MongoDB Atlas (MongoDB Ltd.) — databáza rezervácií, hosťovaná v rámci EÚ.',
             'DigitalOcean LLC — server, na ktorom stránka beží.',
+            'Intuit Mailchimp (Rocket Science Group LLC) — údaje z rezervačného formulára (meno, telefón, e-mail, požadovaný termín a typ šiat) posielame aj sem, aby sme žiadosť nestratili a vedeli vám odpísať.',
             'Google Ireland Ltd. — len ak si zapnete mapu na stránke Kontakt (pozri sekciu o cookies).',
         ],
     },
     {
         heading: 'Prenos mimo EÚ',
         paragraphs: [
-            'Databáza aj server sú v Európskej únii. Ak si zapnete vloženú mapu, Google môže vaše údaje spracúvať aj mimo EÚ na základe štandardných zmluvných doložiek schválených Európskou komisiou. Bez vášho súhlasu sa mapa nenačíta a k žiadnemu takému prenosu nedôjde.',
+            'Databáza aj server sú v Európskej únii. Mailchimp, ktorému posielame údaje z rezervačného formulára, spracúva údaje v Spojených štátoch na základe štandardných zmluvných doložiek schválených Európskou komisiou.',
+            'Ak si zapnete vloženú mapu, Google môže vaše údaje spracúvať aj mimo EÚ na rovnakom základe. Bez vášho súhlasu sa mapa nenačíta a k žiadnemu takému prenosu nedôjde.',
         ],
     },
     {

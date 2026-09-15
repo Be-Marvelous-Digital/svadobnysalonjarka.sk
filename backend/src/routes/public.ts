@@ -6,6 +6,7 @@ import { Photo } from '../models/Photo.js';
 import { Reservation } from '../models/Reservation.js';
 import { readSettings } from '../models/Settings.js';
 import { availabilityQuerySchema, reservationRequestSchema } from '../schemas.js';
+import { forwardInquiry } from '../services/mailchimp.js';
 import { freeSlots, isSlotFree } from '../services/slots.js';
 
 export const publicRouter = Router();
@@ -54,5 +55,9 @@ publicRouter.post('/reservations', reservationLimiter, async (req, res) => {
     }
 
     await Reservation.create({ ...parsed.data, status: 'pending', kind: 'klient' });
+
+    // Answer the visitor first. The forward is best-effort and must never delay or
+    // fail a booking that is already saved.
     res.status(201).json({ ok: true });
+    void forwardInquiry(parsed.data);
 });

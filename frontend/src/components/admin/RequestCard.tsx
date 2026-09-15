@@ -5,6 +5,7 @@ import { TextInput } from '@/components/Field';
 import { useAvailability } from '@/hooks/useAvailability';
 import { formatLongDate, formatTimeRange } from '@/utils/date';
 import styles from './Admin.module.less';
+import { buildReplyMailto } from './RequestCard.helpers';
 import { STATUS_LABELS } from './status';
 
 interface RequestCardProps {
@@ -22,14 +23,25 @@ export const RequestCard = ({ reservation, duration, onConfirm, onReject, onRemo
     const [altTime, setAltTime] = useState('');
     const { slots } = useAvailability(altOpen ? altDate : '');
 
-    const contact = [reservation.phone, reservation.email].filter(Boolean).join(' · ') || 'bez kontaktu';
-
     return (
         <div className={styles.request}>
             <div className={styles.request__row}>
                 <div className={styles.request__person}>
                     <span className={styles.request__name}>{reservation.name}</span>
-                    <span className={styles.request__contact}>{contact}</span>
+                    <span className={styles.request__contact}>
+                        {reservation.phone ? (
+                            <a href={`tel:${reservation.phone.replace(/\s+/g, '')}`} className={styles.request__link}>
+                                {reservation.phone}
+                            </a>
+                        ) : null}
+                        {reservation.phone && reservation.email ? ' · ' : null}
+                        {reservation.email ? (
+                            <a href={`mailto:${reservation.email}`} className={styles.request__link}>
+                                {reservation.email}
+                            </a>
+                        ) : null}
+                        {!reservation.phone && !reservation.email ? 'bez kontaktu' : null}
+                    </span>
                 </div>
                 <span className={styles.request__meta}>{reservation.cat}</span>
                 <span className={`${styles.request__meta} ${styles['request__meta--when']}`}>
@@ -50,6 +62,15 @@ export const RequestCard = ({ reservation, duration, onConfirm, onReject, onRemo
                 <button type="button" className={`${styles.action} ${styles['action--primary']}`} onClick={onConfirm}>
                     Potvrdiť
                 </button>
+                {reservation.email ? (
+                    <a
+                        href={buildReplyMailto(reservation, duration)}
+                        className={`${styles.action} ${styles['action--gold']}`}
+                        title={`Napísať na ${reservation.email}`}
+                    >
+                        Odpovedať e-mailom
+                    </a>
+                ) : null}
                 <button
                     type="button"
                     className={`${styles.action} ${styles['action--outline']}`}

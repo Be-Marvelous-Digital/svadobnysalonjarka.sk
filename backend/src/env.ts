@@ -15,6 +15,10 @@ const schema = z.object({
     LOGIN_RATE_LIMIT: z.coerce.number().int().positive().default(10),
     RESERVATION_RATE_LIMIT: z.coerce.number().int().positive().default(8),
     API_RATE_LIMIT: z.coerce.number().int().positive().default(120),
+    // Mailchimp's hosted form endpoint. Unset means the forwarding is simply off,
+    // which is what dev and the test suite run with.
+    MAILCHIMP_SUBSCRIBE_URL: z.url().optional(),
+    MAILCHIMP_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
     PUBLIC_ORIGIN: z.string().default('https://svadobnysalonjarka.sk'),
     CORS_ORIGIN: z.string().optional(),
     COOKIE_SECURE: z
