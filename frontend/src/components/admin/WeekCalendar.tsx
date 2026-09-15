@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { TextInput } from '@/components/Field';
+import { BookedSlot } from './BookedSlot';
 import { useAdminWeek, mondayOf } from '@/hooks/useAdminWeek';
 import { dayNumber, formatLongDate, weekdayShort } from '@/utils/date';
 import styles from './Admin.module.less';
@@ -88,28 +89,16 @@ export const WeekCalendar = ({ refreshToken }: WeekCalendarProps) => {
                             {day.slots.length === 0 ? (
                                 <span className={styles.week__closed}>zatvorené</span>
                             ) : (
-                                day.slots.map((slot) => (
-                                    <div
-                                        key={slot.time}
-                                        className={[styles.week__slot, slot.booked && styles['week__slot--booked']]
-                                            .filter(Boolean)
-                                            .join(' ')}
-                                    >
-                                        <span className={styles.week__time}>{slot.time}</span>
-                                        {slot.booked ? (
-                                            <span className={styles.week__who}>
-                                                <span className={styles.week__name}>
-                                                    {slot.booked.firstName} {slot.booked.lastName}
-                                                </span>
-                                                {slot.booked.cat ? (
-                                                    <span className={styles.week__cat}>{slot.booked.cat}</span>
-                                                ) : null}
-                                            </span>
-                                        ) : (
+                                day.slots.map((slot) =>
+                                    slot.booked ? (
+                                        <BookedSlot key={slot.time} date={day.date} time={slot.time} booked={slot.booked} />
+                                    ) : (
+                                        <div key={slot.time} className={styles.week__slot}>
+                                            <span className={styles.week__time}>{slot.time}</span>
                                             <span className={styles.week__free}>voľné</span>
-                                        )}
-                                    </div>
-                                ))
+                                        </div>
+                                    ),
+                                )
                             )}
                         </div>
                     ))}

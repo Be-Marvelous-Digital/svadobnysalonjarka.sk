@@ -183,7 +183,12 @@ adminRouter.get('/week', requireAdmin, async (req, res) => {
                               firstName: match.firstName,
                               lastName: match.lastName,
                               phone: match.phone,
+                              email: match.email,
                               cat: match.cat,
+                              // What was originally asked for, so the owner can see
+                              // at a glance whether the agreed time was a change.
+                              requestedDate: match.date,
+                              requestedTime: match.time,
                           }
                         : null,
                 };

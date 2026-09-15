@@ -802,3 +802,79 @@
         }
     }
 }
+
+.week {
+    // The popover escapes its cell, so nothing on the way out may clip it.
+    &__grid,
+    &__day {
+        overflow: visible;
+    }
+
+    &__slotWrap {
+        position: relative;
+    }
+
+    // The booked slot is a button now; it must not look like one.
+    button&__slot,
+    &__slotWrap > button {
+        width: 100%;
+        border: 0;
+        text-align: left;
+        font-family: @font-primary;
+        cursor: pointer;
+    }
+}
+
+.popover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: @z-header;
+    min-width: 230px;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: @spacing-sm 14px;
+    background: @color-ink;
+    color: @color-on-dark;
+    box-shadow: @shadow-dropdown;
+
+    &__name {
+        font-family: @font-display;
+        font-size: @font-size-lg;
+        line-height: 1.2;
+    }
+
+    &__row {
+        font-size: @font-size-xs;
+        color: @color-on-dark-muted;
+    }
+
+    &__link {
+        font-size: @font-size-sm;
+        color: @color-primary-light;
+        border-bottom: 1px solid rgba(198, 169, 123, 0.4);
+        align-self: flex-start;
+
+        &:hover {
+            color: @color-on-dark;
+            border-bottom-color: @color-on-dark;
+        }
+    }
+
+    &__note {
+        margin-top: 4px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(253, 252, 250, 0.16);
+        font-size: @font-size-micro;
+        line-height: 1.5;
+        color: @color-on-dark-faint;
+    }
+
+    // Near the right edge the card would run off the grid.
+    .week__day:nth-child(n + 6) & {
+        left: auto;
+        right: 0;
+    }
+}

@@ -19,9 +19,20 @@ export interface Reservation {
     createdAt: string;
 }
 
+export interface BookedSlot {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    cat: string;
+    requestedDate: string;
+    requestedTime: string;
+}
+
 export interface WeekSlot {
     time: string;
-    booked: null | { id: string; firstName: string; lastName: string; phone: string; cat: string };
+    booked: BookedSlot | null;
 }
 
 export interface WeekDay {
