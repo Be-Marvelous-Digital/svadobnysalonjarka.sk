@@ -17,7 +17,9 @@ const schema = z.object({
     API_RATE_LIMIT: z.coerce.number().int().positive().default(120),
     // Mailchimp's hosted form endpoint. Unset means the forwarding is simply off,
     // which is what dev and the test suite run with.
-    MAILCHIMP_SUBSCRIBE_URL: z.url().optional(),
+    // An empty value in .env means "off", not "invalid"; without this the server
+    // refuses to boot when somebody clears the line instead of deleting it.
+    MAILCHIMP_SUBSCRIBE_URL: z.preprocess((v) => v || undefined, z.url().optional()),
     /**
      * Preferred over the form endpoint when set. The form endpoint answers
      * "success" to everything, including payloads it silently discards; the API
@@ -31,7 +33,7 @@ const schema = z.object({
     MAILCHIMP_AUDIENCE_ID: z.string().min(1).optional(),
     MAILCHIMP_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
     PUBLIC_ORIGIN: z.string().default('https://svadobnysalonjarka.sk'),
-    CORS_ORIGIN: z.string().optional(),
+    CORS_ORIGIN: z.preprocess((v) => v || undefined, z.string().optional()),
     COOKIE_SECURE: z
         .enum(['true', 'false'])
         .default('true')

@@ -39,11 +39,26 @@ export function useAdminInquiries() {
     );
 
     const setHandled = useCallback(
-        (id: string, handled: boolean) => run(() => apiSend('PATCH', `/admin/reservations/${id}`, { handled })),
+        (id: string, handled: boolean) =>
+            // Clearing the flag also drops the agreed time, so the inquiry comes
+            // back as something still to sort out rather than a ghost in the diary.
+            run(() =>
+                apiSend(
+                    'PATCH',
+                    `/admin/reservations/${id}`,
+                    handled ? { handled } : { handled, confirmedDate: '', confirmedTime: '' },
+                ),
+            ),
+        [run],
+    );
+
+    const confirm = useCallback(
+        (id: string, confirmedDate: string, confirmedTime: string) =>
+            run(() => apiSend('PATCH', `/admin/reservations/${id}`, { confirmedDate, confirmedTime })),
         [run],
     );
 
     const remove = useCallback((id: string) => run(() => apiSend('DELETE', `/admin/reservations/${id}`)), [run]);
 
-    return { inquiries, loading, error, setHandled, remove };
+    return { inquiries, loading, error, setHandled, confirm, remove };
 }

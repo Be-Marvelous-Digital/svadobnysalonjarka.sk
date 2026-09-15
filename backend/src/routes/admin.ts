@@ -18,7 +18,9 @@ import {
     photoUrlSchema,
     reservationPatchSchema,
     settingsSchema,
+    weekQuerySchema,
 } from '../schemas.js';
+import { offeredSlots, weekFrom } from '../services/slots.js';
 import { discardUpload, removePhotoFile, storePhoto, UnsupportedImageError } from '../services/photoStorage.js';
 
 export const adminRouter = Router();
@@ -96,6 +98,8 @@ adminRouter.get('/reservations', requireAdmin, async (_req, res) => {
             date: r.date,
             time: r.time,
             handled: r.handled,
+            confirmedDate: r.confirmedDate,
+            confirmedTime: r.confirmedTime,
             createdAt: r.createdAt,
         })),
     );
@@ -107,7 +111,17 @@ adminRouter.patch('/reservations/:id', requireAdmin, async (req, res) => {
         res.status(400).json({ error: 'Neplatná zmena.' });
         return;
     }
-    const updated = await Reservation.findByIdAndUpdate(req.params.id, { handled: parsed.data.handled });
+
+    const { handled, confirmedDate, confirmedTime } = parsed.data;
+    // Confirming a time is what marks an inquiry dealt with; clearing it puts the
+    // inquiry back among the new ones.
+    const change = confirmedDate
+        ? { confirmedDate, confirmedTime, handled: true }
+        : confirmedDate === ''
+          ? { confirmedDate: '', confirmedTime: '', handled: handled ?? false }
+          : { handled: handled ?? false };
+
+    const updated = await Reservation.findByIdAndUpdate(req.params.id, change);
     if (!updated) {
         res.status(404).json({ error: 'Dopyt neexistuje.' });
         return;
@@ -122,6 +136,44 @@ adminRouter.delete('/reservations/:id', requireAdmin, async (req, res) => {
     }
     await Reservation.findByIdAndDelete(req.params.id);
     res.json({ ok: true });
+});
+
+/**
+ * One week of the salon's diary. Built here rather than in the browser so the
+ * opening hours and the fitting length stay in one place.
+ */
+adminRouter.get('/week', requireAdmin, async (req, res) => {
+    const parsed = weekQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+        res.status(400).json({ error: 'Neplatný dátum.' });
+        return;
+    }
+
+    const dates = weekFrom(parsed.data.from);
+    const { duration, buffer } = await readSettings();
+    const booked = await Reservation.find({ confirmedDate: { $in: dates } }).lean();
+
+    res.json({
+        duration,
+        days: dates.map((date) => ({
+            date,
+            slots: offeredSlots(date, duration, buffer).map((time) => {
+                const match = booked.find((r) => r.confirmedDate === date && r.confirmedTime === time);
+                return {
+                    time,
+                    booked: match
+                        ? {
+                              id: String(match._id),
+                              firstName: match.firstName,
+                              lastName: match.lastName,
+                              phone: match.phone,
+                              cat: match.cat,
+                          }
+                        : null,
+                };
+            }),
+        })),
+    });
 });
 
 adminRouter.get('/photos', requireAdmin, async (_req, res) => {

@@ -13,7 +13,25 @@ export interface Reservation {
     date: string;
     time: string;
     handled: boolean;
+    /** What the owner actually agreed, which need not be what was requested. */
+    confirmedDate: string;
+    confirmedTime: string;
     createdAt: string;
+}
+
+export interface WeekSlot {
+    time: string;
+    booked: null | { id: string; firstName: string; lastName: string; phone: string; cat: string };
+}
+
+export interface WeekDay {
+    date: string;
+    slots: WeekSlot[];
+}
+
+export interface Week {
+    duration: number;
+    days: WeekDay[];
 }
 
 export interface Availability {

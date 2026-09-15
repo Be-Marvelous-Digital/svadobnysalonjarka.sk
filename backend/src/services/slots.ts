@@ -34,3 +34,13 @@ export function generateSlots(date: string, duration: number, buffer: number): s
 export function offeredSlots(date: string, duration: number, buffer: number): string[] {
     return generateSlots(date, duration, buffer);
 }
+
+/** The seven dates of the week starting at `from`, inclusive. */
+export function weekFrom(from: string): string[] {
+    const start = new Date(`${from}T12:00:00Z`);
+    return Array.from({ length: 7 }, (_, offset) => {
+        const day = new Date(start);
+        day.setUTCDate(day.getUTCDate() + offset);
+        return day.toISOString().slice(0, 10);
+    });
+}

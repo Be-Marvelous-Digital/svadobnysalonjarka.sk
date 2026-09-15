@@ -6,12 +6,14 @@ import { buildReplyMailto } from './RequestCard.helpers';
 
 interface InquiryCardProps {
     inquiry: Reservation;
+    onConfirm: (inquiry: Reservation) => void;
     onToggleHandled: (id: string, handled: boolean) => void;
     onRemove: (id: string) => void;
 }
 
-export const InquiryCard = ({ inquiry, onToggleHandled, onRemove }: InquiryCardProps) => {
+export const InquiryCard = ({ inquiry, onConfirm, onToggleHandled, onRemove }: InquiryCardProps) => {
     const fullName = [inquiry.firstName, inquiry.lastName].filter(Boolean).join(' ').trim() || 'Bez mena';
+    const confirm = useCallback(() => onConfirm(inquiry), [inquiry, onConfirm]);
     const toggle = useCallback(
         () => onToggleHandled(inquiry.id, !inquiry.handled),
         [inquiry.handled, inquiry.id, onToggleHandled],
@@ -50,11 +52,22 @@ export const InquiryCard = ({ inquiry, onToggleHandled, onRemove }: InquiryCardP
 
                 <span className={styles.request__meta}>{inquiry.cat}</span>
                 <span className={`${styles.request__meta} ${styles['request__meta--when']}`}>
-                    {formatLongDate(inquiry.date)} · {inquiry.time}
+                    {inquiry.confirmedDate ? (
+                        <>
+                            Potvrdené {formatLongDate(inquiry.confirmedDate)} · {inquiry.confirmedTime}
+                        </>
+                    ) : (
+                        <>
+                            {formatLongDate(inquiry.date)} · {inquiry.time}
+                        </>
+                    )}
                 </span>
             </div>
 
             <div className={styles.request__actions}>
+                <button type="button" className={`${styles.action} ${styles['action--primary']}`} onClick={confirm}>
+                    {inquiry.confirmedDate ? 'Zmeniť termín' : 'Potvrdiť'}
+                </button>
                 {inquiry.email ? (
                     <a
                         href={buildReplyMailto(inquiry)}

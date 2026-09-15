@@ -16,10 +16,23 @@ export const reservationRequestSchema = z.object({
     time: timeString,
 });
 
-/** The only thing the owner changes about an inquiry. */
-export const reservationPatchSchema = z.object({
-    handled: z.boolean(),
-});
+/**
+ * Either tick an inquiry off, or confirm a time for it. Confirming implies
+ * handled, so the two arrive together from the dialog.
+ */
+export const reservationPatchSchema = z
+    .object({
+        handled: z.boolean().optional(),
+        confirmedDate: z.union([dateString, z.literal('')]).optional(),
+        confirmedTime: z.union([timeString, z.literal('')]).optional(),
+    })
+    .refine((value) => Object.keys(value).length > 0, 'Žiadne zmeny')
+    .refine(
+        (value) => Boolean(value.confirmedDate) === Boolean(value.confirmedTime),
+        'Dátum aj čas potvrdenia treba zadať spolu',
+    );
+
+export const weekQuerySchema = z.object({ from: dateString });
 
 export const settingsSchema = z.object({
     duration: z.number().int().min(15).max(240),

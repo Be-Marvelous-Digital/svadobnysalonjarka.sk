@@ -13,11 +13,15 @@ const reservationSchema = new Schema(
         time: { type: String, required: true, match: /^\d{1,2}:\d{2}$/ },
         /** Ticked off by the owner once the client has been dealt with. */
         handled: { type: Boolean, default: false, index: true },
+        /** What was actually agreed, which need not be what was requested. */
+        confirmedDate: { type: String, default: '', match: /^(\d{4}-\d{2}-\d{2})?$/ },
+        confirmedTime: { type: String, default: '', match: /^(\d{1,2}:\d{2})?$/ },
     },
     { timestamps: true },
 );
 
 reservationSchema.index({ createdAt: -1 });
+reservationSchema.index({ confirmedDate: 1, confirmedTime: 1 });
 
 export type ReservationDoc = InferSchemaType<typeof reservationSchema>;
 
