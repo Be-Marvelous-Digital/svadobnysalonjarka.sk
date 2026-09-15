@@ -2,9 +2,8 @@ import { useCallback, useState, type FormEvent } from 'react';
 import { Field, TextInput } from '@/components/Field';
 import { useAdminUsers } from '@/hooks/useAdminUsers';
 import { UserRow } from './UserRow';
+import { MIN_PASSWORD, validatePassword, validateUsername } from './userValidation';
 import styles from './Admin.module.less';
-
-const MIN_PASSWORD = 10;
 
 export const AdminUsers = () => {
     const { users, busy, error, notice, create, changeOwnPassword, resetPassword, remove } = useAdminUsers();
@@ -14,12 +13,23 @@ export const AdminUsers = () => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [ownPassword, setOwnPassword] = useState('');
 
+    // A disabled button cannot say what is wrong with it, so both forms stay
+    // pressable and answer on submit.
+    const [createErrors, setCreateErrors] = useState<{ username?: string; password?: string }>({});
+    const [ownErrors, setOwnErrors] = useState<{ current?: string; password?: string }>({});
+
     const handleCreate = useCallback(
         async (event: FormEvent) => {
             event.preventDefault();
+
+            const errors = { username: validateUsername(newUsername), password: validatePassword(newPassword) };
+            setCreateErrors(errors);
+            if (errors.username || errors.password) return;
+
             if (await create(newUsername.trim(), newPassword)) {
                 setNewUsername('');
                 setNewPassword('');
+                setCreateErrors({});
             }
         },
         [create, newUsername, newPassword],
@@ -28,9 +38,18 @@ export const AdminUsers = () => {
     const handleOwnPassword = useCallback(
         async (event: FormEvent) => {
             event.preventDefault();
+
+            const errors = {
+                current: currentPassword ? undefined : 'Vyplňte súčasné heslo.',
+                password: validatePassword(ownPassword),
+            };
+            setOwnErrors(errors);
+            if (errors.current || errors.password) return;
+
             if (await changeOwnPassword(currentPassword, ownPassword)) {
                 setCurrentPassword('');
                 setOwnPassword('');
+                setOwnErrors({});
             }
         },
         [changeOwnPassword, currentPassword, ownPassword],
@@ -78,7 +97,7 @@ export const AdminUsers = () => {
                         </span>
                     </div>
                     <div className={styles.card__side}>
-                        <Field label="Prihlasovacie meno">
+                        <Field label="Prihlasovacie meno" error={createErrors.username}>
                             <TextInput
                                 compact
                                 type="text"
@@ -90,7 +109,7 @@ export const AdminUsers = () => {
                                 onChange={(event) => setNewUsername(event.target.value)}
                             />
                         </Field>
-                        <Field label="Heslo">
+                        <Field label="Heslo" error={createErrors.password}>
                             <TextInput
                                 compact
                                 type="password"
@@ -99,11 +118,7 @@ export const AdminUsers = () => {
                                 onChange={(event) => setNewPassword(event.target.value)}
                             />
                         </Field>
-                        <button
-                            type="submit"
-                            className={`${styles.action} ${styles['action--primary']}`}
-                            disabled={busy || newUsername.trim().length < 3 || newPassword.length < MIN_PASSWORD}
-                        >
+                        <button type="submit" className={`${styles.action} ${styles['action--primary']}`} disabled={busy}>
                             Vytvoriť účet
                         </button>
                     </div>
@@ -117,7 +132,7 @@ export const AdminUsers = () => {
                         </span>
                     </div>
                     <div className={styles.card__side}>
-                        <Field label="Súčasné heslo">
+                        <Field label="Súčasné heslo" error={ownErrors.current}>
                             <TextInput
                                 compact
                                 type="password"
@@ -126,7 +141,7 @@ export const AdminUsers = () => {
                                 onChange={(event) => setCurrentPassword(event.target.value)}
                             />
                         </Field>
-                        <Field label="Nové heslo">
+                        <Field label="Nové heslo" error={ownErrors.password}>
                             <TextInput
                                 compact
                                 type="password"
@@ -135,11 +150,7 @@ export const AdminUsers = () => {
                                 onChange={(event) => setOwnPassword(event.target.value)}
                             />
                         </Field>
-                        <button
-                            type="submit"
-                            className={`${styles.action} ${styles['action--primary']}`}
-                            disabled={busy || !currentPassword || ownPassword.length < MIN_PASSWORD}
-                        >
+                        <button type="submit" className={`${styles.action} ${styles['action--primary']}`} disabled={busy}>
                             Zmeniť heslo
                         </button>
                     </div>

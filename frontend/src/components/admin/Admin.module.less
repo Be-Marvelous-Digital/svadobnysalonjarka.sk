@@ -574,11 +574,19 @@
         color: @color-text-secondary;
     }
 
-    &__actions,
-    &__reset {
+    &__actions {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        gap: 10px;
+    }
+
+    // The reset row carries a labelled field, so it aligns on the baseline of the
+    // input rather than centring the label against the buttons.
+    &__reset {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
         gap: 10px;
     }
 }

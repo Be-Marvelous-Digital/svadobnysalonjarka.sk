@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
-import { TextInput } from '@/components/Field';
+import { Field, TextInput } from '@/components/Field';
 import type { AdminUser } from '@/api/types';
 import styles from './Admin.module.less';
+import { validatePassword } from './userValidation';
 
 interface UserRowProps {
     user: AdminUser;
@@ -14,14 +15,20 @@ interface UserRowProps {
 export const UserRow = ({ user, busy, canDelete, onResetPassword, onRemove }: UserRowProps) => {
     const [resetting, setResetting] = useState(false);
     const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState<string>();
 
     const startReset = useCallback(() => setResetting(true), []);
     const cancelReset = useCallback(() => {
         setResetting(false);
         setPassword('');
+        setPasswordError(undefined);
     }, []);
 
     const submitReset = useCallback(() => {
+        const problem = validatePassword(password);
+        setPasswordError(problem);
+        if (problem) return;
+
         onResetPassword(user.id, password, user.username);
         setResetting(false);
         setPassword('');
@@ -45,18 +52,19 @@ export const UserRow = ({ user, busy, canDelete, onResetPassword, onRemove }: Us
 
             {resetting ? (
                 <div className={styles.userRow__reset}>
-                    <TextInput
-                        compact
-                        type="password"
-                        value={password}
-                        placeholder="Nové heslo"
-                        autoComplete="new-password"
-                        onChange={(event) => setPassword(event.target.value)}
-                    />
+                    <Field label={`Nové heslo pre ${user.username}`} error={passwordError}>
+                        <TextInput
+                            compact
+                            type="password"
+                            value={password}
+                            autoComplete="new-password"
+                            onChange={(event) => setPassword(event.target.value)}
+                        />
+                    </Field>
                     <button
                         type="button"
                         className={`${styles.action} ${styles['action--primary']}`}
-                        disabled={busy || password.length < 10}
+                        disabled={busy}
                         onClick={submitReset}
                     >
                         Nastaviť
