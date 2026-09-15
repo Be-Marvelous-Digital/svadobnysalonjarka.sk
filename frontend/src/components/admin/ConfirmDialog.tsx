@@ -1,7 +1,7 @@
 import { useCallback, useState, type FormEvent } from 'react';
 import type { Reservation } from '@/api/types';
 import { Field, TextInput } from '@/components/Field';
-import { useAvailability } from '@/hooks/useAvailability';
+import { useAdminDay } from '@/hooks/useAdminDay';
 import { useDialog } from '@/hooks/useDialog';
 import { formatLongDate } from '@/utils/date';
 import styles from './Admin.module.less';
@@ -19,7 +19,7 @@ export const ConfirmDialog = ({ inquiry, onConfirm, onClose }: ConfirmDialogProp
     // what gets agreed; the owner only edits it when the phone call says otherwise.
     const [date, setDate] = useState(inquiry.confirmedDate || inquiry.date);
     const [time, setTime] = useState(inquiry.confirmedTime || inquiry.time);
-    const { slots } = useAvailability(date);
+    const { slots } = useAdminDay(date);
 
     const name = [inquiry.firstName, inquiry.lastName].filter(Boolean).join(' ');
     const changed = date !== inquiry.date || time !== inquiry.time;
@@ -61,18 +61,32 @@ export const ConfirmDialog = ({ inquiry, onConfirm, onClose }: ConfirmDialogProp
                     <div className={styles.card__group}>
                         <span className={styles.card__label}>Čas</span>
                         <div className={styles.dialog__slots}>
-                            {slots.map((slot) => (
-                                <button
-                                    key={slot}
-                                    type="button"
-                                    className={[styles.action, styles['action--outline'], slot === time && styles['action--gold']]
-                                        .filter(Boolean)
-                                        .join(' ')}
-                                    onClick={() => setTime(slot)}
-                                >
-                                    {slot}
-                                </button>
-                            ))}
+                            {slots.map((slot) => {
+                                // A slot held by this very inquiry stays choosable, so
+                                // re-confirming an unchanged time is not blocked by itself.
+                                const takenByAnother = Boolean(slot.booked && slot.booked.id !== inquiry.id);
+                                const takenBy = slot.booked ? `${slot.booked.firstName} ${slot.booked.lastName}`.trim() : '';
+
+                                return (
+                                    <button
+                                        key={slot.time}
+                                        type="button"
+                                        className={[
+                                            styles.action,
+                                            styles['action--outline'],
+                                            slot.time === time && styles['action--gold'],
+                                        ]
+                                            .filter(Boolean)
+                                            .join(' ')}
+                                        disabled={takenByAnother}
+                                        title={takenByAnother ? `Obsadené — ${takenBy}` : undefined}
+                                        onClick={() => setTime(slot.time)}
+                                    >
+                                        {slot.time}
+                                        {takenByAnother ? <span className={styles.dialog__taken}>{takenBy}</span> : null}
+                                    </button>
+                                );
+                            })}
                             {slots.length === 0 ? <span className={styles.dialog__note}>V tento deň neskúšame.</span> : null}
                         </div>
                     </div>

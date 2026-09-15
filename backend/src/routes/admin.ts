@@ -113,6 +113,22 @@ adminRouter.patch('/reservations/:id', requireAdmin, async (req, res) => {
     }
 
     const { handled, confirmedDate, confirmedTime } = parsed.data;
+
+    // The dialog greys taken slots out, but a stale list or a direct request must
+    // not be able to put two clients in the same chair.
+    if (confirmedDate && confirmedTime) {
+        const clash = await Reservation.findOne({
+            _id: { $ne: req.params.id },
+            confirmedDate,
+            confirmedTime,
+        }).lean();
+        if (clash) {
+            res.status(409).json({
+                error: `Tento čas je už potvrdený pre ${[clash.firstName, clash.lastName].filter(Boolean).join(' ')}.`,
+            });
+            return;
+        }
+    }
     // Confirming a time is what marks an inquiry dealt with; clearing it puts the
     // inquiry back among the new ones.
     const change = confirmedDate

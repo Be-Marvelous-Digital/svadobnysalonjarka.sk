@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { TextInput } from '@/components/Field';
 import { useAdminWeek, mondayOf } from '@/hooks/useAdminWeek';
 import { dayNumber, formatLongDate, weekdayShort } from '@/utils/date';
 import styles from './Admin.module.less';
@@ -9,10 +10,11 @@ interface WeekCalendarProps {
 }
 
 export const WeekCalendar = ({ refreshToken }: WeekCalendarProps) => {
-    const { from, week, loading, shift, toThisWeek } = useAdminWeek(refreshToken);
+    const { from, week, loading, error, shift, goToWeekOf, toThisWeek } = useAdminWeek(refreshToken);
 
     const previous = useCallback(() => shift(-1), [shift]);
     const next = useCallback(() => shift(1), [shift]);
+    const pick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => goToWeekOf(event.target.value), [goToWeekOf]);
 
     const days = week?.days ?? [];
     const last = days[days.length - 1];
@@ -43,13 +45,29 @@ export const WeekCalendar = ({ refreshToken }: WeekCalendarProps) => {
                     >
                         →
                     </button>
-                    {!isThisWeek ? (
-                        <button type="button" className={`${styles.action} ${styles['action--outline']}`} onClick={toThisWeek}>
-                            Tento týždeň
-                        </button>
-                    ) : null}
+                    {/* Always present, so the toolbar does not reflow as the week
+                        changes; disabled tells the owner where they already are. */}
+                    <button
+                        type="button"
+                        className={`${styles.action} ${styles['action--outline']}`}
+                        onClick={toThisWeek}
+                        disabled={isThisWeek}
+                    >
+                        Tento týždeň
+                    </button>
+                    {/* Jumping months ahead should not take a dozen clicks. */}
+                    <label className={styles.week__jump}>
+                        <span className={styles.week__jumpLabel}>Skočiť na</span>
+                        <TextInput compact type="date" value={from} onChange={pick} aria-label="Zobraziť týždeň s dátumom" />
+                    </label>
                 </div>
             </div>
+
+            {error ? (
+                <span className={styles.block__count} role="alert">
+                    {error}
+                </span>
+            ) : null}
 
             {loading && !week ? (
                 <span className={styles.block__empty}>Načítavam…</span>

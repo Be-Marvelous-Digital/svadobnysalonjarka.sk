@@ -225,6 +225,12 @@
     &--outline {
         border-color: @color-border-strong;
         color: @color-ink;
+
+        &:disabled {
+            border-color: @color-border;
+            color: @color-text-disabled;
+            cursor: not-allowed;
+        }
     }
 
     &--danger {
@@ -762,5 +768,37 @@
 
     @media (max-width: @breakpoint-mobile) {
         padding: 24px;
+    }
+}
+
+.week {
+    &__jump {
+        display: inline-flex;
+        align-items: center;
+        gap: @spacing-xs;
+    }
+
+    &__jumpLabel {
+        font-size: @font-size-micro;
+        letter-spacing: @letter-spacing-wide;
+        text-transform: uppercase;
+        color: @color-text-secondary;
+    }
+}
+
+.dialog {
+    &__taken {
+        display: block;
+        margin-top: 2px;
+        font-size: @font-size-micro;
+        letter-spacing: 0;
+        text-transform: none;
+        color: @color-text-disabled;
+    }
+
+    &__slots {
+        .action--outline:disabled {
+            cursor: not-allowed;
+        }
     }
 }
