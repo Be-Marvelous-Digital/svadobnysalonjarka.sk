@@ -66,11 +66,11 @@ test.describe('reservation flow', () => {
         await expect(page.getByText('V tento deň nemáme voľný termín, vyberte, prosím, iný deň.')).toBeVisible();
     });
 
-    test('announces a conflict and sends the visitor back to pick another time', async ({ page, request }) => {
+    test('lets two people ask about the same time', async ({ page, request }) => {
         const date = dateFor(4, test.info().project.name);
         await completeSchedule(page, date);
 
-        // Someone else takes the slot while this visitor is still filling in their details.
+        // Somebody else asks for the same slot while this visitor is still typing.
         await request.post('/api/reservations', {
             data: {
                 firstName: 'Iná',
@@ -86,9 +86,8 @@ test.describe('reservation flow', () => {
         await completeContact(page);
         await page.getByRole('button', { name: 'Odoslať dopyt' }).click();
 
-        const alert = page.getByRole('alert');
-        await expect(alert).toContainText('už obsadený');
-        await expect(page.locator('input[type="date"]')).toBeVisible();
+        // Nothing is booked here, so there is nothing to clash with.
+        await expect(page.getByRole('heading', { name: 'Žiadosť sme prijali' })).toBeVisible();
     });
 
     test('Enter advances the step, so the form behaves like a form', async ({ page }) => {

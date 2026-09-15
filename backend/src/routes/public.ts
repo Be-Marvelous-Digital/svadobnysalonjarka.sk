@@ -7,7 +7,7 @@ import { Reservation } from '../models/Reservation.js';
 import { readSettings } from '../models/Settings.js';
 import { availabilityQuerySchema, reservationRequestSchema } from '../schemas.js';
 import { forwardInquiry } from '../services/mailchimp.js';
-import { freeSlots, isSlotFree } from '../services/slots.js';
+import { offeredSlots } from '../services/slots.js';
 
 export const publicRouter = Router();
 
@@ -33,7 +33,7 @@ publicRouter.get('/availability', async (req, res) => {
         return;
     }
     const { duration, buffer } = await readSettings();
-    res.json({ date: parsed.data.date, duration, slots: await freeSlots(parsed.data.date, duration, buffer) });
+    res.json({ date: parsed.data.date, duration, slots: offeredSlots(parsed.data.date, duration, buffer) });
 });
 
 publicRouter.post('/reservations', reservationLimiter, async (req, res) => {
@@ -45,12 +45,10 @@ publicRouter.post('/reservations', reservationLimiter, async (req, res) => {
     const { duration, buffer } = await readSettings();
     const { date, time } = parsed.data;
 
-    if (!(await freeSlots(date, duration, buffer)).includes(time)) {
-        res.status(409).json({ error: 'Tento termín je už obsadený. Vyberte, prosím, iný čas.' });
-        return;
-    }
-    if (!(await isSlotFree(date, time, duration))) {
-        res.status(409).json({ error: 'Tento termín je už obsadený. Vyberte, prosím, iný čas.' });
+    // Still refused when the salon is shut or the time is not one it offers; never
+    // because somebody else asked about it first.
+    if (!offeredSlots(date, duration, buffer).includes(time)) {
+        res.status(409).json({ error: 'V tento čas neskúšame. Vyberte, prosím, niektorý z ponúkaných termínov.' });
         return;
     }
 

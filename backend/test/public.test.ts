@@ -76,16 +76,17 @@ describe('GET /api/availability', () => {
         assert.deepEqual(response.body.slots, []);
     });
 
-    it('stops offering a slot somebody has already asked for', async () => {
+    it('keeps offering a slot somebody else has already asked about', async () => {
         const before = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
         const target = before.body.slots[0];
         assert.ok(target);
 
-        // Nothing gets approved any more, so an inquiry holds its slot outright.
         await Reservation.create({ firstName: 'Prvá', lastName: 'Testovacia', date: OPEN_DATE, time: target });
 
+        // A request is not a booking. Hiding the time would cost the salon every
+        // other client who wanted it.
         const after = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
-        assert.ok(!after.body.slots.includes(target));
+        assert.deepEqual(after.body.slots, before.body.slots);
     });
 });
 
@@ -128,11 +129,12 @@ describe('POST /api/reservations', () => {
         });
     }
 
-    it('refuses a slot outside the opening hours', async () => {
+    it('still refuses a time the salon does not offer', async () => {
         const response = await api<{ error: string }>(context, 'POST', '/api/reservations', {
             body: { ...valid, time: '21:00' },
         });
         assert.equal(response.status, 409);
+        assert.match(response.body.error, /neskúšame/);
         assert.equal(await Reservation.countDocuments(), 0);
     });
 
@@ -141,12 +143,13 @@ describe('POST /api/reservations', () => {
         assert.equal(response.status, 409);
     });
 
-    it('refuses a slot already asked for by someone else', async () => {
+    it('accepts a slot somebody else has already asked about', async () => {
         await Reservation.create({ firstName: 'Iná', lastName: 'Testovacia', date: OPEN_DATE, time: '10:00' });
 
-        const response = await api<{ error: string }>(context, 'POST', '/api/reservations', { body: valid });
-        assert.equal(response.status, 409);
-        assert.match(response.body.error, /obsaden/);
+        // Two people may want the same time; the salon sorts that out by phone.
+        const response = await api(context, 'POST', '/api/reservations', { body: valid });
+        assert.equal(response.status, 201);
+        assert.equal(await Reservation.countDocuments({ date: OPEN_DATE, time: '10:00' }), 2);
     });
 
     it('ignores a client trying to mark its own inquiry handled', async () => {

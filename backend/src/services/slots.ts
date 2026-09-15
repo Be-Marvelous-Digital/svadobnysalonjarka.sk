@@ -1,5 +1,4 @@
 import { OPENING_HOURS } from '../constants.js';
-import { Reservation } from '../models/Reservation.js';
 
 export function minutesFromTime(time: string): number {
     const [h, m] = time.split(':');
@@ -26,29 +25,12 @@ export function generateSlots(date: string, duration: number, buffer: number): s
 }
 
 /**
- * Every inquiry holds its slot. Nothing gets approved any more, so there is no
- * later moment at which a slot could become taken: the first person to ask for a
- * time gets offered it, and nobody else is shown it.
+ * What the salon opens for on a given day. Existing inquiries are deliberately
+ * ignored: nothing is approved here, so a request is only a request, and two
+ * people asking about the same time is a phone call to make, not a clash to
+ * prevent. Blocking on it would hide free time from everyone but the first
+ * person to ask.
  */
-export async function busyRanges(date: string, duration: number): Promise<Array<{ start: number; end: number }>> {
-    const taken = await Reservation.find({ date }).select('time').lean();
-    return taken.map((r) => ({ start: minutesFromTime(r.time), end: minutesFromTime(r.time) + duration }));
-}
-
-export async function freeSlots(date: string, duration: number, buffer: number): Promise<string[]> {
-    const all = generateSlots(date, duration, buffer);
-    if (all.length === 0) return [];
-    const busy = await busyRanges(date, duration);
-    return all.filter((time) => {
-        const start = minutesFromTime(time);
-        const end = start + duration;
-        return !busy.some((b) => start < b.end && end > b.start);
-    });
-}
-
-export async function isSlotFree(date: string, time: string, duration: number): Promise<boolean> {
-    const start = minutesFromTime(time);
-    const end = start + duration;
-    const busy = await busyRanges(date, duration);
-    return !busy.some((b) => start < b.end && end > b.start);
+export function offeredSlots(date: string, duration: number, buffer: number): string[] {
+    return generateSlots(date, duration, buffer);
 }

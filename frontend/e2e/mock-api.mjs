@@ -81,15 +81,17 @@ const server = createServer(async (req, res) => {
 
     if (pathname === '/api/availability') {
         const date = url.searchParams.get('date') ?? '';
-        const taken = reservations.filter((r) => r.date === date).map((r) => r.time);
-        const slots = FULLY_BOOKED.has(date) ? [] : SLOTS.filter((slot) => !taken.includes(slot));
+        // Existing inquiries no longer hide a slot from anybody else.
+        const slots = FULLY_BOOKED.has(date) ? [] : [...SLOTS];
         return send(res, 200, { date, duration: 60, slots });
     }
 
     if (pathname === '/api/reservations' && method === 'POST') {
         const body = await readBody(req);
-        if (reservations.some((r) => r.date === body.date && r.time === body.time)) {
-            return send(res, 409, { error: 'Tento termín je už obsadený. Vyberte, prosím, iný čas.' });
+        // Only a time the salon does not offer is refused; two people wanting the
+        // same slot is fine, the salon sorts it out by phone.
+        if (!SLOTS.includes(body.time)) {
+            return send(res, 409, { error: 'V tento čas neskúšame. Vyberte, prosím, niektorý z ponúkaných termínov.' });
         }
         reservations.push(body);
         return send(res, 201, { ok: true });
