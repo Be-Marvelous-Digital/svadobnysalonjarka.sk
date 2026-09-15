@@ -18,6 +18,17 @@ const schema = z.object({
     // Mailchimp's hosted form endpoint. Unset means the forwarding is simply off,
     // which is what dev and the test suite run with.
     MAILCHIMP_SUBSCRIBE_URL: z.url().optional(),
+    /**
+     * Preferred over the form endpoint when set. The form endpoint answers
+     * "success" to everything, including payloads it silently discards; the API
+     * returns the stored record, so a failure is visible instead of guessed at.
+     * Key looks like "abc123...-us18"; the suffix is the server prefix.
+     */
+    MAILCHIMP_API_KEY: z
+        .string()
+        .regex(/^[0-9a-f]{32}-[a-z]{2}\d{1,3}$/, 'Expected a Mailchimp API key')
+        .optional(),
+    MAILCHIMP_AUDIENCE_ID: z.string().min(1).optional(),
     MAILCHIMP_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
     PUBLIC_ORIGIN: z.string().default('https://svadobnysalonjarka.sk'),
     CORS_ORIGIN: z.string().optional(),

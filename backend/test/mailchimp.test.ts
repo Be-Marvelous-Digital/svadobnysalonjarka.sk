@@ -67,3 +67,14 @@ describe('the Mailchimp payload', () => {
         assert.equal(parsed.get('TYPE'), 'Svadobné šaty');
     });
 });
+
+describe('the API payload', () => {
+    it('keeps EMAIL out of merge_fields, where Mailchimp rejects it', () => {
+        const { EMAIL, ...merge } = buildMergePayload(inquiry);
+
+        assert.equal(EMAIL, 'jana@example.sk');
+        assert.ok(!('EMAIL' in merge));
+        assert.ok('FNAME' in merge && 'LNAME' in merge && 'PHONE' in merge);
+        assert.ok('TYPE' in merge && 'REQDATE' in merge && 'REQTIME' in merge);
+    });
+});

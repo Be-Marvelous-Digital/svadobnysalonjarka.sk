@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { env } from '../env.js';
 import { logger } from '../logger.js';
 
@@ -52,6 +53,65 @@ export function buildMergePayload(inquiry: InquiryFields): MergePayload {
     return payload;
 }
 
+/** Mailchimp addresses a member by the md5 of their lowercased e-mail. */
+function subscriberHash(email: string): string {
+    return createHash('md5').update(email.trim().toLowerCase()).digest('hex');
+}
+
+/**
+ * Upserts the contact through the Marketing API, which reports what it actually
+ * stored. Returns false when the API is not configured so the caller can fall
+ * back to the form endpoint.
+ */
+async function forwardViaApi(inquiry: InquiryFields): Promise<boolean> {
+    const key = env.MAILCHIMP_API_KEY;
+    const audience = env.MAILCHIMP_AUDIENCE_ID;
+    if (!key || !audience) return false;
+
+    const prefix = key.split('-')[1];
+    const url = `https://${prefix}.api.mailchimp.com/3.0/lists/${audience}/members/${subscriberHash(inquiry.email)}`;
+    const { EMAIL: _ignored, ...merge } = buildMergePayload(inquiry);
+
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${Buffer.from(`anystring:${key}`).toString('base64')}`,
+            },
+            body: JSON.stringify({
+                email_address: inquiry.email,
+                status_if_new: 'subscribed',
+                merge_fields: merge,
+            }),
+            signal: AbortSignal.timeout(env.MAILCHIMP_TIMEOUT_MS),
+        });
+
+        const body = (await response.json().catch(() => ({}))) as {
+            status?: string;
+            detail?: string;
+            errors?: Array<{ field: string; message: string }>;
+            merge_fields?: Record<string, unknown>;
+        };
+
+        if (!response.ok) {
+            logger.warn(
+                { status: response.status, detail: body.detail, errors: body.errors },
+                'Mailchimp API refused the inquiry',
+            );
+            return true;
+        }
+
+        // Echoing what came back is the whole point: it is the only way to see
+        // which merge fields the audience actually kept.
+        logger.info({ memberStatus: body.status, stored: body.merge_fields }, 'Inquiry stored in Mailchimp');
+        return true;
+    } catch (error) {
+        logger.warn({ error }, 'Could not reach the Mailchimp API');
+        return true;
+    }
+}
+
 /**
  * Sends the inquiry to the Mailchimp audience.
  *
@@ -60,6 +120,8 @@ export function buildMergePayload(inquiry: InquiryFields): MergePayload {
  * client. Failures are logged and dropped.
  */
 export async function forwardInquiry(inquiry: InquiryFields): Promise<void> {
+    if (await forwardViaApi(inquiry)) return;
+
     if (!env.MAILCHIMP_SUBSCRIBE_URL) {
         // Silence here used to look identical to a working forward, which cost a
         // long time to diagnose. Say it out loud instead.
