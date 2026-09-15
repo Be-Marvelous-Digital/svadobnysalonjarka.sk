@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { buildMergePayload } from '../src/services/mailchimp.js';
+import { buildMergePayload, parseFormResponse, reportingEndpoint } from '../src/services/mailchimp.js';
 
 const inquiry = {
     firstName: 'Jana',
@@ -76,5 +76,51 @@ describe('the API payload', () => {
         assert.ok(!('EMAIL' in merge));
         assert.ok('FNAME' in merge && 'LNAME' in merge && 'PHONE' in merge);
         assert.ok('TYPE' in merge && 'REQDATE' in merge && 'REQTIME' in merge);
+    });
+});
+
+describe('the subscribe endpoint', () => {
+    const pasted =
+        'https://gmail.us18.list-manage.com/subscribe/post?u=838607befb59341147d65eda6&amp;id=d7150fe930&amp;f_id=0018ade6f0';
+
+    it('undoes the &amp; a pasted URL carries, which otherwise loses the audience', () => {
+        const url = new URL(reportingEndpoint(pasted));
+
+        assert.equal(url.searchParams.get('id'), 'd7150fe930');
+        assert.equal(url.searchParams.get('f_id'), '0018ade6f0');
+        assert.equal(url.searchParams.get('amp;id'), null);
+    });
+
+    it('switches to the variant that reports validation failures', () => {
+        const url = new URL(reportingEndpoint(pasted));
+
+        assert.match(url.pathname, /\/subscribe\/post-json$/);
+        // Without a callback name the JSON endpoint answers with an HTML page.
+        assert.equal(url.searchParams.get('c'), 'cb');
+    });
+
+    it('leaves an already-correct URL alone', () => {
+        const clean = 'https://gmail.us18.list-manage.com/subscribe/post-json?u=abc&id=def&c=cb';
+        assert.equal(new URL(reportingEndpoint(clean)).searchParams.get('id'), 'def');
+    });
+});
+
+describe('reading the response', () => {
+    it('recognises a refusal the endpoint returns with HTTP 200', () => {
+        const outcome = parseFormResponse('cb({"result":"error","msg":"4 - Please enter a value"})');
+
+        assert.equal(outcome.result, 'error');
+        assert.equal(outcome.message, '4 - Please enter a value');
+    });
+
+    it('recognises a success and strips the markup out of the message', () => {
+        const outcome = parseFormResponse('cb({"result":"success","msg":"<b>Thank you</b> for subscribing!"})');
+
+        assert.equal(outcome.result, 'success');
+        assert.equal(outcome.message, 'Thank you for subscribing!');
+    });
+
+    it('does not throw on an HTML page', () => {
+        assert.equal(parseFormResponse('<!DOCTYPE html><html></html>').result, 'unknown');
     });
 });

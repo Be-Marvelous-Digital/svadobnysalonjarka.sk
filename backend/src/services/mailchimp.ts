@@ -53,6 +53,23 @@ export function buildMergePayload(inquiry: InquiryFields): MergePayload {
     return payload;
 }
 
+/**
+ * Turns whatever was pasted into the endpoint that reports failures.
+ *
+ * Two traps, both of which answer HTTP 200 and look like success:
+ *  - a URL copied from a browser or an HTML snippet carries `&amp;`, so Mailchimp
+ *    reads the audience parameter as `amp;id`, finds no audience, and discards
+ *    the submission;
+ *  - `/subscribe/post` always returns an HTML page, and `/subscribe/post-json`
+ *    only returns JSON when a callback name is present.
+ */
+export function reportingEndpoint(raw: string): string {
+    const url = new URL(raw.replace(/&amp;/g, '&'));
+    url.pathname = url.pathname.replace(/\/post(-json)?$/, '/post-json');
+    url.searchParams.set('c', 'cb');
+    return url.toString();
+}
+
 /** Mailchimp addresses a member by the md5 of their lowercased e-mail. */
 function subscriberHash(email: string): string {
     return createHash('md5').update(email.trim().toLowerCase()).digest('hex');
@@ -112,6 +129,24 @@ async function forwardViaApi(inquiry: InquiryFields): Promise<boolean> {
     }
 }
 
+/** The JSONP-ish body the form endpoint returns, reduced to result and message. */
+export function parseFormResponse(raw: string): { result: string; message: string } {
+    const json = raw
+        .trim()
+        .replace(/^[^(]*\(/, '')
+        .replace(/\);?$/, '');
+    try {
+        const parsed = JSON.parse(json) as { result?: string; msg?: string };
+        const message = (parsed.msg ?? '')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        return { result: parsed.result ?? 'unknown', message };
+    } catch {
+        return { result: 'unknown', message: raw.slice(0, 200) };
+    }
+}
+
 /**
  * Sends the inquiry to the Mailchimp audience.
  *
@@ -131,8 +166,10 @@ export async function forwardInquiry(inquiry: InquiryFields): Promise<void> {
 
     const body = new URLSearchParams(buildMergePayload(inquiry) as unknown as Record<string, string>);
 
+    const endpoint = reportingEndpoint(env.MAILCHIMP_SUBSCRIBE_URL);
+
     try {
-        const response = await fetch(env.MAILCHIMP_SUBSCRIBE_URL, {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body,
@@ -143,10 +180,13 @@ export async function forwardInquiry(inquiry: InquiryFields): Promise<void> {
             logger.warn({ status: response.status }, 'Mailchimp rejected the inquiry');
             return;
         }
-        logger.info(
-            { status: response.status, fields: Object.keys(buildMergePayload(inquiry)).join(',') },
-            'Inquiry forwarded to Mailchimp',
-        );
+
+        const outcome = parseFormResponse(await response.text());
+        if (outcome.result === 'error') {
+            logger.warn({ reason: outcome.message }, 'Mailchimp refused the inquiry');
+            return;
+        }
+        logger.info({ message: outcome.message }, 'Inquiry forwarded to Mailchimp');
     } catch (error) {
         logger.warn({ error }, 'Could not forward the inquiry to Mailchimp');
     }
