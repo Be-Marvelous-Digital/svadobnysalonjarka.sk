@@ -72,44 +72,9 @@ blockquote {
     margin: 0;
 }
 
-@keyframes jFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(26px);
-    }
-    to {
-        opacity: 1;
-        transform: none;
-    }
-}
-
-@keyframes jFade {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes jGradient {
-    0%,
-    100% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-}
-
-@keyframes jZoom {
-    from {
-        transform: scale(1.12);
-    }
-    to {
-        transform: scale(1);
-    }
-}
+/* Keyframes live in mixins.less, next to the mixins that emit them. A module
+   referencing a keyframe defined out here would have the reference renamed by
+   CSS Modules and silently never animate. */
 
 @media (prefers-reduced-motion: reduce) {
     *,

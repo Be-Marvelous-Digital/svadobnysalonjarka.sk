@@ -84,16 +84,31 @@ test.describe('user management', () => {
         await expect(page.getByRole('status')).toContainText(username);
     });
 
-    test('keeps the create button disabled until the password is long enough', async ({ page }) => {
-        const submit = page.getByRole('button', { name: 'Vytvoriť účet' });
-        await expect(submit).toBeDisabled();
+    test('says why a short password was refused instead of going dead', async ({ page }) => {
+        const form = page.locator('form', { has: page.getByRole('button', { name: 'Vytvoriť účet' }) });
+        const submit = form.getByRole('button', { name: 'Vytvoriť účet' });
 
-        await page.getByLabel('Prihlasovacie meno').fill('kratke');
-        await page.getByLabel('Heslo', { exact: true }).first().fill('Kratke1');
-        await expect(submit).toBeDisabled();
-
-        await page.getByLabel('Heslo', { exact: true }).first().fill('DostDlhe123');
+        // A disabled button cannot explain itself, which is exactly the trap here.
         await expect(submit).toBeEnabled();
+
+        await form.locator('input[type="text"]').fill('kratke');
+        await form.locator('input[type="password"]').fill('Kratke1');
+        await submit.click();
+        await expect(form.getByText('Heslo musí mať aspoň 10 znakov.', { exact: true })).toBeVisible();
+
+        await form.locator('input[type="password"]').fill('bezziadnychcislic');
+        await submit.click();
+        await expect(form.getByText(/písmeno a jednu číslicu/)).toBeVisible();
+    });
+
+    test('names a username that would not survive a login', async ({ page }) => {
+        const form = page.locator('form', { has: page.getByRole('button', { name: 'Vytvoriť účet' }) });
+
+        await form.locator('input[type="text"]').fill('meno s medzerou');
+        await form.locator('input[type="password"]').fill('DostDlhe123');
+        await form.getByRole('button', { name: 'Vytvoriť účet' }).click();
+
+        await expect(form.getByText(/bez diakritiky/)).toBeVisible();
     });
 
     test('reports a wrong current password when changing your own', async ({ page }) => {

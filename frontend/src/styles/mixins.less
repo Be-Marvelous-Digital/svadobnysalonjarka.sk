@@ -49,7 +49,56 @@
 
 // `both` holds the element at opacity 0 until the animation runs, so it is gated
 // on the same `js` class as the scroll reveals.
+.keyframes-fade-up() {
+    @keyframes jFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(26px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
+.keyframes-fade() {
+    @keyframes jFade {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}
+
+.keyframes-gradient() {
+    @keyframes jGradient {
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+}
+
+.keyframes-zoom-in() {
+    @keyframes jZoomIn {
+        from {
+            transform: scale(1);
+        }
+        to {
+            transform: scale(1.07);
+        }
+    }
+}
+
 .reveal-up(@delay: 0s) {
+    .keyframes-fade-up();
+
     :global(html.js) & {
         animation: jFadeUp @duration-slow @ease-out-expo @delay both;
     }

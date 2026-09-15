@@ -73,6 +73,12 @@ export const Footer = () => (
             <div className={styles.footer__bottom}>
                 <span>© {new Date().getFullYear()} Svadobný salón Jarka</span>
                 <span>{OPENING_SUMMARY}</span>
+                <span className={styles.footer__credit}>
+                    Vytvorené{' '}
+                    <a href="https://bemarvelousdigital.sk" target="_blank" rel="noopener noreferrer">
+                        BeMarvelousDigital.sk
+                    </a>
+                </span>
                 <nav className={styles.footer__legal}>
                     <Link to={ROUTES.privacy} className={`${styles.footer__link} ${styles['footer__link--quiet']}`}>
                         Ochrana súkromia

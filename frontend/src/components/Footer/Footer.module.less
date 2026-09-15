@@ -118,6 +118,20 @@
         color: @color-on-dark-faint;
     }
 
+    &__credit {
+        a {
+            display: inline-flex;
+            align-items: center;
+            min-height: @touch-target-min;
+            color: @color-primary-light;
+            transition: color @duration-fast ease;
+
+            &:hover {
+                color: @color-on-dark;
+            }
+        }
+    }
+
     &__legal {
         display: flex;
         flex-wrap: wrap;

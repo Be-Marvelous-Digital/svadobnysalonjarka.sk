@@ -188,6 +188,10 @@ test.describe('accessibility', () => {
         for (const route of PUBLIC_ROUTES) {
             await page.goto(route);
             await page.waitForLoadState('networkidle');
+            // Web fonts and the reveal transition both move boxes; measuring mid-flight
+            // reports a height the finished layout never has.
+            await page.evaluate(() => document.fonts.ready);
+            await page.waitForTimeout(400);
 
             const small = await page.evaluate(() => {
                 const results: string[] = [];
@@ -195,7 +199,8 @@ test.describe('accessibility', () => {
                     const box = element.getBoundingClientRect();
                     if (box.width === 0 || box.height === 0) continue;
                     if (getComputedStyle(element).position === 'fixed' && box.top < 0) continue;
-                    if (box.height < 44) {
+                    // Half a pixel of tolerance: sub-pixel rounding, not a real miss.
+                    if (box.height < 43.5) {
                         results.push(`${element.tagName} "${(element.textContent ?? '').trim().slice(0, 24)}" ${Math.round(box.height)}px`);
                     }
                 }

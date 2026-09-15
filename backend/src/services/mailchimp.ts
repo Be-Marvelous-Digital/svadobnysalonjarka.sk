@@ -60,7 +60,12 @@ export function buildMergePayload(inquiry: InquiryFields): MergePayload {
  * client. Failures are logged and dropped.
  */
 export async function forwardInquiry(inquiry: InquiryFields): Promise<void> {
-    if (!env.MAILCHIMP_SUBSCRIBE_URL) return;
+    if (!env.MAILCHIMP_SUBSCRIBE_URL) {
+        // Silence here used to look identical to a working forward, which cost a
+        // long time to diagnose. Say it out loud instead.
+        logger.warn('MAILCHIMP_SUBSCRIBE_URL is not set — the inquiry was saved but not forwarded');
+        return;
+    }
 
     const body = new URLSearchParams(buildMergePayload(inquiry) as unknown as Record<string, string>);
 
@@ -76,7 +81,10 @@ export async function forwardInquiry(inquiry: InquiryFields): Promise<void> {
             logger.warn({ status: response.status }, 'Mailchimp rejected the inquiry');
             return;
         }
-        logger.info('Inquiry forwarded to Mailchimp');
+        logger.info(
+            { status: response.status, fields: Object.keys(buildMergePayload(inquiry)).join(',') },
+            'Inquiry forwarded to Mailchimp',
+        );
     } catch (error) {
         logger.warn({ error }, 'Could not forward the inquiry to Mailchimp');
     }
