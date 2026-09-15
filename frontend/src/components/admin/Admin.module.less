@@ -878,3 +878,27 @@
         right: 0;
     }
 }
+
+.popover {
+    &__action {
+        margin-top: 4px;
+        min-height: @touch-target-min;
+        border: 1px solid @color-on-dark-border;
+        background: none;
+        cursor: pointer;
+        padding: 0 14px;
+        font-family: @font-primary;
+        font-size: @font-size-xxs;
+        letter-spacing: @letter-spacing-wide;
+        text-transform: uppercase;
+        color: @color-on-dark;
+        transition:
+            background @duration-fast ease,
+            border-color @duration-fast ease;
+
+        &:hover {
+            background: rgba(253, 252, 250, 0.12);
+            border-color: @color-on-dark;
+        }
+    }
+}

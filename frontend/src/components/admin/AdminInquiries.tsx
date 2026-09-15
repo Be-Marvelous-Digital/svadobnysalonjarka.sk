@@ -49,7 +49,7 @@ export const AdminInquiries = () => {
 
     return (
         <div className={styles.panel}>
-            <WeekCalendar refreshToken={calendarToken} />
+            <WeekCalendar refreshToken={calendarToken} onReschedule={openConfirm} />
 
             {error ? (
                 <span className={styles.block__count} role="alert">

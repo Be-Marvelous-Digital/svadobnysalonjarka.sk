@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import type { Reservation } from '@/api/types';
 import { TextInput } from '@/components/Field';
 import { BookedSlot } from './BookedSlot';
 import { useAdminWeek, mondayOf } from '@/hooks/useAdminWeek';
@@ -8,9 +9,10 @@ import styles from './Admin.module.less';
 interface WeekCalendarProps {
     /** Bumped by the parent whenever an inquiry is confirmed, to refetch. */
     refreshToken: number;
+    onReschedule: (inquiry: Reservation) => void;
 }
 
-export const WeekCalendar = ({ refreshToken }: WeekCalendarProps) => {
+export const WeekCalendar = ({ refreshToken, onReschedule }: WeekCalendarProps) => {
     const { from, week, loading, error, shift, goToWeekOf, toThisWeek } = useAdminWeek(refreshToken);
 
     const previous = useCallback(() => shift(-1), [shift]);
@@ -91,7 +93,13 @@ export const WeekCalendar = ({ refreshToken }: WeekCalendarProps) => {
                             ) : (
                                 day.slots.map((slot) =>
                                     slot.booked ? (
-                                        <BookedSlot key={slot.time} date={day.date} time={slot.time} booked={slot.booked} />
+                                        <BookedSlot
+                                            key={slot.time}
+                                            date={day.date}
+                                            time={slot.time}
+                                            booked={slot.booked}
+                                            onReschedule={onReschedule}
+                                        />
                                     ) : (
                                         <div key={slot.time} className={styles.week__slot}>
                                             <span className={styles.week__time}>{slot.time}</span>

@@ -1,5 +1,5 @@
 import { useCallback, useId, useRef, useState } from 'react';
-import type { BookedSlot as Booked } from '@/api/types';
+import type { BookedSlot as Booked, Reservation } from '@/api/types';
 import { formatLongDate } from '@/utils/date';
 import styles from './Admin.module.less';
 
@@ -7,6 +7,29 @@ interface BookedSlotProps {
     date: string;
     time: string;
     booked: Booked;
+    onReschedule: (inquiry: Reservation) => void;
+}
+
+/**
+ * The calendar only carries what it needs to draw a slot, but the confirmation
+ * dialog works on an inquiry. Everything it asks for is already here, so the
+ * record is rebuilt rather than refetched.
+ */
+function asInquiry(date: string, time: string, booked: Booked): Reservation {
+    return {
+        id: booked.id,
+        firstName: booked.firstName,
+        lastName: booked.lastName,
+        phone: booked.phone,
+        email: booked.email,
+        cat: booked.cat,
+        date: booked.requestedDate,
+        time: booked.requestedTime,
+        handled: true,
+        confirmedDate: date,
+        confirmedTime: time,
+        createdAt: '',
+    };
 }
 
 /**
@@ -17,7 +40,7 @@ interface BookedSlotProps {
  * open it. The card stays open while the pointer is inside it, otherwise the
  * links in it could never be clicked.
  */
-export const BookedSlot = ({ date, time, booked }: BookedSlotProps) => {
+export const BookedSlot = ({ date, time, booked, onReschedule }: BookedSlotProps) => {
     const [open, setOpen] = useState(false);
     const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const detailsId = useId();
@@ -33,6 +56,11 @@ export const BookedSlot = ({ date, time, booked }: BookedSlotProps) => {
     }, []);
 
     const toggle = useCallback(() => setOpen((current) => !current), []);
+
+    const reschedule = useCallback(() => {
+        setOpen(false);
+        onReschedule(asInquiry(date, time, booked));
+    }, [booked, date, onReschedule, time]);
 
     const name = `${booked.firstName} ${booked.lastName}`.trim();
     // Only worth saying when the agreed slot is not the one she asked for.
@@ -77,6 +105,10 @@ export const BookedSlot = ({ date, time, booked }: BookedSlotProps) => {
                     ) : null}
 
                     {movedFrom ? <span className={styles.popover__note}>Pôvodne žiadala {movedFrom}</span> : null}
+
+                    <button type="button" className={styles.popover__action} onClick={reschedule}>
+                        Zmeniť termín skúšky
+                    </button>
                 </div>
             ) : null}
         </div>
