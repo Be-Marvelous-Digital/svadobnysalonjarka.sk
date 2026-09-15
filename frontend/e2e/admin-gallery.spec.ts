@@ -139,6 +139,11 @@ test.describe('replying to an inquiry', () => {
         const reply = page.getByRole('link', { name: 'Odpovedať e-mailom' }).first();
         await expect(reply).toBeVisible();
 
+        // A mailto: navigation would unload the admin; the reply has to hand off
+        // to a new tab and leave the list where it was.
+        await expect(reply).toHaveAttribute('target', '_blank');
+        await expect(reply).toHaveAttribute('rel', 'noopener noreferrer');
+
         const href = await reply.getAttribute('href');
         expect(href).toBeTruthy();
 

@@ -36,7 +36,12 @@ export const InquiryCard = ({ inquiry, onToggleHandled, onRemove }: InquiryCardP
                         ) : null}
                         {inquiry.phone && inquiry.email ? ' · ' : null}
                         {inquiry.email ? (
-                            <a href={`mailto:${inquiry.email}`} className={styles.request__link}>
+                            <a
+                                href={`mailto:${inquiry.email}`}
+                                className={styles.request__link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
                                 {inquiry.email}
                             </a>
                         ) : null}
@@ -55,6 +60,8 @@ export const InquiryCard = ({ inquiry, onToggleHandled, onRemove }: InquiryCardP
                         href={buildReplyMailto(inquiry)}
                         className={`${styles.action} ${styles['action--gold']}`}
                         title={`Napísať na ${inquiry.email}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                     >
                         Odpovedať e-mailom
                     </a>
