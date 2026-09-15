@@ -9,6 +9,7 @@ import { env } from './env.js';
 import { logger } from './logger.js';
 import { adminRouter } from './routes/admin.js';
 import { publicRouter } from './routes/public.js';
+import { usersRouter } from './routes/users.js';
 
 export function createApp() {
     const app = express();
@@ -40,6 +41,7 @@ export function createApp() {
     );
 
     app.use('/api', publicRouter);
+    app.use('/api/admin/users', usersRouter);
     app.use('/api/admin', adminRouter);
 
     app.use('/api', (_req, res) => res.status(404).json({ error: 'Neznámy endpoint' }));

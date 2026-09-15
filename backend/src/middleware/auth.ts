@@ -2,6 +2,13 @@ import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../env.js';
 
+declare module 'express-serve-static-core' {
+    interface Request {
+        /** Set by requireAdmin: the id of the signed-in user. */
+        adminId?: string;
+    }
+}
+
 export const SESSION_COOKIE = 'jarka_session';
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
 /** Pinned so a token can never talk the verifier into a different algorithm. */
@@ -32,8 +39,9 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
         return;
     }
     try {
-        const payload = jwt.verify(token, env.JWT_SECRET, { algorithms: [ALGORITHM] }) as { role?: string };
-        if (payload.role !== 'admin') throw new Error('wrong role');
+        const payload = jwt.verify(token, env.JWT_SECRET, { algorithms: [ALGORITHM] }) as { role?: string; sub?: string };
+        if (payload.role !== 'admin' || !payload.sub) throw new Error('wrong role');
+        req.adminId = payload.sub;
         next();
     } catch {
         res.status(401).json({ error: 'Neplatná relácia' });

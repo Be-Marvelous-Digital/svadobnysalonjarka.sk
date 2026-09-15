@@ -36,3 +36,11 @@ export interface AdminPhoto {
     category: CategoryKey;
     url: string;
 }
+
+export interface AdminUser {
+    id: string;
+    username: string;
+    role: string;
+    createdAt: string;
+    isSelf: boolean;
+}

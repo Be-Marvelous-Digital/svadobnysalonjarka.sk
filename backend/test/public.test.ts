@@ -27,6 +27,7 @@ describe('GET /api/gallery', () => {
         assert.equal(response.status, 200);
         assert.deepEqual(Object.keys(response.body).sort(), [
             'galeria',
+            'instagram',
             'obuv',
             'prijimacie',
             'spolocenske',

@@ -42,6 +42,35 @@ export const loginSchema = z.object({
     password: z.string().min(1).max(200),
 });
 
+const password = z
+    .string()
+    .min(10, 'Heslo musí mať aspoň 10 znakov')
+    .max(200)
+    .refine((value) => /[a-z]/i.test(value) && /\d/.test(value), 'Heslo musí obsahovať písmeno aj číslicu');
+
+export const createUserSchema = z.object({
+    username: z
+        .string()
+        .trim()
+        .toLowerCase()
+        .min(3)
+        .max(60)
+        .regex(/^[a-z0-9._-]+$/, 'Meno môže obsahovať len písmená bez diakritiky, číslice, bodku, pomlčku a podčiarkovník'),
+    password,
+});
+
+export const changePasswordSchema = z.object({
+    currentPassword: z.string().min(1).max(200),
+    newPassword: password,
+});
+
+export const resetPasswordSchema = z.object({ password });
+
+/** The full, final order for one category. Partial lists are rejected on purpose. */
+export const photoOrderSchema = z.object({
+    ids: z.array(z.string()).min(1).max(500),
+});
+
 export const categoryParamSchema = z.object({
     category: z.enum(CATEGORY_KEYS),
 });

@@ -237,3 +237,105 @@ describe('photo link', () => {
         assert.deepEqual(gallery.body.obuv, ['https://example.com/obuv.webp']);
     });
 });
+
+describe('photo order', () => {
+    async function seedThree() {
+        const created = await upload([await pngBlob(10, 10), await pngBlob(20, 20), await pngBlob(30, 30)]);
+        return created.body.map((photo) => photo.id);
+    }
+
+    it('rewrites the order and the public gallery follows it', async () => {
+        const [first, second, third] = await seedThree();
+        assert.ok(first && second && third);
+
+        const response = await api(context, 'PUT', '/api/admin/photos/svadobne/order', {
+            cookie,
+            body: { ids: [third, first, second] },
+        });
+        assert.equal(response.status, 200);
+
+        const stored = await Photo.find({ category: 'svadobne' }).sort({ order: 1 }).lean();
+        assert.deepEqual(
+            stored.map((photo) => String(photo._id)),
+            [third, first, second],
+        );
+
+        const gallery = await api<Record<string, string[]>>(context, 'GET', '/api/gallery');
+        const urls = new Map(stored.map((photo) => [String(photo._id), photo.url]));
+        assert.deepEqual(gallery.body.svadobne, [urls.get(third), urls.get(first), urls.get(second)]);
+    });
+
+    it('refuses a partial list, because it would scramble the rest', async () => {
+        const [first, second] = await seedThree();
+        assert.ok(first && second);
+
+        const response = await api<{ error: string }>(context, 'PUT', '/api/admin/photos/svadobne/order', {
+            cookie,
+            body: { ids: [second, first] },
+        });
+        assert.equal(response.status, 409);
+    });
+
+    it('refuses duplicates and ids from another category', async () => {
+        const ids = await seedThree();
+        const other = await upload([await pngBlob()], 'obuv');
+        const strayId = other.body[0]?.id;
+        assert.ok(strayId && ids[0] && ids[1]);
+
+        const duplicated = await api(context, 'PUT', '/api/admin/photos/svadobne/order', {
+            cookie,
+            body: { ids: [ids[0], ids[0], ids[1]] },
+        });
+        assert.equal(duplicated.status, 409);
+
+        const foreign = await api(context, 'PUT', '/api/admin/photos/svadobne/order', {
+            cookie,
+            body: { ids: [ids[0], ids[1], strayId] },
+        });
+        assert.equal(foreign.status, 409);
+    });
+
+    it('rejects a malformed id and an unknown category', async () => {
+        await seedThree();
+
+        const badId = await api(context, 'PUT', '/api/admin/photos/svadobne/order', {
+            cookie,
+            body: { ids: ['nie-je-objectid'] },
+        });
+        assert.equal(badId.status, 400);
+
+        const badCategory = await api(context, 'PUT', '/api/admin/photos/vymyslena/order', {
+            cookie,
+            body: { ids: ['000000000000000000000000'] },
+        });
+        assert.equal(badCategory.status, 400);
+    });
+
+    it('requires a session', async () => {
+        const response = await api(context, 'PUT', '/api/admin/photos/svadobne/order', {
+            body: { ids: ['000000000000000000000000'] },
+        });
+        assert.equal(response.status, 401);
+    });
+
+    it('keeps newly uploaded photos after the reordered ones', async () => {
+        const [first, second, third] = await seedThree();
+        assert.ok(first && second && third);
+
+        await api(context, 'PUT', '/api/admin/photos/svadobne/order', { cookie, body: { ids: [third, second, first] } });
+        const added = await upload([await pngBlob(44, 44)]);
+
+        const stored = await Photo.find({ category: 'svadobne' }).sort({ order: 1 }).lean();
+        assert.equal(String(stored[3]?._id), added.body[0]?.id);
+    });
+});
+
+describe('instagram category', () => {
+    it('is a normal gallery category the public endpoint exposes', async () => {
+        await upload([await pngBlob()], 'instagram');
+
+        const gallery = await api<Record<string, string[]>>(context, 'GET', '/api/gallery');
+        assert.equal(gallery.body.instagram?.length, 1);
+        assert.match(gallery.body.instagram?.[0] ?? '', /^\/images\/gallery\/instagram\//);
+    });
+});

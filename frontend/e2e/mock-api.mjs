@@ -21,7 +21,13 @@ const gallery = {
         Object.entries(CATEGORY_PHOTOS).map(([key, indexes]) => [key, indexes.map((n) => `/assets/${key}-${n}.webp`)]),
     ),
     galeria: ['/assets/hero.webp', '/assets/svadobne-1.webp', '/assets/spolocenske-2.webp'],
+    instagram: ['/assets/svadobne-3.webp', '/assets/spolocenske-2.webp', '/assets/svadobne-4.webp'],
 };
+
+let users = [
+    { id: 'u1', username: 'admin', role: 'admin', createdAt: '2026-01-01T00:00:00.000Z', isSelf: true },
+    { id: 'u2', username: 'jarka', role: 'admin', createdAt: '2026-02-01T00:00:00.000Z', isSelf: false },
+];
 
 const SLOTS = ['10:00', '11:15', '12:30', '13:45', '15:00', '16:15'];
 const CREDENTIALS = { username: 'admin', password: 'JarkaAdmin123' };
@@ -107,6 +113,46 @@ const server = createServer(async (req, res) => {
         if (!isAuthed(req)) return send(res, 401, { error: 'Neprihlásený' });
         if (pathname === '/api/admin/me') return send(res, 200, { ok: true });
         if (pathname === '/api/admin/photos') return send(res, 200, photos);
+
+        if (pathname === '/api/admin/users' && method === 'GET') return send(res, 200, users);
+        if (pathname === '/api/admin/users' && method === 'POST') {
+            const body = await readBody(req);
+            if (users.some((user) => user.username === body.username)) {
+                return send(res, 409, { error: 'Používateľ s týmto menom už existuje.' });
+            }
+            const created = {
+                id: `u${users.length + 1}`,
+                username: body.username,
+                role: 'admin',
+                createdAt: '2026-03-01T00:00:00.000Z',
+                isSelf: false,
+            };
+            users.push(created);
+            return send(res, 201, created);
+        }
+        if (pathname === '/api/admin/users/me/password' && method === 'PATCH') {
+            const body = await readBody(req);
+            if (body.currentPassword !== CREDENTIALS.password) {
+                return send(res, 401, { error: 'Súčasné heslo nesedí.' });
+            }
+            return send(res, 200, { ok: true });
+        }
+        if (/^\/api\/admin\/users\/[^/]+$/.test(pathname) && method === 'DELETE') {
+            const id = pathname.split('/').pop();
+            if (users.length <= 1) return send(res, 400, { error: 'Musí zostať aspoň jeden používateľ.' });
+            users = users.filter((user) => user.id !== id);
+            return send(res, 200, { ok: true });
+        }
+
+        // Photo ordering: keep it, so a reorder is visible on the next read.
+        if (/\/api\/admin\/photos\/[^/]+\/order$/.test(pathname) && method === 'PUT') {
+            const category = pathname.split('/')[4];
+            const body = await readBody(req);
+            const byId = new Map(photos.map((photo) => [photo.id, photo]));
+            const reordered = body.ids.map((id) => byId.get(id)).filter(Boolean);
+            photos = [...photos.filter((photo) => photo.category !== category), ...reordered];
+            return send(res, 200, { ok: true });
+        }
         if (pathname === '/api/admin/reservations') return send(res, 200, []);
         if (pathname === '/api/admin/settings') return send(res, 200, { duration: 60, buffer: 15 });
         if (pathname === '/api/admin/day') return send(res, 200, { date: '', duration: 60, slots: [] });

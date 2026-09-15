@@ -218,6 +218,30 @@
         color: @color-text-disabled;
     }
 
+    // Square nudge buttons for keyboard and touch, where a drag never fires.
+    &--step {
+        min-width: @touch-target-min;
+        min-height: @touch-target-min;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-color: @color-border;
+        color: @color-ink;
+        font-size: @font-size-md;
+        line-height: 1;
+
+        &:hover:not(:disabled) {
+            border-color: @color-primary;
+            color: @color-ink;
+        }
+
+        &:disabled {
+            color: @color-text-disabled;
+            cursor: not-allowed;
+        }
+    }
+
     &--link {
         padding: 0;
         color: @color-primary-text;
@@ -388,10 +412,35 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+        cursor: grab;
+        transition: opacity @duration-fast ease;
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        // The tile stays in place and fades; the surrounding tiles slide to show
+        // where it will land, which reads better than dragging a ghost around.
+        &--dragging {
+            opacity: 0.35;
+        }
     }
 
     &__frame {
         .photo-frame(3 / 4);
+        position: relative;
+    }
+
+    &__grip {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        padding: 3px 7px;
+        background: rgba(19, 17, 15, 0.55);
+        color: @color-on-dark;
+        font-size: @font-size-sm;
+        line-height: 1;
+        letter-spacing: 0.08em;
     }
 
     &__image {
@@ -441,5 +490,77 @@
     &__file {
         font-size: 14px;
         color: @color-ink;
+    }
+}
+
+.users {
+    display: flex;
+    flex-direction: column;
+    gap: @spacing-lg;
+
+    &__status {
+        min-height: 20px;
+        font-size: @font-size-sm;
+        color: @color-primary-text;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &__forms {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+        gap: @spacing-md;
+        margin-top: @spacing-md;
+    }
+}
+
+.userRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: @spacing-md;
+    border: 1px solid @color-border;
+    padding: @spacing-md 20px;
+    background: @color-surface;
+
+    &__who {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__name {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: @font-size-md;
+        color: @color-ink;
+    }
+
+    &__badge {
+        padding: 3px 9px;
+        background: @color-surface-muted;
+        font-size: @font-size-micro;
+        letter-spacing: @letter-spacing-wide;
+        text-transform: uppercase;
+        color: @color-primary-text;
+    }
+
+    &__meta {
+        font-size: @font-size-sm;
+        color: @color-text-secondary;
+    }
+
+    &__actions,
+    &__reset {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
     }
 }

@@ -115,3 +115,52 @@ test.describe('page content is actually visible', () => {
             .toBeLessThan(400);
     });
 });
+
+test.describe('home page Instagram strip', () => {
+    test('renders the photos the admin manages, not a hard-coded list', async ({ page }) => {
+        await acceptConsent(page);
+        await page.goto('/');
+        await page.waitForLoadState('networkidle');
+
+        const sources = await page.evaluate(() => {
+            const heading = [...document.querySelectorAll('h2')].find((node) =>
+                node.textContent?.includes('@svadobnysalonjarka'),
+            );
+            const section = heading?.closest('section');
+            return [...(section?.querySelectorAll('img') ?? [])].map((image) => new URL(image.src).pathname);
+        });
+
+        // The mock serves three photos for the instagram category; the six-tile
+        // fallback would mean the section is ignoring the gallery.
+        expect(sources).toEqual(['/assets/svadobne-3.webp', '/assets/spolocenske-2.webp', '/assets/svadobne-4.webp']);
+    });
+
+    test('falls back to bundled photos when the category is empty', async ({ page }) => {
+        await acceptConsent(page);
+        await page.route('**/api/gallery', (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    svadobne: [],
+                    spolocenske: [],
+                    prijimacie: [],
+                    zenich: [],
+                    obuv: [],
+                    galeria: [],
+                    instagram: [],
+                }),
+            }),
+        );
+        await page.goto('/');
+        await page.waitForLoadState('networkidle');
+
+        const count = await page.evaluate(() => {
+            const heading = [...document.querySelectorAll('h2')].find((node) =>
+                node.textContent?.includes('@svadobnysalonjarka'),
+            );
+            return heading?.closest('section')?.querySelectorAll('img').length ?? 0;
+        });
+        expect(count).toBe(6);
+    });
+});

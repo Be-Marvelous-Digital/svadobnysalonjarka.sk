@@ -1,6 +1,21 @@
-export const CATEGORY_KEYS = ['svadobne', 'spolocenske', 'prijimacie', 'zenich', 'obuv', 'galeria'] as const;
+export const CATEGORY_KEYS = ['svadobne', 'spolocenske', 'prijimacie', 'zenich', 'obuv', 'galeria', 'instagram'] as const;
 
 export type CategoryKey = (typeof CATEGORY_KEYS)[number];
+
+/**
+ * Every category the admin can manage. `instagram` feeds the strip on the home
+ * page and deliberately has no public collection page of its own, so it is not
+ * part of COLLECTIONS below.
+ */
+export const CATEGORY_LABELS: Record<CategoryKey, string> = {
+    svadobne: 'Svadobné šaty',
+    spolocenske: 'Spoločenské šaty',
+    prijimacie: 'Prijímacie šaty',
+    zenich: 'Pre ženíchov',
+    obuv: 'Obuv a kabelky',
+    galeria: 'Galéria salónu',
+    instagram: 'Instagram na úvodnej stránke',
+};
 
 export interface Collection {
     key: CategoryKey;

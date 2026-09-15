@@ -1,4 +1,4 @@
-export const CATEGORY_KEYS = ['svadobne', 'spolocenske', 'prijimacie', 'zenich', 'obuv', 'galeria'] as const;
+export const CATEGORY_KEYS = ['svadobne', 'spolocenske', 'prijimacie', 'zenich', 'obuv', 'galeria', 'instagram'] as const;
 
 export type CategoryKey = (typeof CATEGORY_KEYS)[number];
 
@@ -9,6 +9,7 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
     zenich: 'Pre ženíchov',
     obuv: 'Obuv a kabelky',
     galeria: 'Galéria salónu',
+    instagram: 'Instagram na úvodnej stránke',
 };
 
 export const RESERVATION_STATUSES = ['pending', 'confirmed', 'rejected', 'blocked'] as const;

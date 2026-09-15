@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import rateLimit from 'express-rate-limit';
@@ -15,11 +16,12 @@ import {
     categoryParamSchema,
     loginSchema,
     ownerReservationSchema,
+    photoOrderSchema,
     photoUrlSchema,
     reservationPatchSchema,
     settingsSchema,
 } from '../schemas.js';
-import { removePhotoFile, storePhoto, UnsupportedImageError } from '../services/photoStorage.js';
+import { discardUpload, removePhotoFile, storePhoto, UnsupportedImageError } from '../services/photoStorage.js';
 import { generateSlots, isSlotFree } from '../services/slots.js';
 
 export const adminRouter = Router();
@@ -32,11 +34,17 @@ const loginLimiter = rateLimit({
     message: { error: 'Príliš veľa pokusov. Skúste to o chvíľu znova.' },
 });
 
-const MAX_FILES = 10;
+const MAX_FILES = 40;
 
+/**
+ * No file-size limit: the salon photographs at full resolution and everything is
+ * re-encoded to a bounded WebP anyway. Uploads stream to a temporary file instead
+ * of memory, so a large batch cannot exhaust the container's RAM. The temp files
+ * are removed in the route, whatever the outcome.
+ */
 const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 12 * 1024 * 1024, files: MAX_FILES },
+    storage: multer.diskStorage({ destination: (_req, _file, cb) => cb(null, tmpdir()) }),
+    limits: { files: MAX_FILES },
     // A first cheap filter only; storePhoto decides for real, from the decoded bytes.
     fileFilter: (_req, file, cb) => cb(null, file.mimetype.startsWith('image/')),
 });
@@ -205,26 +213,32 @@ adminRouter.post('/photos/:category', requireAdmin, upload.array('photos', MAX_F
     const { category } = parsed.data;
     let order = await nextOrder(category);
     const created = [];
-    for (const file of files) {
-        let url: string;
-        try {
-            url = await storePhoto(category, file.buffer);
-        } catch (error) {
-            if (error instanceof UnsupportedImageError) {
-                res.status(400).json({ error: error.message });
-                return;
+
+    try {
+        for (const file of files) {
+            let url: string;
+            try {
+                url = await storePhoto(category, file.path);
+            } catch (error) {
+                if (error instanceof UnsupportedImageError) {
+                    res.status(400).json({ error: error.message });
+                    return;
+                }
+                throw error;
             }
-            throw error;
+            try {
+                const doc = await Photo.create({ category, url, order: order++ });
+                created.push({ id: String(doc._id), category, url });
+            } catch (error) {
+                // The file is already on the volume; without this the write would be orphaned there.
+                await removePhotoFile(url);
+                throw error;
+            }
         }
-        try {
-            const doc = await Photo.create({ category, url, order: order++ });
-            created.push({ id: String(doc._id), category, url });
-        } catch (error) {
-            // The file is already on the volume; without this the write would be orphaned there.
-            await removePhotoFile(url);
-            throw error;
-        }
+    } finally {
+        await Promise.all(files.map((file) => discardUpload(file.path)));
     }
+
     res.status(201).json(created);
 });
 
@@ -246,13 +260,15 @@ adminRouter.put('/photos/:id', requireAdmin, upload.single('photo'), async (req,
     const previousUrl = photo.url;
     let url: string;
     try {
-        url = await storePhoto(photo.category as CategoryKey, req.file.buffer);
+        url = await storePhoto(photo.category as CategoryKey, req.file.path);
     } catch (error) {
         if (error instanceof UnsupportedImageError) {
             res.status(400).json({ error: error.message });
             return;
         }
         throw error;
+    } finally {
+        await discardUpload(req.file.path);
     }
     try {
         photo.url = url;
@@ -264,6 +280,33 @@ adminRouter.put('/photos/:id', requireAdmin, upload.single('photo'), async (req,
     await removePhotoFile(previousUrl);
 
     res.json({ id: String(photo._id), category: photo.category, url });
+});
+
+adminRouter.put('/photos/:category/order', requireAdmin, async (req, res) => {
+    const params = categoryParamSchema.safeParse(req.params);
+    const body = photoOrderSchema.safeParse(req.body);
+    if (!params.success || !body.success || body.data.ids.some((id) => !isValidObjectId(id))) {
+        res.status(400).json({ error: 'Neplatné poradie.' });
+        return;
+    }
+
+    const { category } = params.data;
+    const { ids } = body.data;
+
+    // The request has to carry the whole category. Anything else means the client
+    // was working from a stale list, and applying it would scramble the order.
+    const existing = await Photo.find({ category }).select('_id').lean();
+    const known = new Set(existing.map((photo) => String(photo._id)));
+    const unique = new Set(ids);
+    if (unique.size !== ids.length || ids.length !== known.size || ids.some((id) => !known.has(id))) {
+        res.status(409).json({ error: 'Zoznam fotografií sa medzičasom zmenil. Obnovte stránku.' });
+        return;
+    }
+
+    await Photo.bulkWrite(
+        ids.map((id, index) => ({ updateOne: { filter: { _id: id }, update: { $set: { order: index } } } })),
+    );
+    res.json({ ok: true });
 });
 
 adminRouter.post('/photos/:category/link', requireAdmin, async (req, res) => {

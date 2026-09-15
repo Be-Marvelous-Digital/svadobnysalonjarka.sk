@@ -2,11 +2,12 @@ import { useCallback, useState } from 'react';
 import { AdminGallery } from '@/components/admin/AdminGallery';
 import { AdminLogin } from '@/components/admin/AdminLogin';
 import { AdminReservations } from '@/components/admin/AdminReservations';
+import { AdminUsers } from '@/components/admin/AdminUsers';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { useAdminSession } from '@/hooks/useAdminSession';
 import styles from './AdminPage.module.less';
 
-type AdminTab = 'rezervacie' | 'galeria';
+type AdminTab = 'rezervacie' | 'galeria' | 'pouzivatelia';
 
 export const AdminPage = () => {
     const session = useAdminSession();
@@ -57,9 +58,20 @@ export const AdminPage = () => {
                             >
                                 Galéria
                             </button>
+                            <button
+                                type="button"
+                                className={[styles.admin__tab, tab === 'pouzivatelia' && styles['admin__tab--active']]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                onClick={() => setTab('pouzivatelia')}
+                            >
+                                Používatelia
+                            </button>
                         </div>
 
-                        {tab === 'rezervacie' ? <AdminReservations /> : <AdminGallery />}
+                        {tab === 'rezervacie' ? <AdminReservations /> : null}
+                        {tab === 'galeria' ? <AdminGallery /> : null}
+                        {tab === 'pouzivatelia' ? <AdminUsers /> : null}
                     </>
                 ) : (
                     <AdminLogin error={session.error} onSubmit={handleLogin} />

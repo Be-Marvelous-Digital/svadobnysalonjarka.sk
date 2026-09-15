@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Chip } from '@/components/Chip';
 import { TextInput } from '@/components/Field';
-import { COLLECTIONS, type CategoryKey } from '@/data/collections';
+import { CATEGORY_KEYS, CATEGORY_LABELS, type CategoryKey } from '@/data/collections';
 import { useAdminGallery } from '@/hooks/useAdminGallery';
+import { useReorderable } from '@/hooks/useReorderable';
 import { GalleryTile } from './GalleryTile';
 import styles from './Admin.module.less';
 
@@ -11,20 +12,25 @@ export const AdminGallery = () => {
     const [url, setUrl] = useState('');
     const gallery = useAdminGallery();
 
-    const { replace, remove } = gallery;
+    const { replace, remove, reorder } = gallery;
     const handleReplace = useCallback((id: string, file: File) => void replace(id, file), [replace]);
     const handleRemove = useCallback((id: string) => void remove(id), [remove]);
 
     const inCategory = useMemo(() => gallery.photos.filter((photo) => photo.category === category), [gallery.photos, category]);
     const countOf = (key: CategoryKey) => gallery.photos.filter((photo) => photo.category === key).length;
-    const label = COLLECTIONS.find((collection) => collection.key === category)?.label ?? '';
+    const label = CATEGORY_LABELS[category];
+
+    const handleCommit = useCallback((ids: string[]) => void reorder(category, ids), [reorder, category]);
+    const order = useReorderable({ items: inCategory, keyOf: (photo) => photo.id, onCommit: handleCommit });
+    const { move } = order;
+    const handleMove = useCallback((id: string, offset: number) => move(id, offset), [move]);
 
     return (
         <div className={styles.gallery}>
             <div className={styles.gallery__tabs}>
-                {COLLECTIONS.map((collection) => (
-                    <Chip key={collection.key} selected={category === collection.key} onClick={() => setCategory(collection.key)}>
-                        {collection.label} ({countOf(collection.key)})
+                {CATEGORY_KEYS.map((key) => (
+                    <Chip key={key} selected={category === key} onClick={() => setCategory(key)}>
+                        {CATEGORY_LABELS[key]} ({countOf(key)})
                     </Chip>
                 ))}
             </div>
@@ -34,8 +40,8 @@ export const AdminGallery = () => {
                     <span className={styles.card__title}>{label}</span>
                     <span className={styles.card__note}>
                         {inCategory.length
-                            ? `${inCategory.length} fotografií v tejto kategórii. Nové sa zobrazia na stránke kolekcie okamžite.`
-                            : 'Žiadne fotografie. Pridajte prvé a zobrazia sa na stránke kolekcie.'}
+                            ? `${inCategory.length} fotografií. Poradie zmeníte potiahnutím alebo šípkami pod fotografiou — prejaví sa na webe okamžite.`
+                            : 'Žiadne fotografie. Pridajte prvé a zobrazia sa na webe.'}
                     </span>
                 </div>
 
@@ -90,12 +96,16 @@ export const AdminGallery = () => {
                 <div className={styles.gallery__empty}>v tejto kategórii nie sú fotografie</div>
             ) : (
                 <div className={styles.gallery__grid}>
-                    {inCategory.map((photo, position) => (
+                    {order.ordered.map((photo, position) => (
                         <GalleryTile
                             key={photo.id}
                             photo={photo}
                             position={position + 1}
+                            total={order.ordered.length}
                             busy={gallery.busy}
+                            dragging={order.draggingKey === photo.id}
+                            dragProps={order.dragProps(photo.id)}
+                            onMove={handleMove}
                             onReplace={handleReplace}
                             onRemove={handleRemove}
                         />

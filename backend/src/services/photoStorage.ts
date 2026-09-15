@@ -8,9 +8,13 @@ import type { CategoryKey } from '../constants.js';
 
 const GALLERY_DIR = () => path.join(env.UPLOAD_DIR, 'gallery');
 const MAX_EDGE = 1600;
-/** ~50 MP. A small file can still decode to a huge bitmap; this caps that before sharp allocates. */
-const MAX_INPUT_PIXELS = 50_000_000;
-const ACCEPTED_FORMATS = new Set(['jpeg', 'png', 'webp', 'avif', 'gif', 'tiff', 'heif']);
+/**
+ * ~400 MP, far above any camera an uploader will realistically use. There is no
+ * file-size limit, but a decompression bomb is about decoded pixels rather than
+ * bytes on disk, so this stays as the backstop against an out-of-memory crash.
+ */
+const MAX_INPUT_PIXELS = 400_000_000;
+const ACCEPTED_FORMATS = new Set(['jpeg', 'png', 'webp', 'avif', 'gif', 'tiff', 'heif', 'svg']);
 
 export class UnsupportedImageError extends Error {
     constructor() {
@@ -19,8 +23,13 @@ export class UnsupportedImageError extends Error {
     }
 }
 
-export async function storePhoto(category: CategoryKey, buffer: Buffer): Promise<string> {
-    const pipeline = sharp(buffer, { limitInputPixels: MAX_INPUT_PIXELS });
+/**
+ * Reads the upload from a temporary file rather than a buffer: multer streams it
+ * to disk, sharp streams it back out, so a large photo never has to fit in RAM.
+ * Whatever comes in, a resized WebP comes out.
+ */
+export async function storePhoto(category: CategoryKey, sourcePath: string): Promise<string> {
+    const pipeline = sharp(sourcePath, { limitInputPixels: MAX_INPUT_PIXELS });
 
     // Trust the decoded bytes, not the multipart Content-Type the client sent.
     const { format } = await pipeline.metadata().catch(() => {
@@ -31,12 +40,26 @@ export async function storePhoto(category: CategoryKey, buffer: Buffer): Promise
     const dir = path.join(GALLERY_DIR(), category);
     await mkdir(dir, { recursive: true });
     const filename = `${Date.now().toString(36)}-${randomBytes(6).toString('hex')}.webp`;
-    await pipeline
-        .rotate()
-        .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 78 })
-        .toFile(path.join(dir, filename));
+
+    try {
+        await pipeline
+            .rotate()
+            .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 78 })
+            .toFile(path.join(dir, filename));
+    } catch (error) {
+        // A truncated or corrupt file only fails once sharp reads past the header.
+        throw error instanceof Error && /unsupported|corrupt|premature/i.test(error.message)
+            ? new UnsupportedImageError()
+            : error;
+    }
+
     return `/images/gallery/${category}/${filename}`;
+}
+
+/** Removes a multer temp file once it has been processed, successfully or not. */
+export async function discardUpload(sourcePath: string): Promise<void> {
+    await unlink(sourcePath).catch((error) => logger.warn({ error, sourcePath }, 'Could not remove temporary upload'));
 }
 
 const URL_PREFIX = '/images/gallery/';
