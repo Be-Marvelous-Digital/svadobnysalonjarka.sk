@@ -25,11 +25,13 @@ export function generateSlots(date: string, duration: number, buffer: number): s
     return slots;
 }
 
-/** Confirmed visits and owner blocks occupy a slot; pending requests stay selectable. */
+/**
+ * Every inquiry holds its slot. Nothing gets approved any more, so there is no
+ * later moment at which a slot could become taken: the first person to ask for a
+ * time gets offered it, and nobody else is shown it.
+ */
 export async function busyRanges(date: string, duration: number): Promise<Array<{ start: number; end: number }>> {
-    const taken = await Reservation.find({ date, status: { $in: ['confirmed', 'blocked'] } })
-        .select('time')
-        .lean();
+    const taken = await Reservation.find({ date }).select('time').lean();
     return taken.map((r) => ({ start: minutesFromTime(r.time), end: minutesFromTime(r.time) + duration }));
 }
 

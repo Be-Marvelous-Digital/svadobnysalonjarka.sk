@@ -3,6 +3,7 @@ import { Chip } from '@/components/Chip';
 import { Field, TextInput } from '@/components/Field';
 import { BOOKABLE_COLLECTIONS } from '@/data/collections';
 import { useAvailability } from '@/hooks/useAvailability';
+import type { FieldErrors } from '@/hooks/reservationValidation';
 import type { ReservationDraft } from '@/hooks/useReservationForm';
 import { formatLongDate, todayKey } from '@/utils/date';
 import styles from './ReservationForm.module.less';
@@ -10,10 +11,11 @@ import styles from './ReservationForm.module.less';
 interface StepScheduleProps {
     draft: ReservationDraft;
     valid: boolean;
+    errors: FieldErrors;
     onChange: (changes: Partial<ReservationDraft>) => void;
 }
 
-export const StepSchedule = ({ draft, valid, onChange }: StepScheduleProps) => {
+export const StepSchedule = ({ draft, valid, errors, onChange }: StepScheduleProps) => {
     const { slots, loading } = useAvailability(draft.date);
 
     const summary = valid ? `${draft.cat} · ${formatLongDate(draft.date)} · ${draft.time}` : 'Vyberte typ šiat, dátum a čas.';
@@ -22,6 +24,7 @@ export const StepSchedule = ({ draft, valid, onChange }: StepScheduleProps) => {
         <div className={styles.step}>
             <div className={styles.step__group}>
                 <span className={styles.step__label}>Čo si chcete vyskúšať</span>
+                {errors.cat ? <span className={styles.step__error}>{errors.cat}</span> : null}
                 <div className={styles.step__chips}>
                     {BOOKABLE_COLLECTIONS.map((collection) => (
                         <Chip
@@ -39,6 +42,7 @@ export const StepSchedule = ({ draft, valid, onChange }: StepScheduleProps) => {
                 <Field
                     label="Preferovaný dátum"
                     hint={draft.date ? formatLongDate(draft.date) : 'Vyberte dátum, ukážeme vám voľné časy.'}
+                    error={errors.date}
                 >
                     <TextInput
                         type="date"
@@ -50,6 +54,7 @@ export const StepSchedule = ({ draft, valid, onChange }: StepScheduleProps) => {
 
                 <div className={styles.step__group}>
                     <span className={styles.step__label}>Preferovaný čas</span>
+                    {errors.time ? <span className={styles.step__error}>{errors.time}</span> : null}
                     <div className={styles.step__slots}>
                         {slots.map((slot) => (
                             <Chip key={slot} size="time" selected={draft.time === slot} onClick={() => onChange({ time: slot })}>
@@ -67,7 +72,7 @@ export const StepSchedule = ({ draft, valid, onChange }: StepScheduleProps) => {
 
             <div className={styles.step__actions}>
                 <span className={styles.step__summary}>{summary}</span>
-                <Button type="submit" variant="dark" disabled={!valid}>
+                <Button type="submit" variant="dark" aria-disabled={!valid}>
                     Pokračovať
                 </Button>
             </div>

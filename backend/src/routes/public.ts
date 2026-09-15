@@ -54,7 +54,7 @@ publicRouter.post('/reservations', reservationLimiter, async (req, res) => {
         return;
     }
 
-    await Reservation.create({ ...parsed.data, status: 'pending', kind: 'klient' });
+    await Reservation.create(parsed.data);
 
     // Answer the visitor first. The forward is best-effort and must never delay or
     // fail a booking that is already saved.

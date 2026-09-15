@@ -1,19 +1,21 @@
 import { Button } from '@/components/Button';
 import { Field, TextInput } from '@/components/Field';
+import type { FieldErrors } from '@/hooks/reservationValidation';
 import type { ReservationDraft } from '@/hooks/useReservationForm';
 import styles from './ReservationForm.module.less';
 
 interface StepContactProps {
     draft: ReservationDraft;
     valid: boolean;
+    errors: FieldErrors;
     onChange: (changes: Partial<ReservationDraft>) => void;
     onBack: () => void;
 }
 
-export const StepContact = ({ draft, valid, onChange, onBack }: StepContactProps) => (
+export const StepContact = ({ draft, valid, errors, onChange, onBack }: StepContactProps) => (
     <div className={styles.step}>
         <div className={styles.step__contactGrid}>
-            <Field label="Meno a priezvisko" className={styles.step__wide}>
+            <Field label="Meno a priezvisko" className={styles.step__wide} error={errors.name}>
                 <TextInput
                     type="text"
                     value={draft.name}
@@ -22,7 +24,7 @@ export const StepContact = ({ draft, valid, onChange, onBack }: StepContactProps
                     onChange={(event) => onChange({ name: event.target.value })}
                 />
             </Field>
-            <Field label="Telefón">
+            <Field label="Telefón" error={errors.phone}>
                 <TextInput
                     type="tel"
                     value={draft.phone}
@@ -31,7 +33,7 @@ export const StepContact = ({ draft, valid, onChange, onBack }: StepContactProps
                     onChange={(event) => onChange({ phone: event.target.value })}
                 />
             </Field>
-            <Field label="E-mail">
+            <Field label="E-mail" error={errors.email}>
                 <TextInput
                     type="email"
                     value={draft.email}
@@ -50,7 +52,7 @@ export const StepContact = ({ draft, valid, onChange, onBack }: StepContactProps
             <button type="button" className={styles.step__back} onClick={onBack}>
                 ← Späť
             </button>
-            <Button type="submit" variant="dark" disabled={!valid}>
+            <Button type="submit" variant="dark" aria-disabled={!valid}>
                 Skontrolovať
             </Button>
         </div>

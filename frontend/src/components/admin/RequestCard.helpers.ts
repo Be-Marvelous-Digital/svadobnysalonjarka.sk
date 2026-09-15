@@ -1,6 +1,6 @@
 import type { Reservation } from '@/api/types';
 import { CONTACT } from '@/data/contact';
-import { formatLongDate, formatTimeRange } from '@/utils/date';
+import { formatLongDate } from '@/utils/date';
 
 /** First word of the name, for the greeting. */
 function firstName(name: string): string {
@@ -8,43 +8,32 @@ function firstName(name: string): string {
 }
 
 /**
- * A reply the owner can send as-is. The subject and body are filled in, so
- * confirming a fitting is one click and one send rather than retyping the date
- * out of the admin every time.
+ * A reply the owner can send as-is. The date and time the client asked for are
+ * already in the body, so answering an inquiry is one click and one send rather
+ * than retyping it out of the admin.
  *
- * When an alternative has already been proposed, the draft offers that instead
- * of confirming the original request.
+ * Nothing here confirms anything on the server: the salon agrees the date with
+ * the client directly, by phone or in this reply.
  */
-export function buildReplyMailto(reservation: Reservation, duration: number): string {
-    const requested = `${formatLongDate(reservation.date)} o ${formatTimeRange(reservation.time, duration)}`;
-    const greeting = firstName(reservation.name);
+export function buildReplyMailto(inquiry: Reservation): string {
+    const greeting = firstName(inquiry.name);
 
-    const lines = reservation.altDate
-        ? [
-              `Dobrý deň${greeting ? `, ${greeting}` : ''},`,
-              '',
-              `ďakujeme za záujem o skúšku (${reservation.cat || 'šaty'}).`,
-              `Vami požadovaný termín ${requested} nám, žiaľ, nevychádza.`,
-              `Ponúkame náhradný termín: ${formatLongDate(reservation.altDate)} o ${reservation.altTime}.`,
-              '',
-              'Vyhovuje vám? Stačí odpovedať na tento e-mail.',
-          ]
-        : [
-              `Dobrý deň${greeting ? `, ${greeting}` : ''},`,
-              '',
-              `ďakujeme za záujem o skúšku (${reservation.cat || 'šaty'}).`,
-              `Termín ${requested} vám potvrdzujeme, tešíme sa na vás.`,
-              '',
-              'Ak by sa vám niečo zmenilo, dajte nám, prosím, vedieť.',
-          ];
+    const lines = [
+        `Dobrý deň${greeting ? `, ${greeting}` : ''},`,
+        '',
+        `ďakujeme za váš dopyt (${inquiry.cat || 'šaty'}).`,
+        `Termín ${formatLongDate(inquiry.date)} o ${inquiry.time} vám vieme potvrdiť, tešíme sa na vás.`,
+        '',
+        'Ak by vám medzičasom vyhovoval iný čas, dajte nám, prosím, vedieť.',
+        '',
+        'S pozdravom',
+        CONTACT.salonName,
+        `${CONTACT.street}, ${CONTACT.city}`,
+        CONTACT.phone,
+    ];
 
-    lines.push('', 'S pozdravom', CONTACT.salonName, `${CONTACT.street}, ${CONTACT.city}`, CONTACT.phone);
-
-    const subject = reservation.altDate
-        ? 'Náhradný termín skúšky — Svadobný salón Jarka'
-        : 'Potvrdenie termínu skúšky — Svadobný salón Jarka';
-
-    // encodeURIComponent leaves the newlines alone; mail clients want them encoded.
+    const subject = 'Váš dopyt na skúšku — Svadobný salón Jarka';
+    // encodeURIComponent leaves newlines alone; mail clients want them encoded.
     const query = `subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\r\n'))}`;
-    return `mailto:${encodeURIComponent(reservation.email)}?${query}`;
+    return `mailto:${encodeURIComponent(inquiry.email)}?${query}`;
 }

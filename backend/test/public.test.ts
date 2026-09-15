@@ -76,27 +76,14 @@ describe('GET /api/availability', () => {
         assert.deepEqual(response.body.slots, []);
     });
 
-    it('hides a slot taken by a confirmed booking but keeps one held by a pending request', async () => {
+    it('stops offering a slot somebody has already asked for', async () => {
         const before = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
         const target = before.body.slots[0];
         assert.ok(target);
 
-        await Reservation.create({ name: 'Pending', date: OPEN_DATE, time: target, status: 'pending', kind: 'klient' });
-        const withPending = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
-        assert.ok(withPending.body.slots.includes(target), 'a pending request must not block the slot');
+        // Nothing gets approved any more, so an inquiry holds its slot outright.
+        await Reservation.create({ name: 'Prvá', date: OPEN_DATE, time: target });
 
-        await Reservation.deleteMany({});
-        await Reservation.create({ name: 'Confirmed', date: OPEN_DATE, time: target, status: 'confirmed', kind: 'klient' });
-        const withConfirmed = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
-        assert.ok(!withConfirmed.body.slots.includes(target), 'a confirmed visit must block the slot');
-    });
-
-    it('treats an owner block like a confirmed visit', async () => {
-        const before = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
-        const target = before.body.slots[1];
-        assert.ok(target);
-
-        await Reservation.create({ name: 'Blok', date: OPEN_DATE, time: target, status: 'blocked', kind: 'blok' });
         const after = await api<{ slots: string[] }>(context, 'GET', `/api/availability?date=${OPEN_DATE}`);
         assert.ok(!after.body.slots.includes(target));
     });
@@ -112,14 +99,14 @@ describe('POST /api/reservations', () => {
         time: '10:00',
     };
 
-    it('stores a request as pending, never as confirmed', async () => {
+    it('stores the inquiry unhandled', async () => {
         const response = await api<{ ok: boolean }>(context, 'POST', '/api/reservations', { body: valid });
         assert.equal(response.status, 201);
 
         const stored = await Reservation.findOne({ email: valid.email }).lean();
-        assert.equal(stored?.status, 'pending');
-        assert.equal(stored?.kind, 'klient');
+        assert.equal(stored?.handled, false);
         assert.equal(stored?.name, valid.name);
+        assert.equal(stored?.cat, valid.cat);
     });
 
     for (const [label, patch] of [
@@ -152,20 +139,18 @@ describe('POST /api/reservations', () => {
         assert.equal(response.status, 409);
     });
 
-    it('refuses a slot already confirmed for someone else', async () => {
-        await Reservation.create({ name: 'Iná', date: OPEN_DATE, time: '10:00', status: 'confirmed', kind: 'klient' });
+    it('refuses a slot already asked for by someone else', async () => {
+        await Reservation.create({ name: 'Iná', date: OPEN_DATE, time: '10:00' });
 
         const response = await api<{ error: string }>(context, 'POST', '/api/reservations', { body: valid });
         assert.equal(response.status, 409);
         assert.match(response.body.error, /obsaden/);
     });
 
-    it('ignores a client-supplied status', async () => {
-        await api(context, 'POST', '/api/reservations', { body: { ...valid, status: 'confirmed', kind: 'majitelka' } });
+    it('ignores a client trying to mark its own inquiry handled', async () => {
+        await api(context, 'POST', '/api/reservations', { body: { ...valid, handled: true } });
 
-        const stored = await Reservation.findOne({ email: valid.email }).lean();
-        assert.equal(stored?.status, 'pending');
-        assert.equal(stored?.kind, 'klient');
+        assert.equal((await Reservation.findOne({ email: valid.email }).lean())?.handled, false);
     });
 
     it('does not fall for an operator object in place of a string', async () => {

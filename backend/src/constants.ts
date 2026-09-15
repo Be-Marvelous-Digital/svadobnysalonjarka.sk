@@ -12,12 +12,6 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
     instagram: 'Instagram na úvodnej stránke',
 };
 
-export const RESERVATION_STATUSES = ['pending', 'confirmed', 'rejected', 'blocked'] as const;
-export type ReservationStatus = (typeof RESERVATION_STATUSES)[number];
-
-export const RESERVATION_KINDS = ['klient', 'majitelka', 'blok'] as const;
-export type ReservationKind = (typeof RESERVATION_KINDS)[number];
-
 /** Opening hours per weekday index (0 = Sunday), as [openHour, closeHour]; null means closed. */
 export const OPENING_HOURS: Record<number, [number, number] | null> = {
     0: null,

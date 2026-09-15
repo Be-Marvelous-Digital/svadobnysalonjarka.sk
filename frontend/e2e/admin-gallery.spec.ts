@@ -6,7 +6,7 @@ async function signIn(page: import('@playwright/test').Page, tab: string) {
     await page.getByLabel('Prihlasovacie meno').fill('admin');
     await page.getByLabel('Heslo').fill('JarkaAdmin123');
     await page.getByRole('button', { name: 'Prihlásiť sa' }).click();
-    await expect(page.getByRole('heading', { name: 'Galéria a rezervácie' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dopyty a galéria' })).toBeVisible();
     await page.getByRole('button', { name: tab, exact: true }).click();
 }
 
@@ -127,7 +127,7 @@ test.describe('user management', () => {
 test.describe('replying to an inquiry', () => {
     test.beforeEach(async ({ page }) => {
         await acceptConsent(page);
-        await signIn(page, 'Rezervácie');
+        await signIn(page, 'Dopyty');
     });
 
     test('the phone and e-mail are links the owner can act on', async ({ page }) => {
@@ -136,7 +136,7 @@ test.describe('replying to an inquiry', () => {
     });
 
     test('the reply button opens a mail client with the date already written', async ({ page }) => {
-        const reply = page.getByRole('link', { name: 'Odpovedať e-mailom' });
+        const reply = page.getByRole('link', { name: 'Odpovedať e-mailom' }).first();
         await expect(reply).toBeVisible();
 
         const href = await reply.getAttribute('href');
@@ -147,7 +147,7 @@ test.describe('replying to an inquiry', () => {
         expect(decodeURIComponent(url.pathname)).toBe('jana@example.sk');
 
         const params = new URLSearchParams(url.search);
-        expect(params.get('subject')).toContain('Potvrdenie termínu');
+        expect(params.get('subject')).toContain('Váš dopyt');
 
         const body = params.get('body') ?? '';
         expect(body).toContain('Dobrý deň, Jana');
@@ -157,5 +157,35 @@ test.describe('replying to an inquiry', () => {
         expect(body).toContain('Svadobné šaty');
         expect(body).toContain('Salón Jarka');
         expect(body).toContain('+421 948 416 066');
+    });
+});
+
+test.describe('the inquiry list', () => {
+    test.beforeEach(async ({ page }) => {
+        await acceptConsent(page);
+        await signIn(page, 'Dopyty');
+    });
+
+    test('separates new inquiries from handled ones', async ({ page }) => {
+        await expect(page.getByRole('heading', { name: 'Nové dopyty' }).or(page.getByText('Nové dopyty'))).toBeVisible();
+        await expect(page.getByText('Vybavené', { exact: true }).first()).toBeVisible();
+        await expect(page.getByText('Jana Nováková')).toBeVisible();
+        await expect(page.getByText('Vybavena Klientka')).toBeVisible();
+    });
+
+    test('says the date is agreed off-site, not approved here', async ({ page }) => {
+        await expect(page.getByText(/Termín sa nepotvrdzuje tu/)).toBeVisible();
+    });
+
+    test('no longer offers any approval action', async ({ page }) => {
+        for (const label of ['Potvrdiť', 'Zamietnuť', 'Navrhnúť iný termín', 'Uložiť návrh']) {
+            await expect(page.getByRole('button', { name: label }), label).toHaveCount(0);
+        }
+    });
+
+    test('has no calendar or opening-hours settings', async ({ page }) => {
+        await expect(page.getByText('Nastavenie skúšok')).toHaveCount(0);
+        await expect(page.getByText('Dĺžka jednej skúšky')).toHaveCount(0);
+        await expect(page.locator('input[type="date"]')).toHaveCount(0);
     });
 });

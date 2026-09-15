@@ -1,17 +1,17 @@
 import { useCallback, useState } from 'react';
 import { AdminGallery } from '@/components/admin/AdminGallery';
 import { AdminLogin } from '@/components/admin/AdminLogin';
-import { AdminReservations } from '@/components/admin/AdminReservations';
+import { AdminInquiries } from '@/components/admin/AdminInquiries';
 import { AdminUsers } from '@/components/admin/AdminUsers';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { useAdminSession } from '@/hooks/useAdminSession';
 import styles from './AdminPage.module.less';
 
-type AdminTab = 'rezervacie' | 'galeria' | 'pouzivatelia';
+type AdminTab = 'dopyty' | 'galeria' | 'pouzivatelia';
 
 export const AdminPage = () => {
     const session = useAdminSession();
-    const [tab, setTab] = useState<AdminTab>('rezervacie');
+    const [tab, setTab] = useState<AdminTab>('dopyty');
 
     const { login } = session;
     const handleLogin = useCallback((username: string, password: string) => void login(username, password), [login]);
@@ -32,7 +32,7 @@ export const AdminPage = () => {
                         <div className={styles.admin__head}>
                             <div className={styles.admin__heading}>
                                 <span className={styles.admin__kicker}>Správa obsahu</span>
-                                <h1 className={styles.admin__title}>Galéria a rezervácie</h1>
+                                <h1 className={styles.admin__title}>Dopyty a galéria</h1>
                             </div>
                             <button type="button" className={styles.admin__logout} onClick={() => void session.logout()}>
                                 Odhlásiť sa
@@ -42,12 +42,12 @@ export const AdminPage = () => {
                         <div className={styles.admin__tabs}>
                             <button
                                 type="button"
-                                className={[styles.admin__tab, tab === 'rezervacie' && styles['admin__tab--active']]
+                                className={[styles.admin__tab, tab === 'dopyty' && styles['admin__tab--active']]
                                     .filter(Boolean)
                                     .join(' ')}
-                                onClick={() => setTab('rezervacie')}
+                                onClick={() => setTab('dopyty')}
                             >
-                                Rezervácie
+                                Dopyty
                             </button>
                             <button
                                 type="button"
@@ -69,7 +69,7 @@ export const AdminPage = () => {
                             </button>
                         </div>
 
-                        {tab === 'rezervacie' ? <AdminReservations /> : null}
+                        {tab === 'dopyty' ? <AdminInquiries /> : null}
                         {tab === 'galeria' ? <AdminGallery /> : null}
                         {tab === 'pouzivatelia' ? <AdminUsers /> : null}
                     </>

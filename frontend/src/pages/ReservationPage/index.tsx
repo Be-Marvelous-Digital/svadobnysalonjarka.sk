@@ -53,11 +53,22 @@ export const ReservationPage = () => {
                         ) : null}
 
                         {form.step === 1 ? (
-                            <StepSchedule draft={form.draft} valid={form.stepValid} onChange={form.patch} />
+                            <StepSchedule
+                                draft={form.draft}
+                                valid={form.stepValid}
+                                errors={form.fieldErrors}
+                                onChange={form.patch}
+                            />
                         ) : null}
 
                         {form.step === 2 ? (
-                            <StepContact draft={form.draft} valid={form.stepValid} onChange={form.patch} onBack={form.back} />
+                            <StepContact
+                                draft={form.draft}
+                                valid={form.stepValid}
+                                errors={form.fieldErrors}
+                                onChange={form.patch}
+                                onBack={form.back}
+                            />
                         ) : null}
 
                         {form.step === 3 ? (

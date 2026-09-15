@@ -30,14 +30,14 @@ test.describe('admin', () => {
         await expect(page.getByRole('alert')).toHaveText('Nesprávne meno alebo heslo.');
     });
 
-    test('signs in, shows both tabs, signs out', async ({ page }) => {
+    test('signs in, shows the tabs, signs out', async ({ page }) => {
         await page.goto('/admin');
         await page.getByLabel('Prihlasovacie meno').fill('admin');
         await page.getByLabel('Heslo').fill('JarkaAdmin123');
         await page.getByRole('button', { name: 'Prihlásiť sa' }).click();
 
-        await expect(page.getByRole('heading', { name: 'Galéria a rezervácie' })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Rezervácie' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Dopyty a galéria' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Dopyty' })).toBeVisible();
 
         await page.getByRole('button', { name: 'Galéria', exact: true }).click();
         await expect(page.getByText(/prevedú do WebP/)).toBeVisible();

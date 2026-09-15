@@ -31,7 +31,7 @@ test.describe('reservation flow', () => {
         await expect(page.getByText('Jana Nováková')).toBeVisible();
         await expect(page.getByText('+421 900 111 222 · jana@example.sk')).toBeVisible();
 
-        await page.getByRole('button', { name: 'Odoslať žiadosť' }).click();
+        await page.getByRole('button', { name: 'Odoslať dopyt' }).click();
 
         await expect(page.getByRole('heading', { name: 'Žiadosť sme prijali' })).toBeVisible();
         await expect(page.getByText(/Ďakujeme, Jana/)).toBeVisible();
@@ -74,7 +74,7 @@ test.describe('reservation flow', () => {
         });
 
         await completeContact(page);
-        await page.getByRole('button', { name: 'Odoslať žiadosť' }).click();
+        await page.getByRole('button', { name: 'Odoslať dopyt' }).click();
 
         const alert = page.getByRole('alert');
         await expect(alert).toContainText('už obsadený');

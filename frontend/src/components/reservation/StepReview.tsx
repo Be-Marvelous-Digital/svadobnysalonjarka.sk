@@ -1,8 +1,10 @@
 import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { MailIcon } from '@/components/Icon';
 import type { ReservationDraft } from '@/hooks/useReservationForm';
 import { formatLongDate } from '@/utils/date';
+import { ROUTES } from '@/utils/routes';
 import styles from './ReservationForm.module.less';
 
 interface StepReviewProps {
@@ -44,12 +46,18 @@ export const StepReview = ({ draft, submitting, onBack }: StepReviewProps) => {
                 </p>
             </div>
 
+            <p className={styles.step__consent}>
+                Odoslaním žiadosti súhlasíte so spracovaním uvedených osobných údajov na účel dohodnutia termínu skúšky a s ich
+                odoslaním do nášho e-mailového nástroja. Podrobnosti aj vaše práva nájdete v{' '}
+                <Link to={ROUTES.privacy}>zásadách ochrany súkromia</Link>.
+            </p>
+
             <div className={styles.step__actions}>
                 <button type="button" className={styles.step__back} onClick={onBack}>
                     ← Späť
                 </button>
                 <Button type="submit" variant="dark" disabled={submitting}>
-                    <MailIcon /> {submitting ? 'Odosielam…' : 'Odoslať žiadosť'}
+                    <MailIcon /> {submitting ? 'Odosielam…' : 'Odoslať dopyt'}
                 </Button>
             </div>
         </div>

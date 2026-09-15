@@ -28,8 +28,6 @@ const PROTECTED = [
     ['GET', '/api/admin/photos'],
     ['GET', '/api/admin/reservations'],
     ['GET', '/api/admin/settings'],
-    ['GET', '/api/admin/day?date=2027-03-10'],
-    ['POST', '/api/admin/reservations'],
     ['PUT', '/api/admin/settings'],
     ['DELETE', '/api/admin/reservations/000000000000000000000000'],
     ['DELETE', '/api/admin/photos/000000000000000000000000'],

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CATEGORY_KEYS, RESERVATION_STATUSES } from './constants.js';
+import { CATEGORY_KEYS } from './constants.js';
 
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Neplatný dátum');
 const timeString = z.string().regex(/^\d{1,2}:\d{2}$/, 'Neplatný čas');
@@ -13,24 +13,10 @@ export const reservationRequestSchema = z.object({
     time: timeString,
 });
 
-export const ownerReservationSchema = z.object({
-    name: z.string().trim().min(1).max(120),
-    phone: z.string().trim().max(40).default(''),
-    email: z.string().trim().max(160).default(''),
-    cat: z.string().trim().max(60).default(''),
-    note: z.string().trim().max(400).default(''),
-    date: dateString,
-    time: timeString,
-    kind: z.enum(['majitelka', 'blok']),
+/** The only thing the owner changes about an inquiry. */
+export const reservationPatchSchema = z.object({
+    handled: z.boolean(),
 });
-
-export const reservationPatchSchema = z
-    .object({
-        status: z.enum(RESERVATION_STATUSES).optional(),
-        altDate: z.union([dateString, z.literal('')]).optional(),
-        altTime: z.union([timeString, z.literal('')]).optional(),
-    })
-    .refine((v) => Object.keys(v).length > 0, 'Žiadne zmeny');
 
 export const settingsSchema = z.object({
     duration: z.number().int().min(15).max(240),

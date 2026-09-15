@@ -10,66 +10,50 @@ export interface InquiryFields {
     time: string;
 }
 
-/** Mailchimp merge tags, as configured on the audience. */
-export interface MergePayload {
-    EMAIL: string;
-    FNAME: string;
-    PHONE: string;
-    MSG: string;
-    REQDATE: string;
-}
+/**
+ * Mailchimp accepts a merge field under its tag name (FNAME) or its positional
+ * alias (MERGE1), and which one the endpoint wants depends on how the form was
+ * generated: the hosted page at /subscribe uses MERGE indices, the classic embed
+ * snippet uses tag names. Sending both costs nothing and unknown keys are
+ * ignored, so the payload does not depend on guessing right.
+ *
+ * A field is only stored if it has been added to the signup form in Mailchimp.
+ * Existing on the audience is not enough — anything not on the form is dropped.
+ */
+export type MergePayload = Record<string, string>;
 
-const MONTHS = [
-    'januára',
-    'februára',
-    'marca',
-    'apríla',
-    'mája',
-    'júna',
-    'júla',
-    'augusta',
-    'septembra',
-    'októbra',
-    'novembra',
-    'decembra',
-];
-
-/** "2027-03-10" as "10. marca 2027", for the human-readable MSG body. */
-function readableDate(date: string): string {
-    const [year, month, day] = date.split('-');
-    const index = Number(month) - 1;
-    if (!year || !day || !MONTHS[index]) return date;
-    return `${Number(day)}. ${MONTHS[index]} ${year}`;
-}
+/** Positional aliases for the fields Mailchimp creates on every audience. */
+const ALIASES: Record<string, string> = {
+    EMAIL: 'MERGE0',
+    FNAME: 'MERGE1',
+    PHONE: 'MERGE4',
+};
 
 /**
- * The reservation form collects a full name, but FNAME is a first-name field.
- * Stuffing the whole name in there would make every Mailchimp greeting read
- * wrong, so the surname travels in MSG instead, where nothing interpolates it.
+ * The form collects a full name, but FNAME is a first-name field and Mailchimp
+ * interpolates it into greetings. Putting the whole name there would make every
+ * mail read "Dobrý deň, Jana Nováková".
  */
 export function buildMergePayload(inquiry: InquiryFields): MergePayload {
-    const [firstName = '', ...rest] = inquiry.name.trim().split(/\s+/);
-    const surname = rest.join(' ');
+    const firstName = inquiry.name.trim().split(/\s+/)[0] ?? '';
 
-    const lines = [
-        `${inquiry.name} má záujem o termín skúšky.`,
-        '',
-        `Typ šiat: ${inquiry.cat || 'neuvedené'}`,
-        `Požadovaný termín: ${readableDate(inquiry.date)} o ${inquiry.time}`,
-        `Telefón: ${inquiry.phone}`,
-        `E-mail: ${inquiry.email}`,
-        ...(surname ? [`Priezvisko: ${surname}`] : []),
-    ];
-
-    return {
+    const byTag: Record<string, string> = {
         EMAIL: inquiry.email,
         FNAME: firstName,
         PHONE: inquiry.phone,
-        MSG: lines.join('\n'),
-        // ISO 8601: unambiguous whichever way the Mailchimp date field is set to
-        // display it, unlike a DD/MM or MM/DD guess.
+        TYPE: inquiry.cat,
+        // ISO 8601 and 24h: unambiguous whichever way the Mailchimp fields are set
+        // to display them, unlike a DD/MM or MM/DD guess.
         REQDATE: inquiry.date,
+        REQTIME: inquiry.time,
     };
+
+    const payload: MergePayload = { ...byTag };
+    for (const [tag, alias] of Object.entries(ALIASES)) {
+        const value = byTag[tag];
+        if (value !== undefined) payload[alias] = value;
+    }
+    return payload;
 }
 
 /**

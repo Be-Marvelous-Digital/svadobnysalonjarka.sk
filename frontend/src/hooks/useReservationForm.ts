@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ApiError, apiSend } from '@/api/client';
 import { BOOKABLE_COLLECTIONS } from '@/data/collections';
+import { validateAll, validateStep, type FieldErrors } from './reservationValidation';
 
 export interface ReservationDraft {
     cat: string;
@@ -28,32 +29,52 @@ export function useReservationForm() {
     const [done, setDone] = useState(false);
     const [confirmed, setConfirmed] = useState<ReservationDraft | null>(null);
 
+    // Errors only appear once a step has been submitted, so the form does not
+    // scold someone for fields they have not reached yet.
+    const [showErrors, setShowErrors] = useState(false);
+
     const patch = useCallback((changes: Partial<ReservationDraft>) => {
         setDraft((current) => ({ ...current, ...changes }));
         setError('');
     }, []);
 
-    const stepValid = useMemo(() => {
-        if (step === 1) return Boolean(draft.cat && draft.date && draft.time);
-        if (step === 2) return draft.name.trim().length > 1 && draft.phone.trim().length > 5 && draft.email.includes('@');
-        return true;
-    }, [step, draft]);
+    const fieldErrors: FieldErrors = useMemo(() => validateStep(step, draft), [step, draft]);
+    const stepValid = Object.keys(fieldErrors).length === 0;
+    const visibleErrors: FieldErrors = showErrors ? fieldErrors : {};
 
     const next = useCallback(() => {
-        if (stepValid) setStep((current) => Math.min(3, current + 1));
+        if (!stepValid) {
+            setShowErrors(true);
+            return;
+        }
+        setShowErrors(false);
+        setStep((current) => Math.min(3, current + 1));
     }, [stepValid]);
 
-    const back = useCallback(() => setStep((current) => Math.max(1, current - 1)), []);
+    const back = useCallback(() => {
+        setShowErrors(false);
+        setStep((current) => Math.max(1, current - 1));
+    }, []);
 
     const reset = useCallback(() => {
         setDraft(EMPTY_DRAFT);
         setStep(1);
         setDone(false);
         setError('');
+        setShowErrors(false);
         setConfirmed(null);
     }, []);
 
     const submit = useCallback(async () => {
+        // Last line of defence before the request leaves: a visitor who reached
+        // step three through a stale draft still cannot send an incomplete one.
+        const remaining = validateAll(draft);
+        if (Object.keys(remaining).length > 0) {
+            setShowErrors(true);
+            setStep(Object.keys(validateStep(1, draft)).length > 0 ? 1 : 2);
+            return;
+        }
+
         setSubmitting(true);
         setError('');
         try {
@@ -69,5 +90,19 @@ export function useReservationForm() {
         }
     }, [draft]);
 
-    return { draft, patch, step, stepValid, next, back, submit, submitting, error, done, confirmed, reset };
+    return {
+        draft,
+        patch,
+        step,
+        stepValid,
+        fieldErrors: visibleErrors,
+        next,
+        back,
+        submit,
+        submitting,
+        error,
+        done,
+        confirmed,
+        reset,
+    };
 }

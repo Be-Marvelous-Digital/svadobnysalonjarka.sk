@@ -12,17 +12,14 @@ import { Reservation } from '../models/Reservation.js';
 import { Settings, readSettings } from '../models/Settings.js';
 import { User } from '../models/User.js';
 import {
-    availabilityQuerySchema,
     categoryParamSchema,
     loginSchema,
-    ownerReservationSchema,
     photoOrderSchema,
     photoUrlSchema,
     reservationPatchSchema,
     settingsSchema,
 } from '../schemas.js';
 import { discardUpload, removePhotoFile, storePhoto, UnsupportedImageError } from '../services/photoStorage.js';
-import { generateSlots, isSlotFree } from '../services/slots.js';
 
 export const adminRouter = Router();
 
@@ -88,7 +85,7 @@ adminRouter.put('/settings', requireAdmin, async (req, res) => {
 });
 
 adminRouter.get('/reservations', requireAdmin, async (_req, res) => {
-    const list = await Reservation.find().sort({ date: 1, time: 1 }).lean();
+    const list = await Reservation.find().sort({ createdAt: -1 }).lean();
     res.json(
         list.map((r) => ({
             id: String(r._id),
@@ -96,65 +93,12 @@ adminRouter.get('/reservations', requireAdmin, async (_req, res) => {
             phone: r.phone,
             email: r.email,
             cat: r.cat,
-            note: r.note,
             date: r.date,
             time: r.time,
-            status: r.status,
-            kind: r.kind,
-            altDate: r.altDate,
-            altTime: r.altTime,
+            handled: r.handled,
+            createdAt: r.createdAt,
         })),
     );
-});
-
-adminRouter.get('/day', requireAdmin, async (req, res) => {
-    const parsed = availabilityQuerySchema.safeParse(req.query);
-    if (!parsed.success) {
-        res.status(400).json({ error: 'Neplatný dátum' });
-        return;
-    }
-    const { date } = parsed.data;
-    const { duration, buffer } = await readSettings();
-    const taken = await Reservation.find({ date, status: { $ne: 'rejected' } }).lean();
-
-    res.json({
-        date,
-        duration,
-        slots: generateSlots(date, duration, buffer).map((time) => {
-            const match = taken.find((r) => r.time === time);
-            return {
-                time,
-                reservation: match
-                    ? {
-                          id: String(match._id),
-                          name: match.name,
-                          note: match.note,
-                          status: match.status,
-                          kind: match.kind,
-                      }
-                    : null,
-            };
-        }),
-    });
-});
-
-adminRouter.post('/reservations', requireAdmin, async (req, res) => {
-    const parsed = ownerReservationSchema.safeParse(req.body);
-    if (!parsed.success) {
-        res.status(400).json({ error: 'Skontrolujte vyplnené údaje.' });
-        return;
-    }
-    const { duration } = await readSettings();
-    const { date, time, kind } = parsed.data;
-    if (!(await isSlotFree(date, time, duration))) {
-        res.status(409).json({ error: 'Tento čas je už obsadený.' });
-        return;
-    }
-    const created = await Reservation.create({
-        ...parsed.data,
-        status: kind === 'blok' ? 'blocked' : 'confirmed',
-    });
-    res.status(201).json({ id: String(created._id) });
 });
 
 adminRouter.patch('/reservations/:id', requireAdmin, async (req, res) => {
@@ -163,20 +107,11 @@ adminRouter.patch('/reservations/:id', requireAdmin, async (req, res) => {
         res.status(400).json({ error: 'Neplatná zmena.' });
         return;
     }
-    const existing = await Reservation.findById(req.params.id);
-    if (!existing) {
-        res.status(404).json({ error: 'Rezervácia neexistuje.' });
+    const updated = await Reservation.findByIdAndUpdate(req.params.id, { handled: parsed.data.handled });
+    if (!updated) {
+        res.status(404).json({ error: 'Dopyt neexistuje.' });
         return;
     }
-    if (parsed.data.status === 'confirmed') {
-        const { duration } = await readSettings();
-        if (!(await isSlotFree(existing.date, existing.time, duration))) {
-            res.status(409).json({ error: 'Tento čas je už obsadený inou potvrdenou skúškou.' });
-            return;
-        }
-    }
-    existing.set(parsed.data);
-    await existing.save();
     res.json({ ok: true });
 });
 

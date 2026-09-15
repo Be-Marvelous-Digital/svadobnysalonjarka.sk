@@ -2,22 +2,17 @@ import type { CategoryKey } from '@/data/collections';
 
 export type Gallery = Record<CategoryKey, string[]>;
 
-export type ReservationStatus = 'pending' | 'confirmed' | 'rejected' | 'blocked';
-export type ReservationKind = 'klient' | 'majitelka' | 'blok';
-
+/** An inquiry from the public form. The salon agrees the date off-site. */
 export interface Reservation {
     id: string;
     name: string;
     phone: string;
     email: string;
     cat: string;
-    note: string;
     date: string;
     time: string;
-    status: ReservationStatus;
-    kind: ReservationKind;
-    altDate: string;
-    altTime: string;
+    handled: boolean;
+    createdAt: string;
 }
 
 export interface Availability {
