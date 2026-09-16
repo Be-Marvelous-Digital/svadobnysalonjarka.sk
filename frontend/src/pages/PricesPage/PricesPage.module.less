@@ -32,6 +32,34 @@
         color: @color-text-secondary;
     }
 
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-lg;
+        .reveal-up();
+    }
+
+    &__groupHead {
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-sm;
+    }
+
+    &__groupTitle {
+        font-family: @font-display;
+        // Has to stay clearly above the row names, which are @font-size-xl.
+        font-size: clamp(30px, 3.2vw, 40px);
+        line-height: 1.2;
+        color: @color-ink;
+    }
+
+    &__groupIntro {
+        max-width: 60ch;
+        font-size: @font-size-base;
+        line-height: 1.8;
+        color: @color-text-secondary;
+    }
+
     &__table {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -53,7 +81,9 @@
     }
 
     &__itemNote {
+        max-width: 56ch;
         font-size: 14px;
+        line-height: 1.7;
         color: @color-text-secondary;
     }
 
@@ -61,8 +91,11 @@
         padding: 34px 0;
         border-bottom: 1px solid @color-border;
         display: flex;
-        align-items: center;
+        // Rows differ in height because the notes do; the price stays with the
+        // name it belongs to instead of drifting to the middle of the row.
+        align-items: flex-start;
         justify-content: flex-end;
+        white-space: nowrap;
         font-family: @font-display;
         font-size: 30px;
         color: @color-primary-text;
@@ -119,6 +152,10 @@
     @media (max-width: @breakpoint-mobile) {
         &__table {
             grid-template-columns: 1fr;
+        }
+
+        &__itemName {
+            font-size: @font-size-lg;
         }
 
         &__item {
