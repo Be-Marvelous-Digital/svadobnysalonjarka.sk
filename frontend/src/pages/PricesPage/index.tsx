@@ -16,13 +16,26 @@ export const PricesPage = () => {
     return (
         <section className={styles.prices}>
             <div className={styles.prices__inner}>
-                <div className={styles.prices__intro}>
-                    <span className={styles.prices__kicker}>Ceny</span>
-                    <h1 className={styles.prices__title}>Cenník</h1>
-                    <p className={styles.prices__lead}>
-                        Cena vždy závisí od konkrétneho modelu a jeho honosnosti, preto uvádzame rozpätia. Presnú cenu vám radi
-                        povieme pri skúške v salóne.
-                    </p>
+                <div className={styles.prices__top}>
+                    <div className={styles.prices__intro}>
+                        <span className={styles.prices__kicker}>Ceny</span>
+                        <h1 className={styles.prices__title}>Cenník</h1>
+                        <p className={styles.prices__lead}>
+                            Cena vždy závisí od konkrétneho modelu a jeho honosnosti, preto uvádzame rozpätia. Presnú cenu vám
+                            radi povieme pri skúške v salóne.
+                        </p>
+                    </div>
+                    <div className={styles.prices__portrait}>
+                        <img
+                            src="/assets/svadobne-1.webp"
+                            alt="Nevesta v svadobných šatách zo salónu Jarka"
+                            className={styles.prices__image}
+                            width={734}
+                            height={1071}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </div>
                 </div>
 
                 {PRICE_GROUPS.map((group) => (
