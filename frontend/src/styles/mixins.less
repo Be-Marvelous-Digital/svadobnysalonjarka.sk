@@ -85,13 +85,27 @@
     }
 }
 
-.keyframes-zoom-in() {
-    @keyframes jZoomIn {
+.keyframes-page-in() {
+    @keyframes jPageIn {
         from {
-            transform: scale(1);
+            opacity: 0;
+            transform: translateY(10px);
         }
         to {
-            transform: scale(1.07);
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
+.keyframes-zoom-out() {
+    // Settles at scale(1) so the resting frame is the least-upscaled one.
+    @keyframes jZoomOut {
+        from {
+            transform: scale(1.05);
+        }
+        to {
+            transform: scale(1);
         }
     }
 }

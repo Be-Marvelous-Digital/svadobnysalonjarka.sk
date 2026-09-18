@@ -10,27 +10,41 @@
 
     &__top {
         display: grid;
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
-        gap: 72px;
-        align-items: start;
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            'intro photo'
+            'notes photo';
+        column-gap: 56px;
+        // The copy column sets the height and the photo spans both its rows, so
+        // the header can never run out of content and leave a hole.
+        align-items: stretch;
     }
 
     &__intro {
+        grid-area: intro;
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
         gap: @spacing-md;
         .reveal-up();
     }
 
     &__portrait {
-        .photo-frame(3 / 4);
+        grid-area: photo;
+        position: relative;
+        min-height: 420px;
+        overflow: hidden;
         .reveal-up(0.2s);
     }
 
     &__image {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: center 30%;
         display: block;
     }
 
@@ -120,29 +134,40 @@
         color: @color-primary-text;
     }
 
+    // Conditions frame the ranges above them, so they read here rather than as a
+    // footnote below every table.
     &__notes {
+        grid-area: notes;
+        align-self: start;
+        margin: @spacing-xl 0 0;
+        padding-top: @spacing-lg;
+        border-top: 1px solid @color-border;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
-        gap: @spacing-xl;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: @spacing-lg @spacing-xl;
+        .reveal-up(0.1s);
     }
 
     &__note {
         display: flex;
         flex-direction: column;
-        gap: @spacing-sm;
+        gap: @spacing-xs;
     }
 
     &__noteTitle {
         font-size: @font-size-xxs;
-        letter-spacing: 0.24em;
+        letter-spacing: @letter-spacing-wider;
         text-transform: uppercase;
         color: @color-primary-text;
     }
 
     &__noteBody {
-        font-size: @font-size-base;
-        line-height: 1.8;
+        margin: 0;
+        max-width: 46ch;
+        font-size: 14px;
+        line-height: 1.7;
         color: @color-text-secondary;
+        text-wrap: pretty;
     }
 
     &__cta {
@@ -154,22 +179,33 @@
             gap: 44px;
         }
 
+        // Stacked, the photo slots between the lead and the conditions so the
+        // header does not become one long wall of text.
         &__top {
             grid-template-columns: 1fr;
-            gap: @spacing-xl;
+            grid-template-rows: auto;
+            grid-template-areas:
+                'intro'
+                'photo'
+                'notes';
+            row-gap: @spacing-xl;
         }
 
-        // A portrait crop this far down the column would push the first price off
-        // the screen, so the photo becomes a band and keeps the dress in frame.
-        // Height, not a ratio: a ratio ties the band's height to the full column
-        // width and it grows to half a tablet screen.
+        // A portrait crop at full column width would push the first price off the
+        // screen, so the photo becomes a band. Height, not a ratio: a ratio ties
+        // it to the column width and it grows to half a tablet screen.
         &__portrait {
-            aspect-ratio: auto;
-            height: clamp(200px, 32vw, 300px);
+            min-height: 0;
+            height: clamp(240px, 38vw, 360px);
         }
 
         &__image {
-            object-position: center 22%;
+            object-position: center 30%;
+        }
+
+        &__notes {
+            margin-top: 0;
+            gap: @spacing-lg @spacing-xl;
         }
 
         &__table {
@@ -187,6 +223,11 @@
     }
 
     @media (max-width: @breakpoint-mobile) {
+        &__notes {
+            grid-template-columns: 1fr;
+            gap: @spacing-md;
+        }
+
         &__table {
             grid-template-columns: 1fr;
         }

@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
-import { CalendarIcon, DressIcon, PhoneIcon } from '@/components/Icon';
+import { ButtonLink } from '@/components/Button';
+import { CalendarIcon, DressIcon, MailIcon, PhoneIcon } from '@/components/Icon';
 import { RevealSection } from '@/components/RevealSection';
 import { SectionHeading } from '@/components/SectionHeading';
+import { ROUTES } from '@/utils/routes';
 import styles from './StepsSection.module.less';
 
 interface Step {
@@ -48,6 +50,12 @@ export const StepsSection = () => (
                         <p className={styles.step__body}>{step.body}</p>
                     </div>
                 ))}
+            </div>
+
+            <div className={styles.steps__action}>
+                <ButtonLink to={ROUTES.reservation} variant="dark">
+                    <MailIcon /> Objednať termín skúšky
+                </ButtonLink>
             </div>
         </div>
     </RevealSection>

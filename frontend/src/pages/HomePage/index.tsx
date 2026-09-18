@@ -22,9 +22,9 @@ export const HomePage = () => {
             <StructuredData id="schema-salon" schema={LOCAL_BUSINESS_SCHEMA} />
             <HeroSection />
             <CollectionsSection />
+            <StepsSection />
             <StorySection />
             <GroomSection />
-            <StepsSection />
             <TestimonialsSection />
             <SocialSection />
             <CtaSection />

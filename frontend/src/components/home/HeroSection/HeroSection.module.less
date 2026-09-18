@@ -12,11 +12,11 @@
         background-image: url('/assets/hero.webp');
         background-size: cover;
         background-position: center 22%;
-        filter: brightness(0.84) saturate(0.94);
+        filter: brightness(0.84) saturate(0.94) contrast(1.04);
         // Long and slight on purpose: noticeable as movement, never as a zoom.
         // `forwards` holds the end state so it does not snap back.
-        .keyframes-zoom-in();
-        animation: jZoomIn @duration-hero-zoom ease-out forwards;
+        .keyframes-zoom-out();
+        animation: jZoomOut @duration-hero-zoom ease-out forwards;
         will-change: transform;
     }
 

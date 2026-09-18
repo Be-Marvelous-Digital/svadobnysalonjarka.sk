@@ -18,13 +18,23 @@ export const PricesPage = () => {
             <div className={styles.prices__inner}>
                 <div className={styles.prices__top}>
                     <div className={styles.prices__intro}>
-                        <span className={styles.prices__kicker}>Ceny</span>
+                        <span className={styles.prices__kicker}>Požičovné a predaj</span>
                         <h1 className={styles.prices__title}>Cenník</h1>
                         <p className={styles.prices__lead}>
                             Cena vždy závisí od konkrétneho modelu a jeho honosnosti, preto uvádzame rozpätia. Presnú cenu vám
                             radi povieme pri skúške v salóne.
                         </p>
                     </div>
+
+                    <dl className={styles.prices__notes}>
+                        {PRICE_CONDITIONS.map((note) => (
+                            <div key={note.title} className={styles.prices__note}>
+                                <dt className={styles.prices__noteTitle}>{note.title}</dt>
+                                <dd className={styles.prices__noteBody}>{note.body}</dd>
+                            </div>
+                        ))}
+                    </dl>
+
                     <div className={styles.prices__portrait}>
                         <img
                             src="/assets/svadobne-1.webp"
@@ -32,7 +42,6 @@ export const PricesPage = () => {
                             className={styles.prices__image}
                             width={734}
                             height={1071}
-                            loading="lazy"
                             decoding="async"
                         />
                     </div>
@@ -41,15 +50,6 @@ export const PricesPage = () => {
                 {PRICE_GROUPS.map((group) => (
                     <PriceTable key={group.title} group={group} />
                 ))}
-
-                <div className={styles.prices__notes}>
-                    {PRICE_CONDITIONS.map((note) => (
-                        <div key={note.title} className={styles.prices__note}>
-                            <span className={styles.prices__noteTitle}>{note.title}</span>
-                            <p className={styles.prices__noteBody}>{note.body}</p>
-                        </div>
-                    ))}
-                </div>
 
                 <ButtonLink to={ROUTES.reservation} variant="dark" className={styles.prices__cta}>
                     <MailIcon /> Objednať termín skúšky
