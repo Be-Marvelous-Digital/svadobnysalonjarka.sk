@@ -31,11 +31,17 @@
         <meta name="twitter:card" content="summary_large_image" />
 
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <!-- Self-hosted: the Google Fonts stylesheet blocked the first paint by ~880ms on a
+             cross-origin round trip, and it handed every visitor's IP to Google. The faces
+             live in src/styles/fonts.less; only the two the first screen actually renders
+             are preloaded, the rest resolve from the bundled CSS. -->
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-300-normal-latin.woff2" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap"
-            rel="stylesheet"
+            rel="preload"
+            as="font"
+            type="font/woff2"
+            href="/fonts/cormorant-garamond-400-normal-latin.woff2"
+            crossorigin
         />
         <!-- The hero is the LCP element on every first visit; without this it waits on the CSS. -->
         <link rel="preload" as="image" href="/assets/hero.webp" fetchpriority="high" />
