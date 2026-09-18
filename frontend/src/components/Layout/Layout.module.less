@@ -1,3 +1,26 @@
+// Keyed on the route, so every navigation replays it.
+.main {
+    .keyframes-page-in();
+
+    :global(html.js) & {
+        animation: jPageIn @duration-base @ease-out-expo both;
+    }
+
+    // Paused at its first frame — opacity 0 — while the drawer covers the screen,
+    // so the transition is not spent behind an overlay and starts on the content
+    // the moment the menu is out of the way. Has to sit at the same specificity as
+    // the rule above: the `animation` shorthand resets play-state to running.
+    :global(html.js) &--held {
+        animation-play-state: paused;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(html.js) & {
+            animation: none;
+        }
+    }
+}
+
 // Off-screen until focused, rather than display:none, so it stays in the tab order.
 .skipLink {
     position: fixed;

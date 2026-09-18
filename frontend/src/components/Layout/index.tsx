@@ -32,7 +32,11 @@ export const Layout = () => {
                 drawerOpen={drawerOpen}
                 onOpenDrawer={openDrawer}
             />
-            <main id="obsah">
+            <main
+                id="obsah"
+                key={pathname}
+                className={[styles.main, drawerOpen && styles['main--held']].filter(Boolean).join(' ')}
+            >
                 <Outlet />
             </main>
             <Footer />
