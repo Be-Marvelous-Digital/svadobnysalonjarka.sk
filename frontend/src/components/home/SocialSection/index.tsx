@@ -37,9 +37,14 @@ export const SocialSection = () => {
                 </div>
 
                 <div className={styles.social__grid}>
-                    {tiles.map((src) => (
+                    {tiles.map((src, index) => (
                         <div key={src} className={styles.social__frame}>
-                            <img src={src} alt="Zo salónu Jarka" className={styles.social__image} loading="lazy" />
+                            <img
+                                src={src}
+                                alt={`Šaty zo salónu Jarka na Instagrame, fotografia ${index + 1}`}
+                                className={styles.social__image}
+                                loading="lazy"
+                            />
                         </div>
                     ))}
                 </div>

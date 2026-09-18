@@ -18,7 +18,7 @@ const GROUP_SIZE = 5;
 export function describePhotos(sources: string[], label: string): MosaicPhoto[] {
     return sources.map((src, index) => ({
         src,
-        alt: `${label} ${index + 1}`,
+        alt: `${label} zo salónu Jarka v Galante — fotografia ${index + 1}`,
         caption: CAPTIONS[index % CAPTIONS.length] ?? '',
         index,
     }));

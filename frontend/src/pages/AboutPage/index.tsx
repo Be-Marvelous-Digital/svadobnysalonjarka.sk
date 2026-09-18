@@ -9,7 +9,12 @@ const PARAGRAPHS = [
     'Sme najmä požičovňou, no šaty a obleky aj predávame a prijímame na komisionálny predaj.',
 ];
 
-const TILES = ['/assets/svadobne-5.webp', '/assets/spolocenske-4.webp', '/assets/prijimacie-1.webp', '/assets/hero.webp'];
+const TILES = [
+    { src: '/assets/svadobne-5.webp', alt: 'Svadobné šaty s čipkovaným korzetom zo salónu Jarka' },
+    { src: '/assets/spolocenske-4.webp', alt: 'Spoločenské šaty na ples zo salónu Jarka' },
+    { src: '/assets/prijimacie-1.webp', alt: 'Šaty na prvé sväté prijímanie zo salónu Jarka' },
+    { src: '/assets/hero.webp', alt: 'Nevesta v svadobných šatách s dlhou vlečkou' },
+];
 
 export const AboutPage = () => {
     usePageMeta({
@@ -31,14 +36,19 @@ export const AboutPage = () => {
                         ))}
                     </div>
                     <div className={styles.about__portrait}>
-                        <img src="/assets/svadobne-4.webp" alt="Salón Jarka" className={styles.about__image} loading="lazy" />
+                        <img
+                            src="/assets/svadobne-4.webp"
+                            alt="Nevesta vo svadobných šatách v salóne Jarka v Galante"
+                            className={styles.about__image}
+                            loading="lazy"
+                        />
                     </div>
                 </div>
 
                 <div className={styles.about__grid}>
-                    {TILES.map((src) => (
-                        <div key={src} className={styles.about__tile}>
-                            <img src={src} alt="Zo salónu Jarka" className={styles.about__image} loading="lazy" />
+                    {TILES.map((tile) => (
+                        <div key={tile.src} className={styles.about__tile}>
+                            <img src={tile.src} alt={tile.alt} className={styles.about__image} loading="lazy" />
                         </div>
                     ))}
                 </div>

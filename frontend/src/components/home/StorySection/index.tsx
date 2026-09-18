@@ -36,7 +36,12 @@ export const StorySection = () => (
                 </div>
 
                 <div className={styles.story__frame}>
-                    <img src="/assets/svadobne-2.webp" alt="Zo salónu Jarka" className={styles.story__image} loading="lazy" />
+                    <img
+                        src="/assets/svadobne-2.webp"
+                        alt="Svadobné šaty z ponuky salónu Jarka v Galante"
+                        className={styles.story__image}
+                        loading="lazy"
+                    />
                 </div>
             </div>
         </div>
