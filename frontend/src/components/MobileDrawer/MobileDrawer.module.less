@@ -51,13 +51,20 @@
         border-bottom: 1px solid @color-border;
         font-size: @font-size-xl;
         color: @color-ink;
+        transition: color 0.3s ease;
 
         &:last-child {
             border-bottom: 0;
         }
 
-        &--accent {
+        // The row already owns a full-width divider, so the active mark sits
+        // under the label itself to stay distinct from it.
+        &[aria-current='page'] {
             color: @color-primary-text;
+            text-decoration: underline;
+            text-decoration-color: @color-primary;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 6px;
         }
     }
 

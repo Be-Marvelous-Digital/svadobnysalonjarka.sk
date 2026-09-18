@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import { ButtonAnchor, ButtonLink } from '@/components/Button';
 import { CheckIcon, PhoneIcon } from '@/components/Icon';
 import { Lightbox } from '@/components/Lightbox';
 import { PhotoMosaic } from '@/components/PhotoMosaic';
+import { PhotoMosaicSkeleton } from '@/components/PhotoMosaic/PhotoMosaicSkeleton';
 import { StructuredData } from '@/components/StructuredData';
 import { COLLECTIONS, findCollection } from '@/data/collections';
 import { CONTACT } from '@/data/contact';
 import { breadcrumbSchema, collectionSchema } from '@/data/schema';
 import { photosOf, useGallery } from '@/hooks/useGallery';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { NotFoundPage } from '@/pages/NotFoundPage';
+import { NOT_FOUND_META } from '@/pages/NotFoundPage/notFoundMeta';
 import { collectionPath, ROUTES } from '@/utils/routes';
 import styles from './CollectionPage.module.less';
 
@@ -21,13 +24,19 @@ export const CollectionPage = () => {
 
     const closeLightbox = () => setLightboxIndex(-1);
 
-    usePageMeta({
-        title: collection ? `${collection.label} — Svadobný salón Jarka Galanta` : 'Kolekcia — Svadobný salón Jarka',
-        description: collection?.description ?? '',
-        image: collection?.cover,
-    });
+    // An unknown key is a dead URL, not a thin collection page, so it reports the
+    // same meta the fallback below renders rather than racing it.
+    usePageMeta(
+        collection
+            ? {
+                  title: `${collection.label} — Svadobný salón Jarka Galanta`,
+                  description: collection.description,
+                  image: collection.cover,
+              }
+            : NOT_FOUND_META,
+    );
 
-    if (!collection) return <Navigate to={ROUTES.home} replace />;
+    if (!collection) return <NotFoundPage />;
 
     const photos = photosOf(gallery, collection.key);
     const trail = [
@@ -70,7 +79,9 @@ export const CollectionPage = () => {
 
                 {photos.length > 0 ? (
                     <PhotoMosaic sources={photos} label={collection.label} onOpen={setLightboxIndex} />
-                ) : loading ? null : (
+                ) : loading ? (
+                    <PhotoMosaicSkeleton />
+                ) : (
                     <div className={styles.collection__empty}>
                         <span className={styles.collection__emptyTag}>fotografie pripravujeme</span>
                         <p className={styles.collection__emptyText}>
@@ -84,15 +95,9 @@ export const CollectionPage = () => {
 
                 <nav className={styles.collection__chips}>
                     {COLLECTIONS.map((entry) => (
-                        <Link
-                            key={entry.key}
-                            to={collectionPath(entry.key)}
-                            className={[styles.collection__chip, entry.key === 'galeria' && styles['collection__chip--accent']]
-                                .filter(Boolean)
-                                .join(' ')}
-                        >
+                        <NavLink key={entry.key} to={collectionPath(entry.key)} className={styles.collection__chip}>
                             {entry.label}
-                        </Link>
+                        </NavLink>
                     ))}
                 </nav>
 

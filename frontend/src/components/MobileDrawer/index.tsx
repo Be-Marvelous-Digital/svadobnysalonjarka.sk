@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { ButtonAnchor, ButtonLink } from '@/components/Button';
 import { PhoneIcon } from '@/components/Icon';
 import { COLLECTIONS } from '@/data/collections';
@@ -6,6 +6,25 @@ import { CONTACT } from '@/data/contact';
 import { useDialog } from '@/hooks/useDialog';
 import { collectionPath, ROUTES } from '@/utils/routes';
 import styles from './MobileDrawer.module.less';
+
+interface DrawerLink {
+    to: string;
+    label: string;
+    // Without it "/" prefix-matches every route and Domov stays lit everywhere.
+    end?: boolean;
+}
+
+const DRAWER_LINKS: DrawerLink[] = [
+    { to: ROUTES.home, label: 'Domov', end: true },
+    { to: collectionPath('galeria'), label: 'Galéria' },
+    ...COLLECTIONS.filter((collection) => collection.key !== 'galeria').map((collection) => ({
+        to: collectionPath(collection.key),
+        label: collection.label,
+    })),
+    { to: ROUTES.prices, label: 'Ceny' },
+    { to: ROUTES.about, label: 'O salóne' },
+    { to: ROUTES.contact, label: 'Kontakt' },
+];
 
 interface MobileDrawerProps {
     onClose: () => void;
@@ -24,35 +43,11 @@ export const MobileDrawer = ({ onClose }: MobileDrawerProps) => {
             </div>
 
             <nav className={styles.drawer__links}>
-                <Link to={ROUTES.home} className={styles.drawer__link} onClick={onClose}>
-                    Domov
-                </Link>
-                <Link
-                    to={collectionPath('galeria')}
-                    className={`${styles.drawer__link} ${styles['drawer__link--accent']}`}
-                    onClick={onClose}
-                >
-                    Galéria
-                </Link>
-                {COLLECTIONS.filter((collection) => collection.key !== 'galeria').map((collection) => (
-                    <Link
-                        key={collection.key}
-                        to={collectionPath(collection.key)}
-                        className={styles.drawer__link}
-                        onClick={onClose}
-                    >
-                        {collection.label}
-                    </Link>
+                {DRAWER_LINKS.map((link) => (
+                    <NavLink key={link.to} to={link.to} end={link.end} className={styles.drawer__link} onClick={onClose}>
+                        {link.label}
+                    </NavLink>
                 ))}
-                <Link to={ROUTES.prices} className={styles.drawer__link} onClick={onClose}>
-                    Ceny
-                </Link>
-                <Link to={ROUTES.about} className={styles.drawer__link} onClick={onClose}>
-                    O salóne
-                </Link>
-                <Link to={ROUTES.contact} className={styles.drawer__link} onClick={onClose}>
-                    Kontakt
-                </Link>
             </nav>
 
             <div className={styles.drawer__actions}>

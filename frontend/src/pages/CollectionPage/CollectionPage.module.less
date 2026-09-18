@@ -151,8 +151,10 @@
             border-color: @color-primary;
         }
 
-        &--accent {
+        &[aria-current='page'] {
             color: @color-primary-text;
+            background: @color-surface-muted;
+            border-color: @color-primary;
         }
     }
 
