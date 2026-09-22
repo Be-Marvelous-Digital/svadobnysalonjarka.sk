@@ -1,4 +1,5 @@
 import { ButtonLink } from '@/components/Button';
+import { photosOf, useGallery } from '@/hooks/useGallery';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { ROUTES } from '@/utils/routes';
 import styles from './AboutPage.module.less';
@@ -9,14 +10,22 @@ const PARAGRAPHS = [
     'Sme najmä požičovňou, no šaty a obleky aj predávame a prijímame na komisionálny predaj.',
 ];
 
-const TILES = [
-    { src: '/assets/svadobne-5.webp', alt: 'Svadobné šaty s čipkovaným korzetom zo salónu Jarka' },
-    { src: '/assets/spolocenske-4.webp', alt: 'Spoločenské šaty na ples zo salónu Jarka' },
-    { src: '/assets/prijimacie-1.webp', alt: 'Šaty na prvé sväté prijímanie zo salónu Jarka' },
-    { src: '/assets/hero.webp', alt: 'Nevesta v svadobných šatách s dlhou vlečkou' },
+/** Shown until the osalone category has been filled in through the admin. */
+const FALLBACK_PHOTOS = [
+    '/assets/svadobne-4.webp',
+    '/assets/svadobne-5.webp',
+    '/assets/spolocenske-4.webp',
+    '/assets/prijimacie-1.webp',
+    '/assets/hero.webp',
 ];
 
 export const AboutPage = () => {
+    const { gallery } = useGallery();
+    const managed = photosOf(gallery, 'osalone');
+    // The first photo is the portrait beside the text and the rest fill the band
+    // below it, so dragging a photo to the front in the admin promotes it.
+    const [portrait = '', ...tiles] = managed.length > 0 ? managed : FALLBACK_PHOTOS;
+
     usePageMeta({
         title: 'O salóne — Svadobný salón Jarka Galanta',
         description: 'Svadobný salón Jarka v Galante funguje od roku 2007. Stovky šiat pre nevesty, ženíchov a družičky.',
@@ -35,23 +44,32 @@ export const AboutPage = () => {
                             </p>
                         ))}
                     </div>
-                    <div className={styles.about__portrait}>
-                        <img
-                            src="/assets/svadobne-4.webp"
-                            alt="Nevesta vo svadobných šatách v salóne Jarka v Galante"
-                            className={styles.about__image}
-                            loading="lazy"
-                        />
-                    </div>
+                    {portrait ? (
+                        <div className={styles.about__portrait}>
+                            <img
+                                src={portrait}
+                                alt="Svadobný salón Jarka v Galante"
+                                className={styles.about__image}
+                                loading="lazy"
+                            />
+                        </div>
+                    ) : null}
                 </div>
 
-                <div className={styles.about__grid}>
-                    {TILES.map((tile) => (
-                        <div key={tile.src} className={styles.about__tile}>
-                            <img src={tile.src} alt={tile.alt} className={styles.about__image} loading="lazy" />
-                        </div>
-                    ))}
-                </div>
+                {tiles.length > 0 ? (
+                    <div className={styles.about__grid}>
+                        {tiles.map((src, index) => (
+                            <div key={src} className={styles.about__tile}>
+                                <img
+                                    src={src}
+                                    alt={`Zo salónu Jarka v Galante, fotografia ${index + 1}`}
+                                    className={styles.about__image}
+                                    loading="lazy"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
 
                 <ButtonLink to={ROUTES.reservation} variant="dark" className={styles.about__cta}>
                     Prídem sa pozrieť

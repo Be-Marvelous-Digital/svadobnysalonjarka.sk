@@ -18,6 +18,8 @@ const BUNDLED: Record<CategoryKey, string[]> = {
     galeria: ['hero', 'svadobne-1', 'svadobne-3', 'spolocenske-2', 'prijimacie-1'],
     // Feeds the Instagram strip on the home page.
     instagram: ['svadobne-3', 'spolocenske-2', 'svadobne-4', 'spolocenske-3', 'svadobne-5', 'prijimacie-2'],
+    // Fills the About page: the first photo is the portrait, the rest the band below it.
+    osalone: ['svadobne-4', 'svadobne-5', 'spolocenske-4', 'prijimacie-1', 'hero'],
 };
 
 /** Creates the admin account on first run; an existing account is never overwritten by a re-seed. */
