@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { CookieBar } from '@/components/CookieBar';
 import { Footer } from '@/components/Footer';
@@ -20,18 +20,20 @@ export const Layout = () => {
     const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
     const onHomeHero = pathname === ROUTES.home && !scrolled;
+    const headerHidden = navHidden && !drawerOpen;
+
+    // Sticky elements inside the page have to know whether the header is still
+    // there to clear; it slides away on the way down.
+    useEffect(() => {
+        document.documentElement.style.setProperty('--header-offset', headerHidden ? '0px' : 'var(--header-height)');
+    }, [headerHidden]);
 
     return (
         <>
             <a href="#obsah" className={styles.skipLink}>
                 Preskočiť na obsah
             </a>
-            <Header
-                transparent={onHomeHero}
-                hidden={navHidden && !drawerOpen}
-                drawerOpen={drawerOpen}
-                onOpenDrawer={openDrawer}
-            />
+            <Header transparent={onHomeHero} hidden={headerHidden} drawerOpen={drawerOpen} onOpenDrawer={openDrawer} />
             <main
                 id="obsah"
                 key={pathname}

@@ -207,10 +207,40 @@
     font-size: @font-size-xxs;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    transition:
+        background @duration-fast @ease-out-expo,
+        border-color @duration-fast @ease-out-expo,
+        color @duration-fast @ease-out-expo,
+        transform @duration-fast @ease-out-expo;
+
+    // Every control in here is a small uppercase label; without a focus ring a
+    // keyboard user has no idea which one they are on.
+    &:focus-visible {
+        outline: 2px solid @color-primary;
+        outline-offset: 2px;
+    }
+
+    // Transform, not margin: a press should not reflow the row around it.
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        &:active:not(:disabled) {
+            transform: none;
+        }
+    }
 
     &--primary {
         background: @color-ink;
         color: @color-on-dark;
+
+        &:hover:not(:disabled) {
+            background: @color-ink-deep;
+            color: @color-on-dark;
+        }
     }
 
     &--gold {
@@ -226,6 +256,12 @@
         border-color: @color-border-strong;
         color: @color-ink;
 
+        &:hover:not(:disabled) {
+            border-color: @color-primary;
+            background: @color-surface-muted;
+            color: @color-ink;
+        }
+
         &:disabled {
             border-color: @color-border;
             color: @color-text-disabled;
@@ -236,10 +272,25 @@
     &--danger {
         border-color: @color-border;
         color: @color-status-rejected;
+
+        &:hover:not(:disabled) {
+            border-color: @color-status-rejected;
+            background: @color-surface-muted;
+            color: @color-status-rejected;
+        }
+
+        &:disabled {
+            color: @color-text-disabled;
+            cursor: not-allowed;
+        }
     }
 
     &--quiet {
         color: @color-text-disabled;
+
+        &:hover:not(:disabled) {
+            color: @color-ink;
+        }
     }
 
     // Square nudge buttons for keyboard and touch, where a drag never fires.
@@ -273,6 +324,17 @@
         white-space: nowrap;
         font-size: 10.5px;
         letter-spacing: @letter-spacing-wide;
+
+        &:hover:not(:disabled) {
+            color: @color-ink;
+            border-bottom-color: @color-primary;
+        }
+
+        &:disabled {
+            color: @color-text-disabled;
+            border-bottom-color: transparent;
+            cursor: not-allowed;
+        }
     }
 }
 
@@ -426,6 +488,53 @@
         gap: 10px;
     }
 
+    // One surface for everything about the category: the cover it is represented
+    // by, what is in it, and how to add to it. Two cards side by side left the
+    // shorter one padded out with nothing.
+    &__top {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+        gap: @spacing-xl 48px;
+        align-items: stretch;
+        background: @color-surface-muted;
+        padding: 32px 36px;
+
+        &--wide {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: @breakpoint-desktop) {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: @breakpoint-mobile) {
+            padding: 24px;
+        }
+    }
+
+    // A hairline rather than a second box: the cover is part of this panel, not
+    // a card parked next to it.
+    &__main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+        gap: @spacing-lg 44px;
+        // The preview sets the height of the row; the drop area grows to meet it
+        // rather than leaving a strip of background under itself.
+        align-items: stretch;
+    }
+
+    &__coverCol {
+        padding-right: 48px;
+        border-right: 1px solid @color-border;
+
+        @media (max-width: @breakpoint-desktop) {
+            padding-right: 0;
+            padding-bottom: @spacing-lg;
+            border-right: 0;
+            border-bottom: 1px solid @color-border;
+        }
+    }
+
     &__grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
@@ -435,6 +544,20 @@
     &__item {
         display: flex;
         flex-direction: column;
+        transition: transform @duration-fast @ease-out-expo;
+
+        &:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+
+            &:hover {
+                transform: none;
+            }
+        }
+
         gap: 10px;
         cursor: grab;
         transition: opacity @duration-fast ease;
@@ -453,6 +576,59 @@
     &__frame {
         .photo-frame(3 / 4);
         position: relative;
+    }
+
+    // Sits on the photo itself: picking one out of a wall of them should not mean
+    // travelling to a column of boxes down the side.
+    &__pick {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: inline-flex;
+        cursor: pointer;
+
+        input {
+            position: absolute;
+            opacity: 0;
+            inset: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+    }
+
+    &__pickBox {
+        width: 22px;
+        height: 22px;
+        border: 1px solid @color-on-dark;
+        background: rgba(19, 17, 15, 0.42);
+        transition:
+            background @duration-fast ease,
+            border-color @duration-fast ease;
+    }
+
+    &__pick input:checked + &__pickBox {
+        background: @color-primary-text;
+        border-color: @color-primary-text;
+    }
+
+    &__pick input:checked + &__pickBox::after {
+        content: '✓';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-size: 13px;
+        color: @color-on-dark;
+    }
+
+    &__pick input:focus-visible + &__pickBox {
+        outline: 2px solid @color-primary;
+        outline-offset: 2px;
+    }
+
+    &__item--selected &__frame {
+        outline: 2px solid @color-primary-text;
+        outline-offset: -2px;
     }
 
     &__grip {
@@ -543,6 +719,12 @@
 }
 
 .userRow {
+    transition: background @duration-fast @ease-out-expo;
+
+    &:hover {
+        background: @color-surface-muted;
+    }
+
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -715,6 +897,8 @@
 }
 
 .overlay {
+    .keyframes-fade();
+    animation: jFade @duration-fast @ease-out-expo backwards;
     position: fixed;
     inset: 0;
     z-index: @z-drawer;
@@ -727,6 +911,10 @@
 }
 
 .dialog {
+    .keyframes-fade-up();
+    // backwards, so no transform is left behind once it settles — a transformed
+    // ancestor would become the containing block for anything fixed inside.
+    animation: jFadeUp @duration-base @ease-out-expo backwards;
     width: 100%;
     max-width: 520px;
     background: @color-surface;
@@ -900,5 +1088,370 @@
             background: rgba(253, 252, 250, 0.12);
             border-color: @color-on-dark;
         }
+    }
+}
+
+.slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 28px;
+}
+
+.slot {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: @color-surface-muted;
+    padding: 18px;
+
+    &__frame {
+        width: 100%;
+        flex: 1;
+        min-height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid @color-border;
+        background: @color-surface-placeholder;
+        padding: 10px;
+        cursor: pointer;
+        transition: border-color @duration-fast ease;
+
+        &:hover,
+        &:focus-visible {
+            border-color: @color-primary;
+        }
+
+        &--over {
+            border-color: @color-primary;
+            border-style: dashed;
+        }
+
+        &:disabled {
+            cursor: progress;
+        }
+    }
+
+    &__shot {
+        position: relative;
+        height: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        display: block;
+    }
+
+    // Sits inside the category header rather than in a grid of its own, so it
+    // drops its background and lays the preview out beside the text.
+    &--inline {
+        height: 100%;
+        flex-direction: row;
+        // Not stretch: the preview keeps the shape of the tile it stands for,
+        // so its height comes from the ratio rather than from the row.
+        align-items: flex-start;
+        gap: @spacing-lg;
+        background: none;
+        padding: 0;
+    }
+
+    // Shown at the shape the home page tile crops to, so the preview is what the
+    // collection will actually look like. Height is stated and the width follows
+    // from the ratio: deriving the height from the row instead would ask the row
+    // for a size the row is still getting from this element. The column is wide
+    // enough that the text beside it stays shorter than this, so the preview is
+    // what sets the row and it meets the padding top and bottom.
+    &--inline &__frame {
+        height: 300px;
+        width: auto;
+        flex: none;
+        min-height: 0;
+        padding: 0;
+    }
+
+    &--inline &__shot {
+        height: 100%;
+        width: auto;
+        max-width: none;
+    }
+
+    &--inline &__body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    // In a narrow column space-between throws the badge to the far edge and
+    // leaves a gap across the middle; it reads better right after the label.
+    &--inline &__heading {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 4px 12px;
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    // Hidden until the frame is hovered, focused or dragged over, so a wall of
+    // photos stays readable as photos rather than as a wall of instructions.
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: @spacing-md;
+        text-align: center;
+        background: rgba(19, 17, 15, 0.62);
+        color: @color-on-dark;
+        font-size: @font-size-xxs;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity @duration-fast ease;
+    }
+
+    &__frame:hover &__overlay,
+    &__frame:focus-visible &__overlay,
+    &__frame--over &__overlay,
+    &__frame:disabled &__overlay {
+        opacity: 1;
+    }
+
+    &__frame--over &__shot {
+        pointer-events: none;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: @spacing-sm;
+    }
+
+    &__label {
+        font-family: @font-display;
+        font-size: @font-size-lg;
+        color: @color-ink;
+    }
+
+    &__badge {
+        flex-shrink: 0;
+        font-size: @font-size-xxs;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: @color-text-disabled;
+
+        &--custom {
+            color: @color-primary-text;
+        }
+    }
+
+    &__hint {
+        font-size: @font-size-sm;
+        line-height: 1.6;
+        color: @color-text-secondary;
+    }
+
+    &__ratio {
+        font-family: @font-mono;
+        font-size: @font-size-xxs;
+        letter-spacing: 0.1em;
+        color: @color-text-disabled;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: @spacing-xs;
+        margin-top: 6px;
+    }
+}
+
+.picker {
+    position: fixed;
+    inset: 0;
+    z-index: @z-drawer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: @spacing-lg;
+    background: rgba(19, 17, 15, 0.58);
+
+    &__panel {
+        width: 100%;
+        max-width: 980px;
+        max-height: 86vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 28px;
+        background: @color-background;
+    }
+
+    &__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: @spacing-lg;
+    }
+
+    &__title {
+        font-family: @font-display;
+        font-size: @font-size-lg + 5px;
+        color: @color-ink;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+        gap: @spacing-sm;
+    }
+
+    &__tile {
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        border: 1px solid @color-border;
+        background: @color-surface-placeholder;
+        padding: 0;
+        cursor: pointer;
+        transition: border-color @duration-fast ease;
+
+        &:hover,
+        &:focus-visible {
+            border-color: @color-primary;
+        }
+    }
+
+    @media (max-width: @breakpoint-mobile) {
+        padding: 0;
+
+        &__panel {
+            max-height: 100vh;
+            height: 100%;
+            padding: 20px;
+        }
+    }
+}
+
+.drop {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: @spacing-sm;
+    min-height: 180px;
+    padding: @spacing-lg;
+    cursor: pointer;
+    text-align: center;
+    border: 1px dashed @color-border-strong;
+    background: @color-background;
+    transition:
+        border-color @duration-fast ease,
+        background @duration-fast ease;
+
+    &__wrap {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: @spacing-sm;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        border-color: @color-primary;
+        background: @color-surface-muted;
+    }
+
+    &:hover:not(:disabled) &__pick {
+        border-color: @color-primary;
+        background: @color-background;
+    }
+
+    // Solid rather than dashed while a file is over it: the edge stops being an
+    // invitation and starts being a target.
+    &--over {
+        border-style: solid;
+        border-color: @color-primary;
+        background: @color-surface-placeholder;
+    }
+
+    &--busy {
+        cursor: progress;
+    }
+
+    &__title {
+        font-family: @font-display;
+        font-size: @font-size-lg;
+        color: @color-ink;
+        transition: color @duration-fast ease;
+    }
+
+    &__note {
+        max-width: 34ch;
+        font-size: @font-size-xs;
+        line-height: 1.6;
+        color: @color-text-secondary;
+    }
+
+    // Looks like a button but is a span: the whole area is already the button.
+    &__pick {
+        pointer-events: none;
+    }
+
+    &:disabled {
+        cursor: progress;
+    }
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.bulk {
+    // Sticky under the site header: a photo picked at the bottom of a long
+    // category should not mean scrolling back up to act on it.
+    //
+    // Pinned at zero and pushed down by a transform rather than by `top`: the
+    // header slides on a transform, and matching it keeps the two moving
+    // together instead of the bar snapping while the header glides.
+    position: sticky;
+    top: 0;
+    transform: translateY(var(--header-offset, @header-height));
+    transition: transform @duration-base cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: @z-header - 1;
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: @spacing-sm @spacing-lg;
+    padding: @spacing-sm 0;
+    background: @color-background;
+    border-bottom: 1px solid @color-border;
+
+    &__count {
+        margin-right: auto;
+        font-size: @font-size-xxs;
+        letter-spacing: @letter-spacing-wide;
+        text-transform: uppercase;
+        color: @color-text-secondary;
     }
 }

@@ -13,6 +13,13 @@ body {
     background: @color-background;
 }
 
+:root {
+    --header-height: @header-height;
+    // How far down the page a sticky element has to start to clear the header.
+    // Layout drops it to zero while the header is slid away.
+    --header-offset: @header-height;
+}
+
 body {
     font-family: @font-primary;
     font-weight: @font-weight-light;
