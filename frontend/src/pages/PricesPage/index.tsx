@@ -1,12 +1,16 @@
 import { ButtonLink } from '@/components/Button';
 import { MailIcon } from '@/components/Icon';
 import { PRICE_CONDITIONS, PRICE_GROUPS } from '@/data/prices';
+import { imageFor, slotInfo } from '@/data/siteImages';
+import { useSiteImages } from '@/hooks/useSiteImages';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { ROUTES } from '@/utils/routes';
 import { PriceTable } from './PriceTable';
 import styles from './PricesPage.module.less';
 
 export const PricesPage = () => {
+    const images = useSiteImages();
+
     usePageMeta({
         title: 'Ceny — Svadobný salón Jarka Galanta',
         description:
@@ -37,11 +41,9 @@ export const PricesPage = () => {
 
                     <div className={styles.prices__portrait}>
                         <img
-                            src="/assets/svadobne-1.webp"
-                            alt="Nevesta v svadobných šatách zo salónu Jarka"
+                            src={imageFor(images, 'prices.portrait')}
+                            alt={slotInfo('prices.portrait').alt}
                             className={styles.prices__image}
-                            width={734}
-                            height={1071}
                             decoding="async"
                         />
                     </div>

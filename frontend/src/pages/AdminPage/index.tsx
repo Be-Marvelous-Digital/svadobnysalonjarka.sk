@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { AdminGallery } from '@/components/admin/AdminGallery';
+import { AdminSiteImages } from '@/components/admin/AdminSiteImages';
 import { AdminLogin } from '@/components/admin/AdminLogin';
 import { AdminInquiries } from '@/components/admin/AdminInquiries';
 import { AdminUsers } from '@/components/admin/AdminUsers';
@@ -7,7 +8,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 import { useAdminSession } from '@/hooks/useAdminSession';
 import styles from './AdminPage.module.less';
 
-type AdminTab = 'dopyty' | 'galeria' | 'pouzivatelia';
+type AdminTab = 'dopyty' | 'galeria' | 'fotky' | 'pouzivatelia';
 
 export const AdminPage = () => {
     const session = useAdminSession();
@@ -56,7 +57,16 @@ export const AdminPage = () => {
                                     .join(' ')}
                                 onClick={() => setTab('galeria')}
                             >
-                                Galéria
+                                Fotky kolekcií
+                            </button>
+                            <button
+                                type="button"
+                                className={[styles.admin__tab, tab === 'fotky' && styles['admin__tab--active']]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                onClick={() => setTab('fotky')}
+                            >
+                                Fotky na stránkach
                             </button>
                             <button
                                 type="button"
@@ -71,6 +81,7 @@ export const AdminPage = () => {
 
                         {tab === 'dopyty' ? <AdminInquiries /> : null}
                         {tab === 'galeria' ? <AdminGallery /> : null}
+                        {tab === 'fotky' ? <AdminSiteImages /> : null}
                         {tab === 'pouzivatelia' ? <AdminUsers /> : null}
                     </>
                 ) : (

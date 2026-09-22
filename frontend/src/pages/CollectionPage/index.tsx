@@ -9,7 +9,9 @@ import { StructuredData } from '@/components/StructuredData';
 import { COLLECTIONS, findCollection } from '@/data/collections';
 import { CONTACT } from '@/data/contact';
 import { breadcrumbSchema, collectionSchema } from '@/data/schema';
+import { coverFor } from '@/data/siteImages';
 import { photosOf, useGallery } from '@/hooks/useGallery';
+import { useSiteImages } from '@/hooks/useSiteImages';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { NOT_FOUND_META } from '@/pages/NotFoundPage/notFoundMeta';
@@ -20,6 +22,7 @@ export const CollectionPage = () => {
     const { key } = useParams<{ key: string }>();
     const collection = findCollection(key);
     const { gallery, loading } = useGallery();
+    const siteImages = useSiteImages();
     const [lightboxIndex, setLightboxIndex] = useState(-1);
 
     const closeLightbox = () => setLightboxIndex(-1);
@@ -31,7 +34,7 @@ export const CollectionPage = () => {
             ? {
                   title: `${collection.label} — Svadobný salón Jarka Galanta`,
                   description: collection.description,
-                  image: collection.cover,
+                  image: coverFor(siteImages, collection.key),
               }
             : NOT_FOUND_META,
     );
