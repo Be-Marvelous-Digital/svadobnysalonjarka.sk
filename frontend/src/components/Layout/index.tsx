@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { BackToTop } from '@/components/BackToTop';
 import { CookieBar } from '@/components/CookieBar';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
@@ -49,6 +50,7 @@ export const Layout = () => {
                 </>
             ) : null}
             {drawerOpen ? <MobileDrawer onClose={closeDrawer} /> : null}
+            <BackToTop />
             <CookieBar />
         </>
     );
