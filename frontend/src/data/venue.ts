@@ -65,7 +65,7 @@ export const VENUE_STORY: VenueStorySection[] = [
 /** Shown on the home page, above the button through to the page itself. */
 export const VENUE_TEASER = {
     kicker: 'Svadobný priestor',
-    title: 'Aj sálu máme',
+    title: 'Máme aj sálu',
     body: `Okrem šiat ponúkame aj miesto, kde sa svadba odohrá. ${VENUE.name} v Topoľnici je náš svadobný priestor — pohostinstvo s kuchyňou na mieste, v deň svadby len pre vás.`,
     cta: 'Pozrieť priestor',
 } as const;
