@@ -28,7 +28,7 @@ export const CookieBar = () => {
                         Odmietnuť
                     </button>
                     <button type="button" className={`${styles.bar__button} ${styles['bar__button--solid']}`} onClick={acceptAll}>
-                        Povoliť mapu
+                        Povoliť
                     </button>
                 </div>
             </div>
