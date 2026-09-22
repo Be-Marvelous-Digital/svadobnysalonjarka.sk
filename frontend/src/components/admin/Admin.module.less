@@ -1424,21 +1424,6 @@
 }
 
 .bulk {
-    // Sticky under the site header: a photo picked at the bottom of a long
-    // category should not mean scrolling back up to act on it.
-    //
-    // Pinned at zero and pushed down by a transform rather than by `top`: the
-    // header slides on a transform, and matching it keeps the two moving
-    // together instead of the bar snapping while the header glides.
-    position: sticky;
-    top: 0;
-    transform: translateY(var(--header-offset, @header-height));
-    transition: transform @duration-base cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: @z-header - 1;
-
-    @media (prefers-reduced-motion: reduce) {
-        transition: none;
-    }
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1446,6 +1431,15 @@
     padding: @spacing-sm 0;
     background: @color-background;
     border-bottom: 1px solid @color-border;
+
+    // Sticky only while the photos are on screen, and offset by `top` rather
+    // than by a transform: a transform draws it below its own sticky slot, which
+    // is what had it sitting over the first row of photos.
+    &--stuck {
+        position: sticky;
+        top: var(--header-offset, @header-height);
+        z-index: @z-header - 1;
+    }
 
     &__count {
         margin-right: auto;

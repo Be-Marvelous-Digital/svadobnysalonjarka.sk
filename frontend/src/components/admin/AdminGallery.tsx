@@ -4,6 +4,8 @@ import { CATEGORY_KEYS, CATEGORY_LABELS, type CategoryKey } from '@/data/collect
 import { coverSlotFor } from '@/data/siteImages';
 import { plural } from '@/utils/plural';
 import { useAdminGallery } from '@/hooks/useAdminGallery';
+import { useInView } from '@/hooks/useInView';
+import { useUrlState } from '@/hooks/useUrlState';
 import { useConfirm } from '@/hooks/useConfirm';
 import { useReorderable } from '@/hooks/useReorderable';
 import { CategoryIntake } from './CategoryIntake';
@@ -13,7 +15,9 @@ import { GalleryTile } from './GalleryTile';
 import styles from './Admin.module.less';
 
 export const AdminGallery = () => {
-    const [category, setCategory] = useState<CategoryKey>('svadobne');
+    // Replaces rather than pushes: this is a filter inside the tab, and every
+    // chip click would otherwise be one more press of the back button.
+    const [category, setCategory] = useUrlState<CategoryKey>('kategoria', CATEGORY_KEYS, 'svadobne', false);
     const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
     const gallery = useAdminGallery();
     const confirm = useConfirm();
@@ -21,13 +25,6 @@ export const AdminGallery = () => {
     const { replace, remove, removeMany, reorder, upload } = gallery;
     const handleReplace = useCallback((id: string, file: File) => void replace(id, file), [replace]);
     const handleUpload = useCallback((key: CategoryKey, files: FileList) => void upload(key, files), [upload]);
-
-    // A selection belongs to the category it was made in; carrying it across
-    // would delete photos the person can no longer see.
-    const pickCategory = useCallback((key: CategoryKey) => {
-        setCategory(key);
-        setSelected(new Set());
-    }, []);
 
     const toggleSelect = useCallback((id: string) => {
         setSelected((current) => {
@@ -54,6 +51,9 @@ export const AdminGallery = () => {
     // have no cover and the panel takes the whole row.
     const hasCover = coverSlotFor(category) !== undefined;
 
+    // Narrowed to the category on the way out rather than cleared on the way in:
+    // a selection made elsewhere can never be counted or deleted here, so there
+    // is nothing to reset when the category changes.
     const selectedHere = useMemo(() => inCategory.filter((photo) => selected.has(photo.id)), [inCategory, selected]);
     const allPicked = inCategory.length > 0 && selectedHere.length === inCategory.length;
 
@@ -81,12 +81,16 @@ export const AdminGallery = () => {
     const handleMove = useCallback((id: string, offset: number) => move(id, offset), [move]);
 
     const headClass = [styles.gallery__top, !hasCover && styles['gallery__top--wide']].filter(Boolean).join(' ');
+    // The bar only follows the photos while the photos are on screen; otherwise
+    // it sits in the flow and stops hanging over rows nobody is working on.
+    const [gridRef, gridInView] = useInView<HTMLDivElement>();
+    const barClass = [styles.bulk, gridInView && styles['bulk--stuck']].filter(Boolean).join(' ');
 
     return (
         <div className={styles.gallery}>
             <div className={styles.gallery__tabs}>
                 {CATEGORY_KEYS.map((key) => (
-                    <Chip key={key} selected={category === key} onClick={() => pickCategory(key)}>
+                    <Chip key={key} selected={category === key} onClick={() => setCategory(key)}>
                         {CATEGORY_LABELS[key]} ({countOf(key)})
                     </Chip>
                 ))}
@@ -113,7 +117,7 @@ export const AdminGallery = () => {
                 <div className={styles.gallery__empty}>v tejto kategórii nie sú fotografie</div>
             ) : (
                 <>
-                    <div className={styles.bulk}>
+                    <div className={barClass}>
                         <button type="button" className={`${styles.action} ${styles['action--link']}`} onClick={toggleAll}>
                             {allPicked ? 'Zrušiť výber' : 'Označiť všetky'}
                         </button>
@@ -130,7 +134,7 @@ export const AdminGallery = () => {
                         </button>
                     </div>
 
-                    <div className={styles.gallery__grid}>
+                    <div ref={gridRef} className={styles.gallery__grid}>
                         {order.ordered.map((photo, position) => (
                             <GalleryTile
                                 key={photo.id}

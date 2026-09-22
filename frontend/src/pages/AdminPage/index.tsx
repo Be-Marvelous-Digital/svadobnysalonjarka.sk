@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { AdminGallery } from '@/components/admin/AdminGallery';
 import { AdminSiteImages } from '@/components/admin/AdminSiteImages';
 import { AdminLogin } from '@/components/admin/AdminLogin';
@@ -6,13 +6,15 @@ import { AdminInquiries } from '@/components/admin/AdminInquiries';
 import { AdminUsers } from '@/components/admin/AdminUsers';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { useAdminSession } from '@/hooks/useAdminSession';
+import { useUrlState } from '@/hooks/useUrlState';
 import styles from './AdminPage.module.less';
 
-type AdminTab = 'dopyty' | 'galeria' | 'fotky' | 'pouzivatelia';
+const ADMIN_TABS = ['dopyty', 'galeria', 'fotky', 'pouzivatelia'] as const;
+type AdminTab = (typeof ADMIN_TABS)[number];
 
 export const AdminPage = () => {
     const session = useAdminSession();
-    const [tab, setTab] = useState<AdminTab>('dopyty');
+    const [tab, setTab] = useUrlState<AdminTab>('sekcia', ADMIN_TABS, 'dopyty');
 
     const { login } = session;
     const handleLogin = useCallback((username: string, password: string) => void login(username, password), [login]);
