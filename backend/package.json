@@ -1,7 +1,7 @@
 {
     "name": "svadobnysalonjarka-backend",
     "version": "1.0.0",
-    "description": "REST API for Svadobn\u00fd sal\u00f3n Jarka \u2014 rezerv\u00e1cie, gal\u00e9ria, admin",
+    "description": "REST API for Svadobný salón Jarka — rezervácie, galéria, admin",
     "private": true,
     "type": "module",
     "main": "dist/index.js",
@@ -14,7 +14,8 @@
         "format": "prettier --write \"src/**/*.ts\"",
         "format:check": "prettier --check \"src/**/*.ts\"",
         "check": "npm run lint && npm run format:check && npm run typecheck && npm run build",
-        "seed": "tsx src/seed/run.ts"
+        "seed": "tsx src/seed/run.ts",
+        "import:photos": "tsx src/seed/importPhotos.ts"
     },
     "license": "UNLICENSED",
     "dependencies": {
