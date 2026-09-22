@@ -7,6 +7,7 @@ export const CATEGORY_KEYS = [
     'galeria',
     'instagram',
     'osalone',
+    'priestor',
 ] as const;
 
 export type CategoryKey = (typeof CATEGORY_KEYS)[number];
@@ -20,6 +21,7 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
     galeria: 'Galéria salónu',
     instagram: 'Instagram na úvodnej stránke',
     osalone: 'O salóne',
+    priestor: 'Svadobný priestor',
 };
 
 /**
@@ -38,6 +40,8 @@ export const SITE_IMAGE_SLOTS = [
     'collection.zenich',
     'collection.obuv',
     'prices.portrait',
+    'home.venue',
+    'venue.hero',
 ] as const;
 
 export type SiteImageSlot = (typeof SITE_IMAGE_SLOTS)[number];

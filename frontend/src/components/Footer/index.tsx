@@ -8,6 +8,7 @@ import styles from './Footer.module.less';
 
 const SALON_LINKS = [
     { to: ROUTES.about, label: 'O salóne' },
+    { to: ROUTES.venue, label: 'Svadobný priestor' },
     { to: ROUTES.prices, label: 'Ceny' },
     { to: collectionPath('galeria'), label: 'Galéria' },
     { to: ROUTES.reservation, label: 'Rezervácia' },

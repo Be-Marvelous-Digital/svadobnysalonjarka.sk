@@ -7,6 +7,7 @@ export const CATEGORY_KEYS = [
     'galeria',
     'instagram',
     'osalone',
+    'priestor',
 ] as const;
 
 export type CategoryKey = (typeof CATEGORY_KEYS)[number];
@@ -25,6 +26,7 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
     galeria: 'Galéria salónu',
     instagram: 'Instagram na úvodnej stránke',
     osalone: 'O salóne',
+    priestor: 'Svadobný priestor',
 };
 
 export interface Collection {

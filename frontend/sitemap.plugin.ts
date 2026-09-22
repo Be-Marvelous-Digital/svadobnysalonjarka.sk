@@ -1,5 +1,5 @@
 import type { Plugin } from 'vite';
-import { CATEGORY_KEYS } from './src/data/collections.ts';
+import { COLLECTIONS } from './src/data/collections.ts';
 import { ROUTES } from './src/utils/routes.ts';
 
 const ORIGIN = 'https://svadobnysalonjarka.sk';
@@ -29,7 +29,10 @@ function paths(): string[] {
     const pages = Object.entries(ROUTES)
         .filter(([name]) => name !== 'admin')
         .map(([, path]) => path);
-    return [...pages, ...CATEGORY_KEYS.map((key) => `/kolekcia/${key}`)];
+    // COLLECTIONS, not every category: instagram, osalone and priestor fill a
+    // strip or a page of their own and have no /kolekcia/ page behind them, so
+    // listing them offered Google three URLs that answer with a noindex 404.
+    return [...pages, ...COLLECTIONS.map((collection) => `/kolekcia/${collection.key}`)];
 }
 
 function render(lastmod: string): string {

@@ -6,6 +6,7 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { SocialSection } from '@/components/home/SocialSection';
 import { StepsSection } from '@/components/home/StepsSection';
 import { StorySection } from '@/components/home/StorySection';
+import { VenueSection } from '@/components/home/VenueSection';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { LOCAL_BUSINESS_SCHEMA } from '@/data/schema';
 import { usePageMeta } from '@/hooks/usePageMeta';
@@ -24,6 +25,7 @@ export const HomePage = () => {
             <CollectionsSection />
             <StepsSection />
             <StorySection />
+            <VenueSection />
             <GroomSection />
             <TestimonialsSection />
             <SocialSection />

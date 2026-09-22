@@ -22,6 +22,7 @@ const DRAWER_LINKS: DrawerLink[] = [
         label: collection.label,
     })),
     { to: ROUTES.prices, label: 'Ceny' },
+    { to: ROUTES.venue, label: 'Svadobný priestor' },
     { to: ROUTES.about, label: 'O salóne' },
     { to: ROUTES.contact, label: 'Kontakt' },
 ];

@@ -70,6 +70,9 @@ export const Header = ({ transparent, hidden, drawerOpen, onOpenDrawer }: Header
                     <NavLink to={ROUTES.prices} className={styles.header__link}>
                         Ceny
                     </NavLink>
+                    <NavLink to={ROUTES.venue} className={styles.header__link}>
+                        Svadobný priestor
+                    </NavLink>
                     <NavLink to={ROUTES.about} className={styles.header__link}>
                         O salóne
                     </NavLink>

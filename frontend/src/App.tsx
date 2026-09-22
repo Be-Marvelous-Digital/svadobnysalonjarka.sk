@@ -11,6 +11,7 @@ import { PricesPage } from '@/pages/PricesPage';
 import { PrivacyPage } from '@/pages/PrivacyPage';
 import { ReservationPage } from '@/pages/ReservationPage';
 import { TermsPage } from '@/pages/TermsPage';
+import { VenuePage } from '@/pages/VenuePage';
 import { ROUTES } from '@/utils/routes';
 
 // The back office is a third of the source and nobody browsing dresses will ever
@@ -26,6 +27,7 @@ export const App = () => (
                 <Route path="/kolekcia/:key" element={<CollectionPage />} />
                 <Route path={ROUTES.prices} element={<PricesPage />} />
                 <Route path={ROUTES.about} element={<AboutPage />} />
+                <Route path={ROUTES.venue} element={<VenuePage />} />
                 <Route path={ROUTES.contact} element={<ContactPage />} />
                 <Route path={ROUTES.reservation} element={<ReservationPage />} />
                 <Route path={ROUTES.privacy} element={<PrivacyPage />} />

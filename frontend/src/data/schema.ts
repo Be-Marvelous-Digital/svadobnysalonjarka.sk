@@ -1,5 +1,6 @@
 import { COLLECTIONS, type Collection } from './collections';
 import { CONTACT, OPENING_ROWS } from './contact';
+import { VENUE } from './venue';
 import { SITE_ORIGIN } from '@/hooks/usePageMeta';
 import { collectionPath, ROUTES } from '@/utils/routes';
 
@@ -98,5 +99,27 @@ export function collectionSchema(collection: Collection, photoCount: number): Re
         isPartOf: { '@id': `${SITE_ORIGIN}/#salon` },
         about: { '@type': 'Product', name: collection.label, description: collection.description },
         ...(photoCount > 0 ? { mainEntity: { '@type': 'ImageGallery', numberOfItems: photoCount } } : {}),
+    };
+}
+
+/** The venue is a place of its own, so it gets its own entry rather than a line in the salon's. */
+export function venueSchema(image: string): Record<string, unknown> {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'EventVenue',
+        name: `${VENUE.name} — svadobný priestor`,
+        description:
+            'Svadobná sála v Topoľnici pri Galante. Pohostinstvo s kuchyňou na mieste, v deň svadby vyhradené jednej oslave.',
+        url: `${SITE_ORIGIN}${ROUTES.venue}`,
+        image: image.startsWith('http') ? image : `${SITE_ORIGIN}${image}`,
+        address: {
+            '@type': 'PostalAddress',
+            addressLocality: VENUE.place,
+            addressRegion: 'Trnavský kraj',
+            addressCountry: 'SK',
+        },
+        telephone: CONTACT.phone,
+        isAccessibleForFree: false,
+        provider: { '@id': `${SITE_ORIGIN}/#salon` },
     };
 }

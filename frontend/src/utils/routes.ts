@@ -4,6 +4,7 @@ export const ROUTES = {
     home: '/',
     prices: '/ceny',
     about: '/o-salone',
+    venue: '/svadobny-priestor',
     contact: '/kontakt',
     reservation: '/rezervacia',
     privacy: '/ochrana-sukromia',

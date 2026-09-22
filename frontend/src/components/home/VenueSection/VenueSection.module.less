@@ -1,0 +1,67 @@
+.venue {
+    padding: @spacing-section @layout-gutter;
+    background: @color-surface-muted;
+
+    &__inner {
+        .container(@layout-max-width-narrow);
+        display: grid;
+        // Photo first and wider: the point of the band is that there is a room.
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: @spacing-xxl 72px;
+        align-items: center;
+    }
+
+    &__frame {
+        .photo-frame(4 / 3);
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    &__copy {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: @spacing-md;
+    }
+
+    &__kicker {
+        .kicker();
+    }
+
+    &__title {
+        font-size: clamp(30px, 3.6vw, 46px);
+        line-height: 1.1;
+        color: @color-ink;
+    }
+
+    &__body {
+        max-width: 48ch;
+        font-size: @font-size-md;
+        line-height: 1.85;
+        color: @color-text-secondary;
+    }
+
+    &__cta {
+        margin-top: @spacing-xs;
+    }
+
+    @media (max-width: @breakpoint-tablet) {
+        padding: 72px @layout-gutter;
+
+        &__inner {
+            grid-template-columns: 1fr;
+            gap: @spacing-xl;
+        }
+
+        // A full-width 4:3 frame would eat the screen before the copy appears.
+        &__frame {
+            aspect-ratio: auto;
+            height: clamp(220px, 40vw, 340px);
+        }
+    }
+}

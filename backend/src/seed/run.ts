@@ -20,6 +20,8 @@ const BUNDLED: Record<CategoryKey, string[]> = {
     instagram: ['svadobne-3', 'spolocenske-2', 'svadobne-4', 'spolocenske-3', 'svadobne-5', 'prijimacie-2'],
     // Fills the About page: the first photo is the portrait, the rest the band below it.
     osalone: ['svadobne-4', 'svadobne-5', 'spolocenske-4', 'prijimacie-1', 'hero'],
+    // No bundled photos yet; the salon uploads its own of the venue.
+    priestor: [],
 };
 
 /** Creates the admin account on first run; an existing account is never overwritten by a re-seed. */
@@ -69,6 +71,14 @@ async function main(): Promise<void> {
     await seedAdmin();
 
     for (const [category, names] of Object.entries(BUNDLED) as Array<[CategoryKey, string[]]>) {
+        // A category holding real uploads has outgrown the samples. Re-seeding
+        // would drop the bundled stock back in among the salon's own photos.
+        const uploaded = await Photo.countDocuments({ category, url: { $regex: '^/images/' } });
+        if (uploaded > 0) {
+            logger.info(`${category}: ${uploaded} uploaded photo(s), bundled samples skipped`);
+            continue;
+        }
+
         let order = 0;
         for (const name of names) {
             const url = `/assets/${name}.webp`;

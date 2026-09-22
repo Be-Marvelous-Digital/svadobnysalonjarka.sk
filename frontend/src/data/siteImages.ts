@@ -9,6 +9,8 @@ export const SITE_IMAGE_SLOTS = [
     'collection.zenich',
     'collection.obuv',
     'prices.portrait',
+    'home.venue',
+    'venue.hero',
 ] as const;
 
 export type SiteImageSlot = (typeof SITE_IMAGE_SLOTS)[number];
@@ -73,6 +75,29 @@ export const SITE_IMAGE_GROUPS: SiteImageGroup[] = [
                 shape: 'portrait',
                 fallback: '/assets/zenich-4.webp',
                 alt: 'Oblek pre ženícha',
+            },
+        ],
+    },
+    {
+        page: 'Svadobný priestor',
+        slots: [
+            {
+                slot: 'home.venue',
+                label: 'Fotka v páse na úvodnej stránke',
+                hint: 'Pás, ktorý na úvodnej stránke odkazuje na svadobný priestor.',
+                ratio: '4 / 3',
+                shape: 'landscape',
+                fallback: '/assets/hero.webp',
+                alt: 'Svadobný priestor K-centrum v Topoľnici',
+            },
+            {
+                slot: 'venue.hero',
+                label: 'Veľká fotka v hlavičke podstránky',
+                hint: 'Prvé, čo návštevník uvidí na stránke Svadobný priestor.',
+                ratio: '16 / 9',
+                shape: 'landscape',
+                fallback: '/assets/hero.webp',
+                alt: 'Sála svadobného priestoru K-centrum',
             },
         ],
     },
