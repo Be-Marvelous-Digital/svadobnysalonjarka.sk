@@ -18,6 +18,8 @@ interface GalleryTileProps {
     busy: boolean;
     dragging: boolean;
     dragProps: DragHandlers;
+    selected: boolean;
+    onToggleSelect: (id: string) => void;
     onMove: (id: string, offset: number) => void;
     onReplace: (id: string, file: File) => void;
     onRemove: (id: string) => void;
@@ -30,6 +32,8 @@ export const GalleryTile = ({
     busy,
     dragging,
     dragProps,
+    selected,
+    onToggleSelect,
     onMove,
     onReplace,
     onRemove,
@@ -49,13 +53,16 @@ export const GalleryTile = ({
         [onReplace, photo.id],
     );
 
-    const handleRemove = useCallback(() => {
-        if (window.confirm('Zmazať fotografiu? Odstráni sa aj súbor z úložiska a nedá sa vrátiť späť.')) {
-            onRemove(photo.id);
-        }
-    }, [onRemove, photo.id]);
+    const handleRemove = useCallback(() => onRemove(photo.id), [onRemove, photo.id]);
+    const handleToggle = useCallback(() => onToggleSelect(photo.id), [onToggleSelect, photo.id]);
 
-    const className = [styles.gallery__item, dragging && styles['gallery__item--dragging']].filter(Boolean).join(' ');
+    const className = [
+        styles.gallery__item,
+        dragging && styles['gallery__item--dragging'],
+        selected && styles['gallery__item--selected'],
+    ]
+        .filter(Boolean)
+        .join(' ');
 
     return (
         <div className={className} {...dragProps}>
@@ -64,6 +71,11 @@ export const GalleryTile = ({
                 <span className={styles.gallery__grip} aria-hidden="true">
                     ⠿
                 </span>
+                <label className={styles.gallery__pick}>
+                    <input type="checkbox" checked={selected} onChange={handleToggle} />
+                    <span className={styles.gallery__pickBox} aria-hidden="true" />
+                    <span className={styles.srOnly}>Vybrať fotografiu {position}</span>
+                </label>
             </div>
 
             <div className={styles.gallery__meta}>

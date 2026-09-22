@@ -42,11 +42,6 @@ export function useAdminGallery() {
         [run],
     );
 
-    const addLink = useCallback(
-        (category: CategoryKey, url: string) => run(() => apiSend('POST', `/admin/photos/${category}/link`, { url })),
-        [run],
-    );
-
     const replace = useCallback(
         (id: string, file: File) =>
             run(() => {
@@ -56,6 +51,8 @@ export function useAdminGallery() {
             }),
         [run],
     );
+
+    const removeMany = useCallback((ids: string[]) => run(() => apiSend('DELETE', '/admin/photos', { ids })), [run]);
 
     const remove = useCallback((id: string) => run(() => apiSend('DELETE', `/admin/photos/${id}`)), [run]);
 
@@ -77,5 +74,5 @@ export function useAdminGallery() {
         [run],
     );
 
-    return { photos, busy, error, upload, addLink, replace, remove, reorder };
+    return { photos, busy, error, upload, replace, remove, removeMany, reorder };
 }
