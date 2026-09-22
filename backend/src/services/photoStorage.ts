@@ -23,6 +23,23 @@ const QUALITY = 78;
  */
 const HERO_MAX_EDGE = 2560;
 const HERO_QUALITY = 72;
+
+/**
+ * Gallery tiles are drawn around 270px wide, so the full file is roughly five
+ * times more than they can show. Each gallery photo gets a thumbnail beside it,
+ * wide enough to stay sharp at twice the pixel density; the lightbox and the
+ * feature tile still take the full one.
+ */
+const THUMB_MAX_EDGE = 640;
+const THUMB_QUALITY = 74;
+const THUMB_SUFFIX = '-640';
+
+/** Thumbnail path for a stored gallery photo, or undefined when there is none. */
+export function thumbUrlFor(url: string): string | undefined {
+    if (!url.startsWith('/images/gallery/')) return undefined;
+    const dot = url.lastIndexOf('.');
+    return dot < 0 ? undefined : `${url.slice(0, dot)}${THUMB_SUFFIX}${url.slice(dot)}`;
+}
 /**
  * ~400 MP, far above any camera an uploader will realistically use. There is no
  * file-size limit, but a decompression bomb is about decoded pixels rather than
@@ -44,7 +61,14 @@ export class UnsupportedImageError extends Error {
  * Whatever comes in, a resized WebP comes out.
  */
 export async function storePhoto(category: CategoryKey, sourcePath: string): Promise<string> {
-    return encodeTo(sourcePath, path.join('gallery', category), randomName(), MAX_EDGE, QUALITY);
+    const name = randomName();
+    const dir = path.join('gallery', category);
+    const url = await encodeTo(sourcePath, dir, name, MAX_EDGE, QUALITY);
+
+    const dot = name.lastIndexOf('.');
+    await encodeTo(sourcePath, dir, `${name.slice(0, dot)}${THUMB_SUFFIX}${name.slice(dot)}`, THUMB_MAX_EDGE, THUMB_QUALITY);
+
+    return url;
 }
 
 /**
@@ -120,6 +144,14 @@ export function isStoredPhoto(url: string): boolean {
 /** Only removes files this server wrote; externally linked photos are just dropped from the database. */
 export async function removePhotoFile(url: string): Promise<void> {
     if (!isStoredPhoto(url)) return;
+    // The thumbnail belongs to the photo, so it goes with it rather than being
+    // left behind for a cleanup nobody runs.
+    for (const target of [url, thumbUrlFor(url)].filter((value): value is string => Boolean(value))) {
+        await unlinkStored(target);
+    }
+}
+
+async function unlinkStored(url: string): Promise<void> {
     const relative = url.slice(URL_PREFIX.length);
     if (relative.includes('..')) return;
     const root = path.resolve(UPLOADS_DIR());

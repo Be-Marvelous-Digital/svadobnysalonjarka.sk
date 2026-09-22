@@ -2,6 +2,7 @@ import { RevealSection } from '@/components/RevealSection';
 import { CONTACT } from '@/data/contact';
 import { photosOf, useGallery } from '@/hooks/useGallery';
 import styles from './SocialSection.module.less';
+import { thumbOf } from '@/utils/photos';
 
 /** Shown until the instagram category has been filled in through the admin. */
 const FALLBACK_TILES = [
@@ -40,7 +41,7 @@ export const SocialSection = () => {
                     {tiles.map((src, index) => (
                         <div key={src} className={styles.social__frame}>
                             <img
-                                src={src}
+                                src={thumbOf(src)}
                                 alt={`Šaty zo salónu Jarka na Instagrame, fotografia ${index + 1}`}
                                 className={styles.social__image}
                                 loading="lazy"

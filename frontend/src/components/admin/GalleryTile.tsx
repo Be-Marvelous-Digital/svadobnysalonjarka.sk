@@ -1,6 +1,7 @@
 import { useCallback, useRef, type ChangeEvent, type DragEvent } from 'react';
 import type { AdminPhoto } from '@/api/types';
 import styles from './Admin.module.less';
+import { thumbOf } from '@/utils/photos';
 
 interface DragHandlers {
     draggable: true;
@@ -67,7 +68,7 @@ export const GalleryTile = ({
     return (
         <div className={className} {...dragProps}>
             <div className={styles.gallery__frame}>
-                <img src={photo.url} alt={`Fotografia ${position}`} className={styles.gallery__image} loading="lazy" />
+                <img src={thumbOf(photo.url)} alt={`Fotografia ${position}`} className={styles.gallery__image} loading="lazy" />
                 <span className={styles.gallery__grip} aria-hidden="true">
                     ⠿
                 </span>

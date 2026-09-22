@@ -15,7 +15,7 @@ const Tile = ({ photo, withRatio, onOpen }: TileProps) => (
         onClick={() => onOpen(photo.index)}
         aria-label={`Zväčšiť ${photo.alt}`}
     >
-        <img src={photo.src} alt={photo.alt} className={styles.tile__image} loading="lazy" />
+        <img src={photo.thumb} alt={photo.alt} className={styles.tile__image} loading="lazy" decoding="async" />
     </button>
 );
 
@@ -44,7 +44,13 @@ export const PhotoMosaic = ({ sources, label, ratio, onOpen }: PhotoMosaicProps)
                             onClick={() => onOpen(group.feature?.index ?? 0)}
                             aria-label={`Zväčšiť ${group.feature.alt}`}
                         >
-                            <img src={group.feature.src} alt={group.feature.alt} className={styles.tile__image} loading="lazy" />
+                            <img
+                                src={group.feature.src}
+                                alt={group.feature.alt}
+                                className={styles.tile__image}
+                                loading="lazy"
+                                decoding="async"
+                            />
                             <span className={styles.group__caption}>{group.feature.caption}</span>
                         </button>
                         <div className={styles.group__small}>

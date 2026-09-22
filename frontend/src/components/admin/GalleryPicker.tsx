@@ -4,6 +4,7 @@ import type { AdminPhoto } from '@/api/types';
 import { CATEGORY_KEYS, CATEGORY_LABELS, type CategoryKey } from '@/data/collections';
 import { useDialog } from '@/hooks/useDialog';
 import styles from './Admin.module.less';
+import { thumbOf } from '@/utils/photos';
 
 interface GalleryPickerProps {
     /** Shown in the heading so it is clear which position is being filled. */
@@ -58,7 +59,7 @@ export const GalleryPicker = ({ slotLabel, photos, initialCategory, onChoose, on
                                 className={styles.picker__tile}
                                 onClick={() => onChoose(photo.url)}
                             >
-                                <img src={photo.url} alt="" className={styles.slot__image} loading="lazy" />
+                                <img src={thumbOf(photo.url)} alt="" className={styles.slot__image} loading="lazy" />
                             </button>
                         ))}
                     </div>

@@ -1,5 +1,9 @@
+import { thumbOf } from '@/utils/photos';
+
 export interface MosaicPhoto {
     src: string;
+    /** Smaller copy for the tiles; the feature and the lightbox use `src`. */
+    thumb: string;
     alt: string;
     caption: string;
     index: number;
@@ -18,6 +22,7 @@ const GROUP_SIZE = 5;
 export function describePhotos(sources: string[], label: string): MosaicPhoto[] {
     return sources.map((src, index) => ({
         src,
+        thumb: thumbOf(src),
         alt: `${label} zo salónu Jarka v Galante — fotografia ${index + 1}`,
         caption: CAPTIONS[index % CAPTIONS.length] ?? '',
         index,
