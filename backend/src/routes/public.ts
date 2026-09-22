@@ -5,6 +5,7 @@ import { env } from '../env.js';
 import { Photo } from '../models/Photo.js';
 import { Reservation } from '../models/Reservation.js';
 import { readSettings } from '../models/Settings.js';
+import { readSiteImages } from '../models/SiteImage.js';
 import { availabilityQuerySchema, reservationRequestSchema } from '../schemas.js';
 import { forwardInquiry } from '../services/mailchimp.js';
 import { offeredSlots } from '../services/slots.js';
@@ -24,6 +25,11 @@ publicRouter.get('/gallery', async (_req, res) => {
     const grouped = Object.fromEntries(CATEGORY_KEYS.map((key) => [key, [] as string[]])) as Record<CategoryKey, string[]>;
     for (const photo of photos) grouped[photo.category as CategoryKey]?.push(photo.url);
     res.json(grouped);
+});
+
+/** Only the positions the salon has overridden; the frontend renders its own photo for the rest. */
+publicRouter.get('/site-images', async (_req, res) => {
+    res.json(await readSiteImages());
 });
 
 publicRouter.get('/availability', async (req, res) => {

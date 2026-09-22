@@ -9,7 +9,10 @@
     &__image {
         position: absolute;
         inset: 0;
-        background-image: url('/assets/hero.webp');
+        // Not /assets/hero.webp: this path is served by nginx, which falls back to
+        // the bundled photo until the salon uploads one. One URL either way, so the
+        // preload in index.html stays correct and the hero needs no JavaScript.
+        background-image: url('/images/site/hero.webp');
         background-size: cover;
         background-position: center 22%;
         filter: brightness(0.84) saturate(0.94) contrast(1.04);

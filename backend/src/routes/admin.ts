@@ -10,18 +10,21 @@ import { clearSession, issueSession, requireAdmin } from '../middleware/auth.js'
 import { Photo } from '../models/Photo.js';
 import { Reservation } from '../models/Reservation.js';
 import { Settings, readSettings } from '../models/Settings.js';
+import { SiteImage, readSiteImages } from '../models/SiteImage.js';
 import { User } from '../models/User.js';
 import {
     categoryParamSchema,
     loginSchema,
     photoOrderSchema,
     photoUrlSchema,
+    siteImageSlotParamSchema,
+    siteImageUrlSchema,
     reservationPatchSchema,
     settingsSchema,
     weekQuerySchema,
 } from '../schemas.js';
 import { offeredSlots, weekFrom } from '../services/slots.js';
-import { discardUpload, removePhotoFile, storePhoto, UnsupportedImageError } from '../services/photoStorage.js';
+import { discardUpload, removePhotoFile, storePhoto, storeSiteImage, UnsupportedImageError } from '../services/photoStorage.js';
 
 export const adminRouter = Router();
 
@@ -212,9 +215,13 @@ function splitName(record: { firstName?: string; lastName?: string; name?: strin
     return { firstName: first, lastName: rest.join(' ') };
 }
 
-async function nextOrder(category: CategoryKey): Promise<number> {
-    const last = await Photo.findOne({ category }).sort({ order: -1 }).select('order').lean();
-    return (last?.order ?? -1) + 1;
+/**
+ * Makes room at the front of a category. New photos lead the collection, because
+ * what the salon has just photographed is what it wants shown first; anything
+ * else can be dragged back into place afterwards.
+ */
+async function makeRoomAtFront(category: CategoryKey, count: number): Promise<void> {
+    await Photo.updateMany({ category }, { $inc: { order: count } });
 }
 
 adminRouter.post('/photos/:category', requireAdmin, upload.array('photos', MAX_FILES), async (req, res) => {
@@ -229,7 +236,8 @@ adminRouter.post('/photos/:category', requireAdmin, upload.array('photos', MAX_F
         return;
     }
     const { category } = parsed.data;
-    let order = await nextOrder(category);
+    await makeRoomAtFront(category, files.length);
+    let order = 0;
     const created = [];
 
     try {
@@ -295,6 +303,10 @@ adminRouter.put('/photos/:id', requireAdmin, upload.single('photo'), async (req,
         await removePhotoFile(url);
         throw error;
     }
+    // A fixed position may point at the photo that was just replaced. Moving the
+    // slot to the new file keeps it showing the photo the salon expects rather
+    // than a URL whose file is about to be deleted.
+    await SiteImage.updateMany({ url: previousUrl }, { url });
     await removePhotoFile(previousUrl);
 
     res.json({ id: String(photo._id), category: photo.category, url });
@@ -325,6 +337,67 @@ adminRouter.put('/photos/:category/order', requireAdmin, async (req, res) => {
     res.json({ ok: true });
 });
 
+adminRouter.get('/site-images', requireAdmin, async (_req, res) => res.json(await readSiteImages()));
+
+/**
+ * Only files written under site/ belong to a slot. A slot pointed at a gallery
+ * photo — the "reuse one already uploaded" path — shares that file with the
+ * gallery, so replacing or clearing the slot must leave it alone.
+ */
+async function discardSlotFile(previousUrl: string | undefined, nextUrl?: string): Promise<void> {
+    if (!previousUrl?.startsWith('/images/site/') || previousUrl === nextUrl) return;
+    await removePhotoFile(previousUrl);
+}
+
+adminRouter.put('/site-images/:slot', requireAdmin, upload.single('photo'), async (req, res) => {
+    const params = siteImageSlotParamSchema.safeParse(req.params);
+    if (!params.success) {
+        res.status(400).json({ error: 'Neznáme miesto na stránke.' });
+        return;
+    }
+    const { slot } = params.data;
+    const previous = await SiteImage.findOne({ slot }).lean();
+
+    let url: string;
+    if (req.file) {
+        try {
+            url = await storeSiteImage(slot, req.file.path);
+        } catch (error) {
+            if (error instanceof UnsupportedImageError) {
+                res.status(400).json({ error: error.message });
+                return;
+            }
+            throw error;
+        } finally {
+            await discardUpload(req.file.path);
+        }
+    } else {
+        // No file, so this is the "pick one already in the gallery" path.
+        const body = siteImageUrlSchema.safeParse(req.body);
+        if (!body.success) {
+            res.status(400).json({ error: 'Nevybrali ste fotografiu.' });
+            return;
+        }
+        url = body.data.url;
+    }
+
+    await SiteImage.findOneAndUpdate({ slot }, { slot, url }, { upsert: true });
+    await discardSlotFile(previous?.url, url);
+    res.json({ slot, url });
+});
+
+/** Clearing a slot is a delete, so the frontend falls back to its bundled photo. */
+adminRouter.delete('/site-images/:slot', requireAdmin, async (req, res) => {
+    const params = siteImageSlotParamSchema.safeParse(req.params);
+    if (!params.success) {
+        res.status(400).json({ error: 'Neznáme miesto na stránke.' });
+        return;
+    }
+    const removed = await SiteImage.findOneAndDelete({ slot: params.data.slot }).lean();
+    await discardSlotFile(removed?.url);
+    res.json({ ok: true });
+});
+
 adminRouter.post('/photos/:category/link', requireAdmin, async (req, res) => {
     const params = categoryParamSchema.safeParse(req.params);
     const body = photoUrlSchema.safeParse(req.body);
@@ -333,8 +406,37 @@ adminRouter.post('/photos/:category/link', requireAdmin, async (req, res) => {
         return;
     }
     const { category } = params.data;
-    const doc = await Photo.create({ category, url: body.data.url, order: await nextOrder(category) });
+    await makeRoomAtFront(category, 1);
+    const doc = await Photo.create({ category, url: body.data.url, order: 0 });
     res.status(201).json({ id: String(doc._id), category, url: doc.url });
+});
+
+/**
+ * Several at once, so clearing out an old shoot is not a click per photo. Same
+ * cleanup as the single delete: slots pointing at a removed photo are cleared
+ * and the files go with it.
+ */
+adminRouter.delete('/photos', requireAdmin, async (req, res) => {
+    const parsed = photoOrderSchema.safeParse(req.body);
+    if (!parsed.success) {
+        res.status(400).json({ error: 'Nevybrali ste žiadne fotografie.' });
+        return;
+    }
+    const ids = parsed.data.ids.filter((id) => isValidObjectId(id));
+    const photos = await Photo.find({ _id: { $in: ids } })
+        .select('url')
+        .lean();
+    if (photos.length === 0) {
+        res.json({ removed: 0 });
+        return;
+    }
+
+    const urls = photos.map((photo) => photo.url);
+    await Photo.deleteMany({ _id: { $in: photos.map((photo) => photo._id) } });
+    await SiteImage.deleteMany({ url: { $in: urls } });
+    await Promise.all(urls.map((url) => removePhotoFile(url)));
+
+    res.json({ removed: photos.length });
 });
 
 adminRouter.delete('/photos/:id', requireAdmin, async (req, res) => {
@@ -343,6 +445,12 @@ adminRouter.delete('/photos/:id', requireAdmin, async (req, res) => {
         return;
     }
     const photo = await Photo.findByIdAndDelete(req.params.id);
-    if (photo) await removePhotoFile(photo.url);
+    if (photo) {
+        // Clearing the slots first: the file is about to go, and a slot left
+        // pointing at it would render a dead image instead of falling back to
+        // the photo bundled with the frontend.
+        await SiteImage.deleteMany({ url: photo.url });
+        await removePhotoFile(photo.url);
+    }
     res.json({ ok: true });
 });

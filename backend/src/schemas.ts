@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CATEGORY_KEYS } from './constants.js';
+import { CATEGORY_KEYS, SITE_IMAGE_SLOTS } from './constants.js';
 
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Neplatný dátum');
 const timeString = z.string().regex(/^\d{1,2}:\d{2}$/, 'Neplatný čas');
@@ -79,6 +79,27 @@ export const categoryParamSchema = z.object({
 
 export const availabilityQuerySchema = z.object({
     date: dateString,
+});
+
+export const siteImageSlotParamSchema = z.object({
+    slot: z.enum(SITE_IMAGE_SLOTS),
+});
+
+/**
+ * A slot can reuse a photo the gallery already holds rather than upload it twice,
+ * and a gallery entry is an upload (/images/), a photo bundled with the frontend
+ * (/assets/) or an external link. Anything else — javascript:, data:, a traversal
+ * out of those two directories — is refused.
+ */
+export const siteImageUrlSchema = z.object({
+    url: z
+        .string()
+        .max(600)
+        .refine(
+            (value) =>
+                !value.includes('..') && (/^https?:\/\//i.test(value) || /^\/(images|assets)\/[A-Za-z0-9._\-/]+$/.test(value)),
+            'Neplatný odkaz na fotografiu.',
+        ),
 });
 
 export const photoUrlSchema = z.object({

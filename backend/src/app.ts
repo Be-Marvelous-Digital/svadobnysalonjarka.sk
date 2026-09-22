@@ -21,6 +21,15 @@ export function createApp() {
     app.use(express.json({ limit: '100kb' }));
     app.use(cookieParser());
 
+    /**
+     * nginx serves uploads in production and this process never sees the request.
+     * Mounted anyway so photos resolve in local development, where Vite proxies
+     * /images straight here — without it an uploaded photo 404s on a dev machine.
+     * The hero falls back to the bundled file the same way nginx does.
+     */
+    app.use('/images', express.static(env.UPLOAD_DIR));
+    app.get('/images/site/hero.webp', (_req, res) => res.redirect(302, '/assets/hero.webp'));
+
     app.get('/api/health', async (_req, res) => {
         const dbUp = mongoose.connection.readyState === 1;
         res.status(dbUp ? 200 : 503).json({ status: dbUp ? 'ok' : 'degraded' });
