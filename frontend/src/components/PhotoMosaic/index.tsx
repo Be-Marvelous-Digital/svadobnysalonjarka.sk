@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import { describePhotos, groupPhotos, type MosaicPhoto } from './PhotoMosaic.helpers';
 import styles from './PhotoMosaic.module.less';
 
@@ -22,14 +22,16 @@ const Tile = ({ photo, withRatio, onOpen }: TileProps) => (
 interface PhotoMosaicProps {
     sources: string[];
     label: string;
+    /** Tile shape, width over height. Falls back to the portrait default. */
+    ratio?: number;
     onOpen: (index: number) => void;
 }
 
-export const PhotoMosaic = ({ sources, label, onOpen }: PhotoMosaicProps) => {
+export const PhotoMosaic = ({ sources, label, ratio, onOpen }: PhotoMosaicProps) => {
     const groups = useMemo(() => groupPhotos(describePhotos(sources, label)), [sources, label]);
 
     return (
-        <div className={styles.mosaic}>
+        <div className={styles.mosaic} style={ratio ? ({ '--photo-ratio': ratio } as CSSProperties) : undefined}>
             {groups.map((group) =>
                 group.feature ? (
                     <div

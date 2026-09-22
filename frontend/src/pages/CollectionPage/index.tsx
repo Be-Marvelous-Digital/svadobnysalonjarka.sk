@@ -81,7 +81,12 @@ export const CollectionPage = () => {
                 </div>
 
                 {photos.length > 0 ? (
-                    <PhotoMosaic sources={photos} label={collection.label} onOpen={setLightboxIndex} />
+                    <PhotoMosaic
+                        sources={photos}
+                        label={collection.label}
+                        ratio={collection.tileRatio}
+                        onOpen={setLightboxIndex}
+                    />
                 ) : loading ? (
                     <PhotoMosaicSkeleton />
                 ) : (

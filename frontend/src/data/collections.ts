@@ -36,6 +36,12 @@ export interface Collection {
     facts: string[];
     teaser: string;
     cover: string;
+    /**
+     * Width divided by height of the gallery tiles. Portrait by default, because
+     * dresses are photographed standing; shoes and bags come as landscape product
+     * shots and get cropped to ribbons in a portrait frame.
+     */
+    tileRatio?: number;
 }
 
 export const COLLECTIONS: Collection[] = [
@@ -101,6 +107,8 @@ export const COLLECTIONS: Collection[] = [
         facts: ['Obuv a kabelky ku každej kolekcii', 'Zvýhodnená cena k požičaným šatám', 'Poradíme s výberom priamo na skúške'],
         teaser: 'Doplníme celý outfit',
         cover: '/assets/obuv-6.webp',
+        // Product shots on white, landscape; the portrait default crops them to ribbons.
+        tileRatio: 620 / 474,
     },
     {
         key: 'galeria',

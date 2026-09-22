@@ -1,4 +1,6 @@
-@photo-ratio: 3 / 4.3;
+// A plain number, not a `3 / 4.3` ratio, so a collection can override it through
+// --photo-ratio and the doubled group ratio can still be calculated from it.
+@photo-ratio: 0.698;
 
 .mosaic {
     display: flex;
@@ -11,7 +13,7 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 100%;
     gap: @spacing-md;
-    aspect-ratio: 2 * @photo-ratio;
+    aspect-ratio: calc(2 * var(--photo-ratio, @photo-ratio));
     overflow: hidden;
 
     &--mirrored {
@@ -59,7 +61,7 @@
         aspect-ratio: auto;
 
         &__feature {
-            aspect-ratio: @photo-ratio;
+            aspect-ratio: var(--photo-ratio, @photo-ratio);
         }
 
         &__small {
@@ -68,7 +70,7 @@
         }
 
         &__small > * {
-            aspect-ratio: @photo-ratio;
+            aspect-ratio: var(--photo-ratio, @photo-ratio);
         }
     }
 }
@@ -111,7 +113,7 @@
     cursor: zoom-in;
 
     &--ratio {
-        aspect-ratio: @photo-ratio;
+        aspect-ratio: var(--photo-ratio, @photo-ratio);
     }
 
     &__image {
