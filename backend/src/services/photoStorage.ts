@@ -7,7 +7,22 @@ import { logger } from '../logger.js';
 import { HERO_SLOT, HERO_STABLE_PATH, type CategoryKey, type SiteImageSlot } from '../constants.js';
 
 const UPLOADS_DIR = () => env.UPLOAD_DIR;
+
+/**
+ * Gallery photos and the smaller fixed positions are never drawn wider than a
+ * column, so 1600px covers them at twice the pixel density.
+ */
 const MAX_EDGE = 1600;
+const QUALITY = 78;
+
+/**
+ * The hero is drawn across the whole viewport, where 1600px is already being
+ * stretched on an ordinary laptop. A wider file costs nothing here: at this size
+ * a slightly lower quality is invisible, and 2560px at 72 lands under what 1600px
+ * at 78 would have weighed.
+ */
+const HERO_MAX_EDGE = 2560;
+const HERO_QUALITY = 72;
 /**
  * ~400 MP, far above any camera an uploader will realistically use. There is no
  * file-size limit, but a decompression bomb is about decoded pixels rather than
@@ -29,7 +44,7 @@ export class UnsupportedImageError extends Error {
  * Whatever comes in, a resized WebP comes out.
  */
 export async function storePhoto(category: CategoryKey, sourcePath: string): Promise<string> {
-    return encodeTo(sourcePath, path.join('gallery', category), randomName());
+    return encodeTo(sourcePath, path.join('gallery', category), randomName(), MAX_EDGE, QUALITY);
 }
 
 /**
@@ -41,15 +56,28 @@ export async function storePhoto(category: CategoryKey, sourcePath: string): Pro
  * random name and can be cached forever.
  */
 export async function storeSiteImage(slot: SiteImageSlot, sourcePath: string): Promise<string> {
-    const target = slot === HERO_SLOT ? HERO_STABLE_PATH : path.join('site', randomName());
-    return encodeTo(sourcePath, path.dirname(target), path.basename(target));
+    const isHero = slot === HERO_SLOT;
+    const target = isHero ? HERO_STABLE_PATH : path.join('site', randomName());
+    return encodeTo(
+        sourcePath,
+        path.dirname(target),
+        path.basename(target),
+        isHero ? HERO_MAX_EDGE : MAX_EDGE,
+        isHero ? HERO_QUALITY : QUALITY,
+    );
 }
 
 function randomName(): string {
     return `${Date.now().toString(36)}-${randomBytes(6).toString('hex')}.webp`;
 }
 
-async function encodeTo(sourcePath: string, relativeDir: string, filename: string): Promise<string> {
+async function encodeTo(
+    sourcePath: string,
+    relativeDir: string,
+    filename: string,
+    maxEdge: number,
+    quality: number,
+): Promise<string> {
     const pipeline = sharp(sourcePath, { limitInputPixels: MAX_INPUT_PIXELS });
 
     // Trust the decoded bytes, not the multipart Content-Type the client sent.
@@ -64,8 +92,8 @@ async function encodeTo(sourcePath: string, relativeDir: string, filename: strin
     try {
         await pipeline
             .rotate()
-            .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
-            .webp({ quality: 78 })
+            .resize({ width: maxEdge, height: maxEdge, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality })
             .toFile(path.join(dir, filename));
     } catch (error) {
         // A truncated or corrupt file only fails once sharp reads past the header.
