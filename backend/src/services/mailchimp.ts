@@ -98,7 +98,10 @@ async function forwardViaApi(inquiry: InquiryFields): Promise<boolean> {
             },
             body: JSON.stringify({
                 email_address: inquiry.email,
-                status_if_new: 'subscribed',
+                // transactional, not subscribed: the form asks for a fitting, and
+                // its consent text covers exactly that. "subscribed" would put the
+                // person on a marketable audience, which needs its own opt-in.
+                status_if_new: 'transactional',
                 merge_fields: merge,
             }),
             signal: AbortSignal.timeout(env.MAILCHIMP_TIMEOUT_MS),

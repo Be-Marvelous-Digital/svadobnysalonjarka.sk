@@ -3,7 +3,7 @@ import { connectDatabase, disconnectDatabase } from '../db.js';
 import type { CategoryKey } from '../constants.js';
 import { env } from '../env.js';
 import { Photo } from '../models/Photo.js';
-import { Reservation } from '../models/Reservation.js';
+import { purgeDateFor, Reservation } from '../models/Reservation.js';
 import { readSettings } from '../models/Settings.js';
 import { User } from '../models/User.js';
 import { logger } from '../logger.js';
@@ -44,9 +44,27 @@ async function splitLegacyNames(): Promise<void> {
     if (legacy.length > 0) logger.info(`Split ${legacy.length} legacy name(s) into firstName/lastName`);
 }
 
+/**
+ * Gives records written before retention was enforced a purge date, so the TTL
+ * index covers them too. Safe to run repeatedly.
+ */
+async function backfillPurgeDates(): Promise<void> {
+    const missing = await Reservation.find({ purgeAfter: { $exists: false } })
+        .select('date confirmedDate')
+        .lean();
+    for (const record of missing) {
+        await Reservation.updateOne(
+            { _id: record._id },
+            { $set: { purgeAfter: purgeDateFor(record.date, record.confirmedDate) } },
+        );
+    }
+    if (missing.length > 0) logger.info(`Backfilled a purge date on ${missing.length} reservation(s)`);
+}
+
 async function main(): Promise<void> {
     await connectDatabase();
     await splitLegacyNames();
+    await backfillPurgeDates();
     await readSettings();
     await seedAdmin();
 

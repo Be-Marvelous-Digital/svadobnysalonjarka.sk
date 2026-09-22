@@ -2,3 +2,6 @@ node_modules
 dist
 .env
 *.tsbuildinfo
+
+# Locally uploaded photos; the container keeps these in a volume.
+uploads/

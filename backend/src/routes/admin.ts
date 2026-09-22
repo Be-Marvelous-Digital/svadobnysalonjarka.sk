@@ -8,7 +8,7 @@ import type { CategoryKey } from '../constants.js';
 import { env } from '../env.js';
 import { clearSession, issueSession, requireAdmin } from '../middleware/auth.js';
 import { Photo } from '../models/Photo.js';
-import { Reservation } from '../models/Reservation.js';
+import { purgeDateFor, Reservation } from '../models/Reservation.js';
 import { Settings, readSettings } from '../models/Settings.js';
 import { SiteImage, readSiteImages } from '../models/SiteImage.js';
 import { User } from '../models/User.js';
@@ -135,7 +135,7 @@ adminRouter.patch('/reservations/:id', requireAdmin, async (req, res) => {
     // Confirming a time is what marks an inquiry dealt with; clearing it puts the
     // inquiry back among the new ones.
     const change = confirmedDate
-        ? { confirmedDate, confirmedTime, handled: true }
+        ? { confirmedDate, confirmedTime, handled: true, purgeAfter: purgeDateFor(confirmedDate) }
         : confirmedDate === ''
           ? { confirmedDate: '', confirmedTime: '', handled: handled ?? false }
           : { handled: handled ?? false };
