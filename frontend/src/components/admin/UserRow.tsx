@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react';
 import { Field, TextInput } from '@/components/Field';
 import type { AdminUser } from '@/api/types';
+import { useConfirm } from '@/hooks/useConfirm';
+import { ConfirmModal } from './ConfirmModal';
 import styles from './Admin.module.less';
 import { validatePassword } from './userValidation';
 
@@ -13,6 +15,7 @@ interface UserRowProps {
 }
 
 export const UserRow = ({ user, busy, canDelete, onResetPassword, onRemove }: UserRowProps) => {
+    const confirm = useConfirm();
     const [resetting, setResetting] = useState(false);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState<string>();
@@ -34,11 +37,16 @@ export const UserRow = ({ user, busy, canDelete, onResetPassword, onRemove }: Us
         setPassword('');
     }, [onResetPassword, password, user.id, user.username]);
 
-    const handleRemove = useCallback(() => {
-        if (window.confirm(`Zmazať používateľa „${user.username}“? Stratí prístup do administrácie.`)) {
-            onRemove(user.id, user.username);
-        }
-    }, [onRemove, user.id, user.username]);
+    const handleRemove = useCallback(
+        () =>
+            confirm.ask({
+                title: 'Zmazať používateľa?',
+                body: `Používateľ „${user.username}“ stratí prístup do administrácie. Prihlásené relácie sa zrušia.`,
+                confirmLabel: 'Zmazať používateľa',
+                onConfirm: () => onRemove(user.id, user.username),
+            }),
+        [confirm, onRemove, user.id, user.username],
+    );
 
     return (
         <div className={styles.userRow}>
@@ -99,6 +107,9 @@ export const UserRow = ({ user, busy, canDelete, onResetPassword, onRemove }: Us
                     ) : null}
                 </div>
             )}
+            {confirm.pending ? (
+                <ConfirmModal request={confirm.pending} onCancel={confirm.cancel} onAccept={confirm.accept} />
+            ) : null}
         </div>
     );
 };

@@ -3,7 +3,10 @@
     .keyframes-page-in();
 
     :global(html.js) & {
-        animation: jPageIn @duration-base @ease-out-expo both;
+        // backwards, not both: `both` leaves a transform on main once the
+        // animation ends, and a transformed ancestor becomes the containing
+        // block for position:fixed, which drags every overlay out of place.
+        animation: jPageIn @duration-base @ease-out-expo backwards;
     }
 
     // Paused at its first frame — opacity 0 — while the drawer covers the screen,

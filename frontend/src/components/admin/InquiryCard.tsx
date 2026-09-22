@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import type { Reservation } from '@/api/types';
+import { useConfirm } from '@/hooks/useConfirm';
 import { formatLongDate } from '@/utils/date';
+import { ConfirmModal } from './ConfirmModal';
 import styles from './Admin.module.less';
 import { buildReplyMailto } from './RequestCard.helpers';
 
@@ -13,15 +15,23 @@ interface InquiryCardProps {
 
 export const InquiryCard = ({ inquiry, onConfirm, onToggleHandled, onRemove }: InquiryCardProps) => {
     const fullName = [inquiry.firstName, inquiry.lastName].filter(Boolean).join(' ').trim() || 'Bez mena';
-    const confirm = useCallback(() => onConfirm(inquiry), [inquiry, onConfirm]);
+    const ask = useConfirm();
+    const startConfirm = useCallback(() => onConfirm(inquiry), [inquiry, onConfirm]);
     const toggle = useCallback(
         () => onToggleHandled(inquiry.id, !inquiry.handled),
         [inquiry.handled, inquiry.id, onToggleHandled],
     );
 
-    const handleRemove = useCallback(() => {
-        if (window.confirm(`Zmazať dopyt od ${fullName}? Nedá sa vrátiť späť.`)) onRemove(inquiry.id);
-    }, [fullName, inquiry.id, onRemove]);
+    const handleRemove = useCallback(
+        () =>
+            ask.ask({
+                title: 'Zmazať dopyt?',
+                body: `Dopyt od ${fullName} sa odstráni natrvalo. Nedá sa vrátiť späť.`,
+                confirmLabel: 'Zmazať dopyt',
+                onConfirm: () => onRemove(inquiry.id),
+            }),
+        [ask, fullName, inquiry.id, onRemove],
+    );
 
     const className = [styles.request, inquiry.handled && styles['request--handled']].filter(Boolean).join(' ');
 
@@ -65,7 +75,7 @@ export const InquiryCard = ({ inquiry, onConfirm, onToggleHandled, onRemove }: I
             </div>
 
             <div className={styles.request__actions}>
-                <button type="button" className={`${styles.action} ${styles['action--primary']}`} onClick={confirm}>
+                <button type="button" className={`${styles.action} ${styles['action--primary']}`} onClick={startConfirm}>
                     {inquiry.confirmedDate ? 'Zmeniť termín' : 'Potvrdiť'}
                 </button>
                 {inquiry.email ? (
@@ -86,6 +96,7 @@ export const InquiryCard = ({ inquiry, onConfirm, onToggleHandled, onRemove }: I
                     Zmazať
                 </button>
             </div>
+            {ask.pending ? <ConfirmModal request={ask.pending} onCancel={ask.cancel} onAccept={ask.accept} /> : null}
         </div>
     );
 };
