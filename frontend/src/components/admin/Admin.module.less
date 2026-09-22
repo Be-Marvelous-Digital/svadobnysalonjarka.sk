@@ -1,3 +1,5 @@
+// @color-text-disabled is for controls that cannot be used. Text that can be
+// read and acted on uses @color-text-secondary, which clears 4.5:1.
 .panel {
     display: flex;
     flex-direction: column;
@@ -286,7 +288,7 @@
     }
 
     &--quiet {
-        color: @color-text-disabled;
+        color: @color-text-secondary;
 
         &:hover:not(:disabled) {
             color: @color-ink;
@@ -596,6 +598,16 @@
         }
     }
 
+    &__pick input {
+        // The box stays small, the thing you can actually hit does not.
+        min-width: @touch-target-min;
+        min-height: @touch-target-min;
+        top: -11px;
+        right: -11px;
+        left: auto;
+        bottom: auto;
+    }
+
     &__pickBox {
         width: 22px;
         height: 22px;
@@ -842,7 +854,7 @@
 
     &__closed {
         font-size: @font-size-xs;
-        color: @color-text-disabled;
+        color: @color-text-secondary;
     }
 
     &__slot {
@@ -865,7 +877,7 @@
 
     &__free {
         font-size: @font-size-micro;
-        color: @color-text-disabled;
+        color: @color-text-secondary;
     }
 
     &__who {
@@ -981,7 +993,7 @@
         font-size: @font-size-micro;
         letter-spacing: 0;
         text-transform: none;
-        color: @color-text-disabled;
+        color: @color-text-secondary;
     }
 
     &__slots {
@@ -1187,6 +1199,25 @@
         gap: 4px 12px;
     }
 
+    // Side by side stops fitting long before the phone does.
+    @media (max-width: @breakpoint-mobile) {
+        &--inline {
+            flex-direction: column;
+        }
+
+        &--inline &__frame {
+            width: 100%;
+            max-width: none;
+            aspect-ratio: 3 / 2;
+            height: auto;
+        }
+
+        &--inline &__shot {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
     &__image {
         width: 100%;
         height: 100%;
@@ -1248,7 +1279,7 @@
         font-size: @font-size-xxs;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        color: @color-text-disabled;
+        color: @color-text-secondary;
 
         &--custom {
             color: @color-primary-text;
@@ -1265,7 +1296,7 @@
         font-family: @font-mono;
         font-size: @font-size-xxs;
         letter-spacing: 0.1em;
-        color: @color-text-disabled;
+        color: @color-text-secondary;
     }
 
     &__actions {

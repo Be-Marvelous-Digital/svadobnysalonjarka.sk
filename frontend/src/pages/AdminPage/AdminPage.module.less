@@ -50,6 +50,9 @@
 
     &__tabs {
         display: flex;
+        // Wrapping rather than scrolling sideways: four tabs with long labels,
+        // and a tab nobody can see is a tab nobody uses.
+        flex-wrap: wrap;
         gap: @spacing-xs;
         border-bottom: 1px solid @color-border;
     }
@@ -73,5 +76,12 @@
 
     @media (max-width: @breakpoint-tablet) {
         padding: 120px @layout-gutter 72px;
+    }
+
+    @media (max-width: @breakpoint-mobile) {
+        &__tab {
+            padding: 14px 12px;
+            letter-spacing: 0.12em;
+        }
     }
 }

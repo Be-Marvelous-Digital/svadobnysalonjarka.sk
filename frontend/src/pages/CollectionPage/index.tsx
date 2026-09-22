@@ -101,7 +101,7 @@ export const CollectionPage = () => {
                     </div>
                 )}
 
-                <nav className={styles.collection__chips}>
+                <nav className={styles.collection__chips} aria-label="Ďalšie kolekcie">
                     {COLLECTIONS.map((entry) => (
                         <NavLink key={entry.key} to={collectionPath(entry.key)} className={styles.collection__chip}>
                             {entry.label}

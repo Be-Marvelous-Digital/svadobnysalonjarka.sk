@@ -25,7 +25,11 @@ export const StepSchedule = ({ draft, valid, errors, onChange }: StepSchedulePro
         <div className={styles.step}>
             <div className={styles.step__group}>
                 <span className={styles.step__label}>Čo si chcete vyskúšať</span>
-                {errors.cat ? <span className={styles.step__error}>{errors.cat}</span> : null}
+                {errors.cat ? (
+                    <span role="alert" className={styles.step__error}>
+                        {errors.cat}
+                    </span>
+                ) : null}
                 <div className={styles.step__chips}>
                     {BOOKABLE_COLLECTIONS.map((collection) => (
                         <Chip
@@ -55,7 +59,11 @@ export const StepSchedule = ({ draft, valid, errors, onChange }: StepSchedulePro
 
                 <div className={styles.step__group}>
                     <span className={styles.step__label}>Preferovaný čas</span>
-                    {errors.time ? <span className={styles.step__error}>{errors.time}</span> : null}
+                    {errors.time ? (
+                        <span role="alert" className={styles.step__error}>
+                            {errors.time}
+                        </span>
+                    ) : null}
                     <div className={styles.step__slots}>
                         {slots.map((slot) => (
                             <Chip key={slot} size="time" selected={draft.time === slot} onClick={() => onChange({ time: slot })}>

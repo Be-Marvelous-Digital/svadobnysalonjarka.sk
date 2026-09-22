@@ -32,7 +32,7 @@ export const Header = ({ transparent, hidden, drawerOpen, onOpenDrawer }: Header
                     <span className={styles.header__brandNote}>{CONTACT.tagline}</span>
                 </Link>
 
-                <nav className={styles.header__nav}>
+                <nav className={styles.header__nav} aria-label="Hlavné menu">
                     <NavLink to={ROUTES.home} end className={styles.header__link}>
                         Domov
                     </NavLink>

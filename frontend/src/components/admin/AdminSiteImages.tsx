@@ -36,7 +36,11 @@ export const AdminSiteImages = () => {
                 </div>
             </div>
 
-            {site.error ? <div className={styles.gallery__empty}>{site.error}</div> : null}
+            {site.error ? (
+                <div role="alert" className={styles.gallery__empty}>
+                    {site.error}
+                </div>
+            ) : null}
 
             {SITE_IMAGE_GROUPS.map((group) => (
                 <div key={group.page} className={styles.block}>

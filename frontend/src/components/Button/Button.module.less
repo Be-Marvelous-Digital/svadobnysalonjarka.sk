@@ -12,6 +12,16 @@
     text-transform: uppercase;
     text-align: center;
     white-space: nowrap;
+
+    // A long label has nowhere to go on a narrow screen, and nowrap pushes it
+    // straight through the side of the page.
+    @media (max-width: @breakpoint-mobile) {
+        white-space: normal;
+        text-wrap: balance;
+        // An address has no spaces to break at, so without this it sets the
+        // button's width and pushes it off the screen.
+        overflow-wrap: anywhere;
+    }
     transition:
         background @duration-base ease,
         color @duration-base ease,

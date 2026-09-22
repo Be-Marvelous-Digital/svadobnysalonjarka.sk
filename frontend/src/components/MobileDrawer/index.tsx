@@ -43,7 +43,7 @@ export const MobileDrawer = ({ onClose }: MobileDrawerProps) => {
                 </button>
             </div>
 
-            <nav className={styles.drawer__links}>
+            <nav className={styles.drawer__links} aria-label="Hlavné menu">
                 {DRAWER_LINKS.map((link) => (
                     <NavLink key={link.to} to={link.to} end={link.end} className={styles.drawer__link} onClick={onClose}>
                         {link.label}

@@ -53,7 +53,11 @@ export const CollectionCover = ({ category, photos }: CollectionCoverProps) => {
                 onReset={handleReset}
             />
 
-            {site.error ? <span className={styles.card__note}>{site.error}</span> : null}
+            {site.error ? (
+                <span role="alert" className={styles.card__note}>
+                    {site.error}
+                </span>
+            ) : null}
 
             {picking ? (
                 <GalleryPicker

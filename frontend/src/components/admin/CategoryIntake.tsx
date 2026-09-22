@@ -65,7 +65,11 @@ export const CategoryIntake = ({ category, busy, error, onUpload }: CategoryInta
                 <span className={styles.drop__note}>Zmenšia sa a prevedú do WebP. Naraz aj viac fotiek.</span>
             </button>
 
-            {error ? <span className={styles.card__label}>{error}</span> : null}
+            {error ? (
+                <span role="alert" className={styles.card__label}>
+                    {error}
+                </span>
+            ) : null}
 
             <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={handleFiles} />
         </div>

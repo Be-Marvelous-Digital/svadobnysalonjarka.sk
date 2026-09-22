@@ -80,7 +80,7 @@ export const Footer = () => (
                         BeMarvelousDigital.sk
                     </a>
                 </span>
-                <nav className={styles.footer__legal}>
+                <nav className={styles.footer__legal} aria-label="Právne informácie">
                     <Link to={ROUTES.privacy} className={`${styles.footer__link} ${styles['footer__link--quiet']}`}>
                         Ochrana súkromia
                     </Link>
