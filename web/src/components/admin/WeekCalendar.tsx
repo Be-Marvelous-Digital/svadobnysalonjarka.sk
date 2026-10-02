@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import type { Reservation } from '@/api/types';
 import { TextInput } from '@/components/Field';
 import { BookedSlot } from './BookedSlot';
+import { FreeSlot } from './FreeSlot';
 import { useAdminWeek, mondayOf } from '@/hooks/useAdminWeek';
 import { dayNumber, formatLongDate, weekdayShort } from '@/utils/date';
 import styles from './Admin.module.scss';
@@ -10,9 +11,11 @@ interface WeekCalendarProps {
     /** Bumped by the parent whenever an inquiry is confirmed, to refetch. */
     refreshToken: number;
     onReschedule: (inquiry: Reservation) => void;
+    /** Time is empty when the owner starts from the toolbar rather than a slot. */
+    onBook: (date: string, time: string) => void;
 }
 
-export const WeekCalendar = ({ refreshToken, onReschedule }: WeekCalendarProps) => {
+export const WeekCalendar = ({ refreshToken, onReschedule, onBook }: WeekCalendarProps) => {
     const { from, week, loading, error, shift, goToWeekOf, toThisWeek } = useAdminWeek(refreshToken);
 
     const previous = useCallback(() => shift(-1), [shift]);
@@ -23,6 +26,7 @@ export const WeekCalendar = ({ refreshToken, onReschedule }: WeekCalendarProps) 
     const last = days[days.length - 1];
     const isThisWeek = from === mondayOf(new Date());
     const today = new Date().toISOString().slice(0, 10);
+    const bookFromToolbar = useCallback(() => onBook(isThisWeek ? today : from, ''), [from, isThisWeek, onBook, today]);
 
     return (
         <div className={styles.week}>
@@ -57,6 +61,9 @@ export const WeekCalendar = ({ refreshToken, onReschedule }: WeekCalendarProps) 
                         disabled={isThisWeek}
                     >
                         Tento týždeň
+                    </button>
+                    <button type="button" className={`${styles.action} ${styles['action--primary']}`} onClick={bookFromToolbar}>
+                        + Zapísať termín
                     </button>
                     {/* Jumping months ahead should not take a dozen clicks. */}
                     <label className={styles.week__jump}>
@@ -101,10 +108,13 @@ export const WeekCalendar = ({ refreshToken, onReschedule }: WeekCalendarProps) 
                                             onReschedule={onReschedule}
                                         />
                                     ) : (
-                                        <div key={slot.time} className={styles.week__slot}>
-                                            <span className={styles.week__time}>{slot.time}</span>
-                                            <span className={styles.week__free}>voľné</span>
-                                        </div>
+                                        <FreeSlot
+                                            key={slot.time}
+                                            date={day.date}
+                                            time={slot.time}
+                                            past={day.date < today}
+                                            onBook={onBook}
+                                        />
                                     ),
                                 )
                             )}

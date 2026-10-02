@@ -1,9 +1,10 @@
-import { useCallback, useState, type FormEvent } from 'react';
+import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { Reservation } from '@/api/types';
 import { Field, TextInput } from '@/components/Field';
 import { useAdminDay } from '@/hooks/useAdminDay';
 import { useDialog } from '@/hooks/useDialog';
 import { formatLongDate } from '@/utils/date';
+import { SlotPicker } from './SlotPicker';
 import styles from './Admin.module.scss';
 
 interface ConfirmDialogProps {
@@ -23,6 +24,11 @@ export const ConfirmDialog = ({ inquiry, onConfirm, onClose }: ConfirmDialogProp
 
     const name = [inquiry.firstName, inquiry.lastName].filter(Boolean).join(' ');
     const changed = date !== inquiry.date || time !== inquiry.time;
+
+    const changeDate = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        setDate(event.target.value);
+        setTime('');
+    }, []);
 
     const submit = useCallback(
         (event: FormEvent) => {
@@ -47,49 +53,10 @@ export const ConfirmDialog = ({ inquiry, onConfirm, onClose }: ConfirmDialogProp
                     </p>
 
                     <Field label="Dátum">
-                        <TextInput
-                            compact
-                            type="date"
-                            value={date}
-                            onChange={(event) => {
-                                setDate(event.target.value);
-                                setTime('');
-                            }}
-                        />
+                        <TextInput compact type="date" value={date} onChange={changeDate} />
                     </Field>
 
-                    <div className={styles.card__group}>
-                        <span className={styles.card__label}>Čas</span>
-                        <div className={styles.dialog__slots}>
-                            {slots.map((slot) => {
-                                // A slot held by this very inquiry stays choosable, so
-                                // re-confirming an unchanged time is not blocked by itself.
-                                const takenByAnother = Boolean(slot.booked && slot.booked.id !== inquiry.id);
-                                const takenBy = slot.booked ? `${slot.booked.firstName} ${slot.booked.lastName}`.trim() : '';
-
-                                return (
-                                    <button
-                                        key={slot.time}
-                                        type="button"
-                                        className={[
-                                            styles.action,
-                                            styles['action--outline'],
-                                            slot.time === time && styles['action--gold'],
-                                        ]
-                                            .filter(Boolean)
-                                            .join(' ')}
-                                        disabled={takenByAnother}
-                                        title={takenByAnother ? `Obsadené — ${takenBy}` : undefined}
-                                        onClick={() => setTime(slot.time)}
-                                    >
-                                        {slot.time}
-                                        {takenByAnother ? <span className={styles.dialog__taken}>{takenBy}</span> : null}
-                                    </button>
-                                );
-                            })}
-                            {slots.length === 0 ? <span className={styles.dialog__note}>V tento deň neskúšame.</span> : null}
-                        </div>
-                    </div>
+                    <SlotPicker slots={slots} value={time} onChange={setTime} ownId={inquiry.id} />
 
                     {changed && time ? (
                         <p className={styles.dialog__note}>

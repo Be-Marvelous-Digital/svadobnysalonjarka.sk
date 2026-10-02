@@ -1,14 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Reservation } from '@/api/types';
+import type { BookingDraft, Reservation } from '@/api/types';
 import { useAdminInquiries } from '@/hooks/useAdminInquiries';
+import { BookingDialog } from './BookingDialog';
 import { ConfirmDialog } from './ConfirmDialog';
 import { InquiryCard } from './InquiryCard';
 import { WeekCalendar } from './WeekCalendar';
 import styles from './Admin.module.scss';
 
 export const AdminInquiries = () => {
-    const { inquiries, loading, error, setHandled, confirm, remove } = useAdminInquiries();
+    const { inquiries, loading, error, setHandled, confirm, book, remove } = useAdminInquiries();
     const [confirming, setConfirming] = useState<Reservation | null>(null);
+    const [booking, setBooking] = useState<{ date: string; time: string } | null>(null);
     // Bumped on every confirmation so the calendar refetches the affected week.
     const [calendarToken, setCalendarToken] = useState(0);
 
@@ -37,6 +39,20 @@ export const AdminInquiries = () => {
         [confirm],
     );
 
+    const openBooking = useCallback((date: string, time: string) => setBooking({ date, time }), []);
+    const closeBooking = useCallback(() => setBooking(null), []);
+    const applyBooking = useCallback(
+        async (draft: BookingDraft) => {
+            const message = await book(draft);
+            if (!message) {
+                setCalendarToken((token) => token + 1);
+                setBooking(null);
+            }
+            return message;
+        },
+        [book],
+    );
+
     // Newest first: the one that just came in is the one the owner wants.
     const sorted = useMemo(
         () => [...inquiries].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? '')),
@@ -49,7 +65,7 @@ export const AdminInquiries = () => {
 
     return (
         <div className={styles.panel}>
-            <WeekCalendar refreshToken={calendarToken} onReschedule={openConfirm} />
+            <WeekCalendar refreshToken={calendarToken} onReschedule={openConfirm} onBook={openBooking} />
 
             {error ? (
                 <span className={styles.block__count} role="alert">
@@ -100,6 +116,14 @@ export const AdminInquiries = () => {
                 </div>
             ) : null}
 
+            {booking ? (
+                <BookingDialog
+                    initialDate={booking.date}
+                    initialTime={booking.time}
+                    onBook={applyBooking}
+                    onClose={closeBooking}
+                />
+            ) : null}
             {confirming ? <ConfirmDialog inquiry={confirming} onConfirm={applyConfirm} onClose={closeConfirm} /> : null}
         </div>
     );

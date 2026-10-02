@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ApiError, apiGet, apiSend } from '@/api/client';
-import type { Reservation } from '@/api/types';
+import type { BookingDraft, Reservation } from '@/api/types';
 
 /**
  * The admin only reads inquiries and marks them off. There is no approval step:
@@ -58,7 +58,20 @@ export function useAdminInquiries() {
         [run],
     );
 
+    const book = useCallback(
+        async (draft: BookingDraft): Promise<string> => {
+            try {
+                await apiSend('POST', '/admin/reservations', draft);
+                await refresh();
+                return '';
+            } catch (caught) {
+                return caught instanceof ApiError ? caught.message : 'Termín sa nepodarilo uložiť.';
+            }
+        },
+        [refresh],
+    );
+
     const remove = useCallback((id: string) => run(() => apiSend('DELETE', `/admin/reservations/${id}`)), [run]);
 
-    return { inquiries, loading, error, setHandled, confirm, remove };
+    return { inquiries, loading, error, setHandled, confirm, book, remove };
 }

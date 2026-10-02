@@ -243,6 +243,12 @@
             background: $color-ink-deep;
             color: $color-on-dark;
         }
+
+        &:disabled {
+            background: $color-border;
+            color: $color-text-secondary;
+            cursor: not-allowed;
+        }
     }
 
     &--gold {
@@ -867,6 +873,19 @@
         &--booked {
             background: $color-status-confirmed-bg;
         }
+
+        &--free {
+            background: transparent;
+            transition:
+                background $duration-fast ease,
+                box-shadow $duration-fast ease;
+
+            &:hover,
+            &:focus-visible {
+                background: $color-surface-muted;
+                box-shadow: inset 2px 0 0 $color-accent-soft;
+            }
+        }
     }
 
     &__time {
@@ -915,7 +934,8 @@
     inset: 0;
     z-index: $z-drawer;
     display: flex;
-    align-items: center;
+    // safe: a dialog taller than the screen starts at the top instead of losing its head.
+    align-items: safe center;
     justify-content: center;
     padding: $layout-gutter;
     background: rgba(19, 17, 15, 0.55);
@@ -956,6 +976,25 @@
         display: flex;
         flex-wrap: wrap;
         gap: $spacing-xs;
+    }
+
+    &__fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: $spacing-md;
+
+        @media (max-width: $breakpoint-mobile) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__error {
+        border: 1px solid $color-accent-soft;
+        background: $color-surface-muted;
+        padding: $spacing-sm $spacing-md;
+        font-size: $font-size-sm;
+        line-height: 1.6;
+        color: $color-primary-text;
     }
 
     &__actions {

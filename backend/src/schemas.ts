@@ -16,6 +16,17 @@ export const reservationRequestSchema = z.object({
     time: timeString,
 });
 
+/** A fitting the owner books herself after a phone call: only a name and phone are certain. */
+export const adminBookingSchema = z.object({
+    firstName: z.string().trim().min(1).max(60),
+    lastName: z.string().trim().max(60).default(''),
+    phone: z.string().trim().min(6).max(40),
+    email: z.union([z.email().max(160), z.literal('')]).default(''),
+    cat: z.string().trim().max(60).default(''),
+    date: dateString,
+    time: timeString,
+});
+
 /**
  * Either tick an inquiry off, or confirm a time for it. Confirming implies
  * handled, so the two arrive together from the dialog.

@@ -69,3 +69,14 @@ export interface AdminUser {
     createdAt: string;
     isSelf: boolean;
 }
+
+/** A fitting the owner books herself, typically during a phone call. */
+export interface BookingDraft {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    cat: string;
+    date: string;
+    time: string;
+}

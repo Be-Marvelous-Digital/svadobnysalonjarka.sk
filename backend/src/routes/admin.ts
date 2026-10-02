@@ -13,6 +13,7 @@ import { Settings, readSettings } from '../models/Settings.js';
 import { SiteImage, readSiteImages } from '../models/SiteImage.js';
 import { User } from '../models/User.js';
 import {
+    adminBookingSchema,
     categoryParamSchema,
     loginSchema,
     photoOrderSchema,
@@ -109,6 +110,32 @@ adminRouter.get('/reservations', requireAdmin, async (_req, res) => {
             createdAt: r.createdAt,
         })),
     );
+});
+
+adminRouter.post('/reservations', requireAdmin, async (req, res) => {
+    const parsed = adminBookingSchema.safeParse(req.body);
+    if (!parsed.success) {
+        res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Skontrolujte vyplnené údaje.' });
+        return;
+    }
+    const { date, time } = parsed.data;
+    const { duration, buffer } = await readSettings();
+    if (!offeredSlots(date, duration, buffer).includes(time)) {
+        res.status(409).json({ error: 'V tento čas neskúšame. Vyberte niektorý z ponúkaných časov.' });
+        return;
+    }
+
+    const clash = await Reservation.findOne({ confirmedDate: date, confirmedTime: time }).lean();
+    if (clash) {
+        res.status(409).json({
+            error: `Tento čas je už potvrdený pre ${[clash.firstName, clash.lastName].filter(Boolean).join(' ')}.`,
+        });
+        return;
+    }
+
+    // Agreed on the phone already; no Mailchimp forward, the form's consent was never given.
+    const created = await Reservation.create({ ...parsed.data, confirmedDate: date, confirmedTime: time, handled: true });
+    res.status(201).json({ id: String(created._id) });
 });
 
 adminRouter.patch('/reservations/:id', requireAdmin, async (req, res) => {
