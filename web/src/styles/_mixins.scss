@@ -1,0 +1,122 @@
+@use 'sass:math';
+@use 'variables' as *;
+
+@mixin kicker {
+    font-size: $font-size-xxs;
+    letter-spacing: $letter-spacing-widest;
+    text-transform: uppercase;
+    color: $color-primary-text;
+}
+
+@mixin section-shell {
+    padding: $spacing-section $layout-gutter;
+    background: $color-background;
+
+    @media (max-width: $breakpoint-tablet) {
+        padding: 72px $layout-gutter;
+    }
+}
+
+@mixin page-shell {
+    padding: 156px $layout-gutter 120px;
+    background: $color-background;
+
+    @media (max-width: $breakpoint-tablet) {
+        padding: 120px $layout-gutter 88px;
+    }
+}
+
+@mixin container($width: $layout-max-width) {
+    width: 100%;
+    max-width: $width;
+    margin: 0 auto;
+}
+
+@mixin photo-frame($ratio: math.div(3, 4.2)) {
+    aspect-ratio: $ratio;
+    overflow: hidden;
+    background: $color-surface-placeholder;
+}
+
+@mixin zoom-on-hover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform $duration-image $ease-out-expo;
+
+    &:hover {
+        transform: scale(1.06);
+    }
+}
+
+// `both` holds the element at opacity 0 until the animation runs, so it is gated
+// on the same `js` class as the scroll reveals.
+@mixin keyframes-fade-up {
+    @keyframes jFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(26px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
+@mixin keyframes-fade {
+    @keyframes jFade {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}
+
+@mixin keyframes-gradient {
+    @keyframes jGradient {
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+}
+
+@mixin keyframes-page-in {
+    @keyframes jPageIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
+@mixin keyframes-zoom-out {
+    // Settles at scale(1) so the resting frame is the least-upscaled one.
+    @keyframes jZoomOut {
+        from {
+            transform: scale(1.05);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
+}
+
+@mixin reveal-up($delay: 0s) {
+    @include keyframes-fade-up;
+
+    :global(html.js) & {
+        animation: jFadeUp $duration-slow $ease-out-expo $delay both;
+    }
+}

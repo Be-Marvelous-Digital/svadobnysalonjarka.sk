@@ -1,0 +1,68 @@
+.social {
+    @include section-shell;
+
+    &__inner {
+        @include container;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xl;
+    }
+
+    &__top {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 32px;
+    }
+
+    &__handle {
+        font-size: clamp(30px, 3.2vw, 50px);
+        line-height: 1.06;
+        color: $color-ink;
+    }
+
+    &__kicker {
+        @include kicker;
+    }
+
+    &__heading {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    &__links {
+        display: flex;
+        gap: 22px;
+        font-size: $font-size-xs;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            min-height: $touch-target-min;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+        gap: $spacing-sm;
+    }
+
+    &__frame {
+        @include photo-frame(math.div(4, 5));
+    }
+
+    &__image {
+        @include zoom-on-hover;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+        &__grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}

@@ -1,0 +1,211 @@
+.venue {
+    background: $color-background;
+
+    &__hero {
+        position: relative;
+        min-height: 68svh;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+    }
+
+    &__heroImage {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center 40%;
+        filter: brightness(0.82) saturate(0.95);
+    }
+
+    &__scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(27, 24, 21, 0.3) 0%, rgba(27, 24, 21, 0.25) 42%, rgba(27, 24, 21, 0.78) 100%);
+    }
+
+    &__heroCopy {
+        @include container($layout-max-width-narrow);
+        position: relative;
+        padding: 160px $layout-gutter 64px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-md;
+    }
+
+    &__kicker {
+        @include kicker;
+        color: $color-on-dark-muted;
+    }
+
+    &__title {
+        max-width: 16ch;
+        font-size: clamp(38px, 5.4vw, 78px);
+        line-height: 1.04;
+        color: $color-on-dark;
+        text-shadow: 0 2px 28px rgba(19, 17, 15, 0.45);
+        text-wrap: balance;
+    }
+
+    &__lead {
+        max-width: 58ch;
+        font-size: $font-size-md;
+        line-height: 1.8;
+        color: $color-on-dark-muted;
+    }
+
+    &__heroActions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: $spacing-sm;
+    }
+
+    &__inner {
+        @include container($layout-max-width-narrow);
+        padding: $spacing-section $layout-gutter;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-section;
+    }
+
+    // Two by two, not auto-fit: four points across three columns leaves the
+    // fourth stranded on a row of its own.
+    &__usps {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: $spacing-xxl 72px;
+
+        @media (max-width: $breakpoint-mobile) {
+            grid-template-columns: 1fr;
+            gap: $spacing-xl;
+        }
+    }
+
+    &__cta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-md;
+        padding: 64px $spacing-xxl;
+        background: $color-ink;
+    }
+
+    &__ctaKicker {
+        @include kicker;
+        color: $color-primary-light;
+    }
+
+    &__ctaTitle {
+        max-width: 20ch;
+        font-size: clamp(28px, 3.4vw, 44px);
+        line-height: 1.15;
+        color: $color-on-dark;
+    }
+
+    &__ctaNote {
+        max-width: 56ch;
+        font-size: $font-size-base;
+        line-height: 1.8;
+        color: $color-on-dark-muted;
+    }
+
+    &__ctaActions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: $spacing-xs;
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+        &__hero {
+            min-height: 60svh;
+        }
+
+        &__heroCopy {
+            padding: 120px $layout-gutter 48px;
+        }
+
+        &__inner {
+            padding: 72px $layout-gutter;
+            gap: 72px;
+        }
+
+        &__cta {
+            padding: 48px 28px;
+        }
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+        &__heroActions,
+        &__ctaActions {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+}
+
+.usp {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    border-top: 1px solid $color-border-strong;
+    padding-top: $spacing-lg;
+
+    &__mark {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: $border-radius-circle;
+        border: 1px solid $color-border-strong;
+        color: $color-primary-text;
+    }
+
+    &__title {
+        font-family: $font-display;
+        font-weight: $font-weight-regular;
+        font-size: $font-size-xl;
+        color: $color-ink;
+    }
+
+    &__body {
+        font-size: $font-size-base;
+        line-height: 1.8;
+        color: $color-text-secondary;
+    }
+}
+
+.story {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+    gap: $spacing-lg 72px;
+    align-items: start;
+
+    &__heading {
+        font-family: $font-display;
+        font-size: clamp(28px, 3.2vw, 40px);
+        line-height: 1.15;
+        color: $color-ink;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
+
+        p {
+            max-width: 64ch;
+            font-size: $font-size-md;
+            line-height: 1.85;
+            color: $color-text-secondary;
+        }
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+        grid-template-columns: 1fr;
+        gap: $spacing-md;
+    }
+}

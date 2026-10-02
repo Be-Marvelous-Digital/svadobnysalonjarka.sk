@@ -28,6 +28,8 @@ KEEP=5
 # started and nothing else, and an API crash-looping on a bad env var sails
 # straight through it.
 HEALTH_PATH="/api/health"
+# And the home page, rendered by the Next.js site service.
+SITE_PATH="/"
 HEALTH_RETRIES=10
 HEALTH_DELAY_S=3
 
@@ -56,22 +58,23 @@ bring_up() {
 # The host port is compose's to decide (WEB_PORT overrides it), so ask compose
 # instead of hardcoding 8080 a second time.
 health_url() {
-    local mapping port
+    local path="${1:-$HEALTH_PATH}" mapping port
     mapping="$(docker compose port web 8080 2>/dev/null | tail -n1)"
     port="${mapping##*:}"
     if [ -z "$port" ]; then
         echo "==> Could not read the published port for web; falling back to ${WEB_PORT:-8080}." >&2
         port="${WEB_PORT:-8080}"
     fi
-    echo "http://127.0.0.1:${port}${HEALTH_PATH}"
+    echo "http://127.0.0.1:${port}${path}"
 }
 
 wait_for_health() {
-    local url
+    local url site_url
     url="$(health_url)"
-    echo "==> Waiting on ${url}"
+    site_url="$(health_url "$SITE_PATH")"
+    echo "==> Waiting on ${url} and ${site_url}"
     for _ in $(seq 1 "$HEALTH_RETRIES"); do
-        if curl -fsS "$url" >/dev/null 2>&1; then
+        if curl -fsS "$url" >/dev/null 2>&1 && curl -fsS "$site_url" >/dev/null 2>&1; then
             return 0
         fi
         sleep "$HEALTH_DELAY_S"
@@ -119,6 +122,16 @@ fi
 
 echo "==> ${NEW_TAG} is healthy."
 echo "$NEW_TAG" >>"$HISTORY_FILE"
+
+# The image was built without the API, so its pages hold fallback photos until refreshed.
+echo "==> Refreshing the site's cached pages"
+docker compose exec -T api node -e '
+const { WEB_REVALIDATE_URL: url, REVALIDATE_SECRET: secret } = process.env;
+if (!url || !secret) process.exit(0);
+Promise.all(["gallery", "site-images"].map((tag) =>
+    fetch(url, { method: "POST", headers: { "content-type": "application/json", "x-revalidate-secret": secret }, body: JSON.stringify({ tag }) })
+)).catch(() => process.exit(1));
+' || echo "==> Cache refresh failed; pages refresh on their own within 5 minutes."
 
 # Keep only the KEEP most recently deployed tags, both in the history file and on
 # disk. The registry keeps every image regardless — this is disk hygiene on the

@@ -34,6 +34,9 @@ const schema = z.object({
     MAILCHIMP_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
     PUBLIC_ORIGIN: z.string().default('https://svadobnysalonjarka.sk'),
     CORS_ORIGIN: z.preprocess((v) => v || undefined, z.string().optional()),
+    // The Next.js site's revalidation endpoint; unset leaves its cache to expire on its own.
+    WEB_REVALIDATE_URL: z.preprocess((v) => v || undefined, z.url().optional()),
+    REVALIDATE_SECRET: z.preprocess((v) => v || undefined, z.string().min(16).optional()),
     COOKIE_SECURE: z
         .enum(['true', 'false'])
         .default('true')

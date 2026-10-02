@@ -3,9 +3,9 @@
 # MongoDB is not a service here: the project uses MongoDB Atlas, configured
 # through MONGODB_URI in backend/.env.
 #
-# Both services run the SAME image (built once, from the repo root Dockerfile) —
-# only `command` and `user` differ. `web` has no `build:` of its own; it just
-# references the tag `api` builds or pulls.
+# All services run the SAME image (built once, from the repo root Dockerfile) —
+# only `command` and `user` differ. `site` and `web` have no `build:` of their
+# own; they reference the tag `api` builds or pulls.
 #
 # CI (.github/workflows/ci.yml) builds and pushes this image to GHCR on every
 # push to main, tagged `latest` and the commit sha. A deploy host only ever needs
@@ -29,10 +29,34 @@ services:
             NODE_ENV: production
             PORT: 4000
             UPLOAD_DIR: /var/lib/jarka/uploads
+            WEB_REVALIDATE_URL: http://site:3000/revalidate
+            REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
         volumes:
             - gallery-uploads:/var/lib/jarka/uploads
         expose:
             - '4000'
+        logging:
+            driver: json-file
+            options:
+                max-size: '5m'
+                max-file: '2'
+        networks: [jarka]
+
+    site:
+        image: ghcr.io/be-marvelous-digital/svadobnysalonjarka.sk:${TAG:-latest}
+        command: ['node', 'web/server.js']
+        user: node
+        restart: unless-stopped
+        depends_on:
+            - api
+        environment:
+            NODE_ENV: production
+            PORT: 3000
+            HOSTNAME: 0.0.0.0
+            API_ORIGIN: http://api:4000
+            REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
+        expose:
+            - '3000'
         logging:
             driver: json-file
             options:
@@ -47,6 +71,7 @@ services:
         restart: unless-stopped
         depends_on:
             - api
+            - site
         ports:
             - '${WEB_PORT:-8080}:8080'
         volumes:

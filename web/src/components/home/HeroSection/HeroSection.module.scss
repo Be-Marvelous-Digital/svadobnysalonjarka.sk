@@ -1,0 +1,121 @@
+.hero {
+    position: relative;
+    height: 100svh;
+    min-height: 640px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    &__image {
+        position: absolute;
+        inset: 0;
+        // Not /assets/hero.webp: this path is served by nginx, which falls back to
+        // the bundled photo until the salon uploads one. One URL either way, so the
+        // preload in index.html stays correct and the hero needs no JavaScript.
+        background-image: url('/images/site/hero.webp');
+        background-size: cover;
+        background-position: center 22%;
+        filter: brightness(0.84) saturate(0.94) contrast(1.04);
+        // Long and slight on purpose: noticeable as movement, never as a zoom.
+        // `forwards` holds the end state so it does not snap back.
+        @include keyframes-zoom-out;
+        animation: jZoomOut $duration-hero-zoom ease-out forwards;
+        will-change: transform;
+    }
+
+    &__scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            180deg,
+            rgba(27, 24, 21, 0.42) 0%,
+            rgba(27, 24, 21, 0.28) 34%,
+            rgba(27, 24, 21, 0.4) 62%,
+            rgba(27, 24, 21, 0.62) 100%
+        );
+    }
+
+    &__vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 78% 62% at 50% 44%, rgba(19, 17, 15, 0.32) 0%, rgba(19, 17, 15, 0) 76%);
+    }
+
+    &__copy {
+        @include container;
+        position: relative;
+        padding: 96px $layout-gutter;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 30px;
+    }
+
+    &__kicker {
+        font-size: $font-size-xxs;
+        letter-spacing: $letter-spacing-hero;
+        text-transform: uppercase;
+        color: $color-on-dark;
+        text-shadow: 0 1px 18px rgba(19, 17, 15, 0.55);
+        @include reveal-up(0.3s);
+    }
+
+    &__title {
+        font-size: clamp(32px, 5.6vw, 84px);
+        line-height: 1.1;
+        letter-spacing: 0.01em;
+        color: $color-on-dark;
+        text-shadow: 0 2px 28px rgba(19, 17, 15, 0.45);
+        text-wrap: balance;
+        @include reveal-up(0.45s);
+    }
+
+    &__lead {
+        max-width: 60ch;
+        font-size: clamp(15px, 1.2vw, 16px);
+        line-height: 1.75;
+        color: rgba(253, 252, 250, 0.92);
+        // The title and kicker carry one; without it the lead lands on the brightest
+        // part of the chandelier and disappears.
+        text-shadow: 0 1px 16px rgba(19, 17, 15, 0.7);
+        @include reveal-up(0.6s);
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        justify-content: center;
+        margin-top: $spacing-xxs;
+        @include reveal-up(0.75s);
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+        min-height: 560px;
+
+        // Narrow viewports crop straight into the bright centre of the image,
+        // so the copy needs more to sit on.
+        &__scrim {
+            background: linear-gradient(
+                180deg,
+                rgba(27, 24, 21, 0.5) 0%,
+                rgba(27, 24, 21, 0.44) 34%,
+                rgba(27, 24, 21, 0.54) 62%,
+                rgba(27, 24, 21, 0.7) 100%
+            );
+        }
+
+        &__copy {
+            padding: 96px 20px;
+            gap: $spacing-md;
+        }
+
+        &__actions {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+}

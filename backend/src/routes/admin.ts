@@ -23,10 +23,13 @@ import {
     settingsSchema,
     weekQuerySchema,
 } from '../schemas.js';
+import { revalidateOnChange } from '../services/revalidate.js';
 import { offeredSlots, weekFrom } from '../services/slots.js';
 import { discardUpload, removePhotoFile, storePhoto, storeSiteImage, UnsupportedImageError } from '../services/photoStorage.js';
 
 export const adminRouter = Router();
+
+adminRouter.use(revalidateOnChange);
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,

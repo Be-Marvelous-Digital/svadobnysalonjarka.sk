@@ -5,9 +5,9 @@ a interná správa rezervácií a galérie.
 
 ## Stack
 
-- **frontend** — React 19 + TypeScript + Vite, LESS moduly, react-router
+- **web** — Next.js 16 (App Router, ISR) + React 19 + TypeScript, SCSS moduly
 - **backend** — Express 5 + TypeScript, Mongoose (MongoDB Atlas), zod, helmet, sharp
-- **nasadenie** — jeden Docker image (nginx + node), GHCR, GitHub Actions, DigitalOcean droplet
+- **nasadenie** — jeden Docker image pre tri služby (nginx, Next.js, API), GHCR, GitHub Actions, DigitalOcean droplet
 
 ## Lokálny vývoj
 
@@ -16,10 +16,12 @@ cd backend && npm ci && cp .env.example .env && npm run dev
 ```
 
 ```bash
-cd frontend && npm ci && npm run dev
+cd web && npm ci && npm run dev
 ```
 
-Vite proxuje `/api` a `/images` na `http://localhost:4000`.
+Next beží na `http://localhost:5173` a proxuje `/api` a `/images` na `API_ORIGIN` (predvolene `http://localhost:4000`).
+Verejné stránky sa renderujú na serveri s dátami z API a cachujú sa (ISR, 5 minút). Po zmene fotiek v admine
+ich API hneď obnoví cez `POST /revalidate`, ak má nastavené `WEB_REVALIDATE_URL` a `REVALIDATE_SECRET`.
 
 Hash admin hesla sa generuje takto:
 
@@ -42,7 +44,7 @@ cd backend && npm run check
 ```
 
 ```bash
-cd frontend && npm run check
+cd web && npm run check
 ```
 
 ## API
@@ -61,10 +63,10 @@ cd frontend && npm run check
 
 ## Nasadenie
 
-CI (`.github/workflows/ci.yml`) pri každom pushi na `main` spustí kontroly frontendu
+CI (`.github/workflows/ci.yml`) pri každom pushi na `main` spustí kontroly webu
 a backendu, zostaví image, pošle ho do GHCR (`latest` + commit sha) a cez SSH spustí
 `deploy/deploy.sh` s tým konkrétnym sha. Skript stiahne presne ten image, spustí compose,
-počká na `/api/health` a pri neúspechu sa vráti na posledný zdravý tag.
+počká na `/api/health` aj úvodnú stránku, obnoví cache stránok a pri neúspechu sa vráti na posledný zdravý tag.
 
 ### Príprava droplet-u (jednorazovo)
 
@@ -74,7 +76,8 @@ git clone git@github.com:Be-Marvelous-Digital/svadobnysalonjarka.sk.git
 cd svadobnysalonjarka.sk && cp backend/.env.example backend/.env
 ```
 
-Vyplňte `backend/.env` (MONGODB_URI, JWT_SECRET, ADMIN_USERNAME, ADMIN_PASSWORD) a
+Vyplňte `backend/.env` (MONGODB_URI, JWT_SECRET, ADMIN_USERNAME, ADMIN_PASSWORD), do koreňového `.env`
+dajte `REVALIDATE_SECRET` (napr. `openssl rand -hex 32`) a
 prihláste docker do GHCR. Potom raz spustite `npm run seed` v `backend/` — založí
 admin účet a nahrá do databázy fotky dodané s aplikáciou.
 

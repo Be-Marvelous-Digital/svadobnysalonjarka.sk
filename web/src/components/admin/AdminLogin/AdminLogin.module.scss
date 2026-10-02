@@ -1,0 +1,25 @@
+.login {
+    max-width: 440px;
+    margin: $spacing-xl auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    @include reveal-up;
+
+    &__kicker {
+        @include kicker;
+    }
+
+    &__title {
+        font-size: 44px;
+        line-height: 1.05;
+        color: $color-ink;
+    }
+
+    // Always rendered so the announcement region is stable and the button never shifts.
+    &__error {
+        min-height: 20px;
+        font-size: $font-size-sm;
+        color: $color-primary-dark;
+    }
+}

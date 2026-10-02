@@ -1,0 +1,223 @@
+.collection {
+    @include page-shell;
+    min-height: 90vh;
+
+    &__inner {
+        @include container;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xxl;
+    }
+
+    &__header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 24px $spacing-xl;
+        border-bottom: 1px solid $color-border;
+        padding-bottom: 36px;
+    }
+
+    &__intro {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
+        max-width: 640px;
+        @include reveal-up;
+    }
+
+    &__kicker {
+        @include kicker;
+    }
+
+    &__title {
+        font-size: clamp(38px, 5vw, 76px);
+        line-height: 1;
+        color: $color-ink;
+    }
+
+    &__flavor {
+        font-family: $font-display;
+        font-style: italic;
+        font-size: clamp(19px, 1.6vw, 24px);
+        line-height: 1.55;
+        color: $color-primary-text;
+    }
+
+    &__description {
+        max-width: 56ch;
+        font-size: $font-size-md;
+        line-height: 1.8;
+        color: $color-text-secondary;
+    }
+
+    &__aside {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
+        align-items: flex-end;
+    }
+
+    &__count {
+        font-size: $font-size-xs;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: $color-text-secondary;
+    }
+
+    &__facts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+        gap: 28px $spacing-xl;
+    }
+
+    &__fact {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+        border-left: 1px solid $color-accent-soft;
+        padding-left: 20px;
+    }
+
+    &__factMark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: $border-radius-circle;
+        background: $color-surface-muted;
+        color: $color-primary-text;
+    }
+
+    &__factText {
+        font-size: 14px;
+        line-height: 1.6;
+        color: $color-text-secondary;
+    }
+
+    &__empty {
+        padding: 96px $spacing-xl;
+        background-image: repeating-linear-gradient(135deg, #f7f2eb 0 12px, #f1ebe3 12px 24px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        text-align: center;
+    }
+
+    &__emptyTag {
+        font-family: $font-mono;
+        font-size: $font-size-xxs;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: $color-primary-text;
+    }
+
+    &__emptyText {
+        max-width: 46ch;
+        font-family: $font-display;
+        font-size: 24px;
+        line-height: 1.5;
+        color: $color-ink;
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-sm;
+        border-top: 1px solid $color-border;
+        padding-top: $spacing-xl;
+    }
+
+    &__chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: $touch-target-min;
+        padding: $spacing-sm 22px;
+        border: 1px solid $color-border;
+        font-size: $font-size-xxs;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: $color-ink;
+        transition:
+            background $duration-fast ease,
+            border-color $duration-fast ease;
+
+        &:hover {
+            color: $color-ink;
+            background: $color-surface-muted;
+            border-color: $color-primary;
+        }
+
+        &[aria-current='page'] {
+            color: $color-primary-text;
+            background: $color-surface-muted;
+            border-color: $color-primary;
+        }
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+        &__aside {
+            align-items: flex-start;
+        }
+
+        &__empty {
+            padding: 56px 24px;
+        }
+    }
+}
+
+.banner {
+    position: relative;
+    overflow: hidden;
+    background: $color-ink;
+    padding: clamp(56px, 8vw, 96px) clamp(32px, 6vw, 72px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+
+    &__glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 60% 120% at 100% 0%, rgba(169, 131, 79, 0.35) 0%, rgba(169, 131, 79, 0) 60%);
+    }
+
+    &__copy {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-width: 640px;
+    }
+
+    &__kicker {
+        font-size: $font-size-xxs;
+        letter-spacing: $letter-spacing-widest;
+        text-transform: uppercase;
+        color: $color-primary-light;
+    }
+
+    &__title {
+        font-family: $font-display;
+        font-weight: $font-weight-light;
+        font-size: clamp(30px, 3.6vw, 48px);
+        line-height: 1.12;
+        color: $color-on-dark;
+    }
+
+    &__note {
+        font-size: $font-size-base;
+        color: rgba(253, 252, 250, 0.68);
+    }
+
+    &__actions {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+}

@@ -1,0 +1,54 @@
+// Keyed on the route, so every navigation replays it.
+.main {
+    @include keyframes-page-in;
+
+    :global(html.js) & {
+        // backwards, not both: `both` leaves a transform on main once the
+        // animation ends, and a transformed ancestor becomes the containing
+        // block for position:fixed, which drags every overlay out of place.
+        animation: jPageIn $duration-base $ease-out-expo backwards;
+    }
+
+    // Paused at its first frame — opacity 0 — while the drawer covers the screen,
+    // so the transition is not spent behind an overlay and starts on the content
+    // the moment the menu is out of the way. Has to sit at the same specificity as
+    // the rule above: the `animation` shorthand resets play-state to running.
+    :global(html.js) &--held {
+        animation-play-state: paused;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(html.js) & {
+            animation: none;
+        }
+    }
+}
+
+// Off-screen until focused, rather than display:none, so it stays in the tab order.
+.skipLink {
+    position: fixed;
+    top: $spacing-xs;
+    left: $spacing-xs;
+    z-index: $z-skip-link;
+    transform: translateY(calc(-100% - $spacing-lg));
+    padding: $spacing-sm $spacing-lg;
+    min-height: $touch-target-min;
+    display: inline-flex;
+    align-items: center;
+    background: $color-ink;
+    color: $color-on-dark;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+    transition: transform $duration-fast $ease-out-expo;
+
+    &:focus-visible {
+        transform: none;
+    }
+
+    // It sits on a dark chip, so it has to hold its colour in both states.
+    &:hover,
+    &:focus-visible {
+        color: $color-on-dark;
+    }
+}

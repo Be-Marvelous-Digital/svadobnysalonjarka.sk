@@ -1,24 +1,22 @@
 # syntax=docker/dockerfile:1.7
 #
-# One image, built once from the whole repo, used for both docker-compose
-# services. `api` runs it as `node dist/index.js`, `web` runs the same image as
-# `nginx -g daemon off;` — one process per container, only the build artifact is
-# unified.
+# One image, built once from the whole repo, used for all docker-compose
+# services: `api` runs `node dist/index.js`, `site` runs `node web/server.js`
+# (Next.js) and `web` runs `nginx -g daemon off;` in front of both.
 
-# --- frontend build ---------------------------------------------------------
-FROM node:22-alpine AS frontend-build
+# --- web build --------------------------------------------------------------
+FROM node:22-alpine AS web-build
 
-WORKDIR /app/frontend
+WORKDIR /app/web
 
-COPY frontend/package.json frontend/package-lock.json* ./
+COPY web/package.json web/package-lock.json* ./
 RUN npm ci
 
-# sitemap.plugin.ts is referenced by both vite.config.ts and tsconfig.node.json,
-# so leaving it out fails the build at `tsc -b`, not at runtime.
-COPY frontend/tsconfig*.json frontend/vite.config.ts frontend/sitemap.plugin.ts frontend/index.html ./
-COPY frontend/public ./public
-COPY frontend/src ./src
+COPY web/tsconfig.json web/next.config.ts ./
+COPY web/public ./public
+COPY web/src ./src
 
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # --- backend build ----------------------------------------------------------
@@ -52,22 +50,25 @@ COPY --from=backend-build --chown=node:node /app/backend/node_modules ./node_mod
 COPY --from=backend-build --chown=node:node /app/backend/dist ./dist
 COPY --chown=node:node backend/package.json ./
 
-COPY frontend/nginx.conf /etc/nginx/http.d/default.conf
+COPY web/nginx/default.conf /etc/nginx/http.d/default.conf
 # Deliberately NOT in http.d/, which alpine's nginx.conf glob-includes: this file
 # is a bare list of add_header directives pulled into specific locations, not a
 # standalone config.
-COPY frontend/security-headers.conf /etc/nginx/security-headers.conf
-COPY --from=frontend-build /app/frontend/dist /usr/share/nginx/html
+COPY web/nginx/security-headers.conf /etc/nginx/security-headers.conf
+
+# Next standalone server; nginx serves its static and public files straight from here.
+COPY --from=web-build --chown=node:node /app/web/.next/standalone ./web
+COPY --from=web-build --chown=node:node /app/web/.next/static ./web/.next/static
+COPY --from=web-build --chown=node:node /app/web/public ./web/public
 
 # Gallery uploads. A volume normally covers this, but creating it here means the
 # api role also works without one — must be writable by the node user.
 RUN mkdir -p /var/lib/jarka/uploads /var/cache/nginx /var/log/nginx \
     && chown -R node:node /var/lib/jarka \
-    && chown -R nginx:nginx /usr/share/nginx/html \
     && touch /var/run/nginx.pid && chown nginx:nginx /var/run/nginx.pid \
     && chown -R nginx:nginx /var/cache/nginx /var/log/nginx
 
-EXPOSE 4000 8080
+EXPOSE 3000 4000 8080
 
 ENTRYPOINT ["dumb-init", "--"]
 # Overridden per-service in docker-compose.yml (`command:` + `user:`).

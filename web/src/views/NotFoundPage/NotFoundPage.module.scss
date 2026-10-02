@@ -1,0 +1,77 @@
+.missing {
+    @include page-shell;
+
+    &__inner {
+        @include container($layout-max-width-form);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-md;
+        @include reveal-up;
+    }
+
+    &__code {
+        font-family: $font-mono;
+        font-size: $font-size-xxs;
+        letter-spacing: $letter-spacing-widest;
+        color: $color-primary-text;
+    }
+
+    &__title {
+        max-width: 18ch;
+        font-size: clamp(38px, 5vw, 76px);
+        line-height: 1;
+        color: $color-ink;
+    }
+
+    &__lead {
+        max-width: 56ch;
+        font-size: $font-size-md;
+        line-height: 1.8;
+        color: $color-text-secondary;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: $spacing-sm;
+    }
+
+    &__links {
+        width: 100%;
+        margin-top: $spacing-xxl;
+        padding-top: $spacing-lg;
+        border-top: 1px solid $color-border;
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-sm $spacing-xl;
+    }
+
+    &__link {
+        font-family: $font-display;
+        font-size: $font-size-lg;
+        color: $color-ink;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s ease;
+
+        &:hover {
+            border-bottom-color: $color-primary;
+        }
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+        &__links {
+            margin-top: $spacing-xl;
+            gap: $spacing-sm $spacing-lg;
+        }
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+        &__actions {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+}

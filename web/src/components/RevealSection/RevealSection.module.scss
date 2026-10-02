@@ -1,0 +1,19 @@
+// Hiding by default means a failed bundle leaves the whole page blank, so the
+// hidden state is opt-in: main.tsx stamps `js` on <html> before React mounts.
+// No script, no class, no hiding.
+.reveal {
+    // Both states have to sit under `html.js`, or the hidden rule outweighs the
+    // revealed one on specificity and the section never comes back.
+    :global(html.js) & {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+            opacity $duration-slow ease,
+            transform $duration-slow $ease-out-expo;
+
+        &[data-revealed='true'] {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}

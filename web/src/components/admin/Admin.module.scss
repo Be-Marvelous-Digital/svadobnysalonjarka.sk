@@ -1,0 +1,1482 @@
+// $color-text-disabled is for controls that cannot be used. Text that can be
+// read and acted on uses $color-text-secondary, which clears 4.5:1.
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+}
+
+.card {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 32px 48px;
+    align-items: start;
+    background: $color-surface-muted;
+    padding: 32px 36px;
+
+    &__title {
+        font-family: $font-display;
+        font-size: $font-size-lg + 5px;
+        color: $color-ink;
+    }
+
+    &__note {
+        font-size: $font-size-sm;
+        line-height: 1.7;
+        color: $color-text-secondary;
+    }
+
+    &__side {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &__label {
+        font-size: $font-size-xxs;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: $color-primary-text;
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-xs;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+        padding: 24px;
+    }
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    &--separated {
+        border-top: 1px solid $color-border;
+        padding-top: 36px;
+    }
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    &__title {
+        font-family: $font-display;
+        font-size: 30px;
+        color: $color-ink;
+    }
+
+    &__count {
+        font-size: $font-size-xs;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: $color-primary-text;
+    }
+
+    &__empty {
+        font-size: 14px;
+        color: $color-text-secondary;
+    }
+}
+
+.status {
+    padding: 6px $spacing-sm;
+    font-size: $font-size-micro;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    &--pending {
+        color: $color-primary-text;
+        background: $color-surface-muted;
+    }
+
+    &--confirmed {
+        color: $color-status-confirmed;
+        background: $color-status-confirmed-bg;
+    }
+
+    &--rejected {
+        color: $color-status-rejected;
+        background: $color-status-rejected-bg;
+    }
+
+    &--blocked {
+        color: $color-status-blocked;
+        background: $color-status-blocked-bg;
+    }
+
+    &--free {
+        color: $color-text-tertiary;
+        background: transparent;
+    }
+}
+
+.request {
+    border: 1px solid $color-border;
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    &__row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+        gap: $spacing-md;
+        align-items: center;
+    }
+
+    &__person {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xxs;
+    }
+
+    &__name {
+        font-size: $font-size-md;
+        color: $color-ink;
+    }
+
+    &__contact {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+    }
+
+    &__link {
+        color: $color-primary-text;
+        border-bottom: 1px solid $color-accent-soft;
+
+        &:hover {
+            color: $color-ink;
+            border-bottom-color: $color-primary;
+        }
+    }
+
+    &__meta {
+        font-size: 14px;
+        color: $color-ink;
+
+        &--when {
+            color: $color-primary-text;
+        }
+    }
+
+    &__alt {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        border-top: 1px solid $color-border;
+        padding-top: $spacing-md;
+    }
+
+    &__panel {
+        background: $color-surface-muted;
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+}
+
+.action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: $touch-target-min;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    padding: 11px 22px;
+    font-size: $font-size-xxs;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition:
+        background $duration-fast $ease-out-expo,
+        border-color $duration-fast $ease-out-expo,
+        color $duration-fast $ease-out-expo,
+        transform $duration-fast $ease-out-expo;
+
+    // Every control in here is a small uppercase label; without a focus ring a
+    // keyboard user has no idea which one they are on.
+    &:focus-visible {
+        outline: 2px solid $color-primary;
+        outline-offset: 2px;
+    }
+
+    // Transform, not margin: a press should not reflow the row around it.
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        &:active:not(:disabled) {
+            transform: none;
+        }
+    }
+
+    &--primary {
+        background: $color-ink;
+        color: $color-on-dark;
+
+        &:hover:not(:disabled) {
+            background: $color-ink-deep;
+            color: $color-on-dark;
+        }
+    }
+
+    &--gold {
+        background: $color-primary-text;
+        color: $color-on-dark;
+
+        &:hover {
+            color: $color-on-dark;
+        }
+    }
+
+    &--outline {
+        border-color: $color-border-strong;
+        color: $color-ink;
+
+        &:hover:not(:disabled) {
+            border-color: $color-primary;
+            background: $color-surface-muted;
+            color: $color-ink;
+        }
+
+        &:disabled {
+            border-color: $color-border;
+            color: $color-text-disabled;
+            cursor: not-allowed;
+        }
+    }
+
+    &--danger {
+        border-color: $color-border;
+        color: $color-status-rejected;
+
+        &:hover:not(:disabled) {
+            border-color: $color-status-rejected;
+            background: $color-surface-muted;
+            color: $color-status-rejected;
+        }
+
+        &:disabled {
+            color: $color-text-disabled;
+            cursor: not-allowed;
+        }
+    }
+
+    &--quiet {
+        color: $color-text-secondary;
+
+        &:hover:not(:disabled) {
+            color: $color-ink;
+        }
+    }
+
+    // Square nudge buttons for keyboard and touch, where a drag never fires.
+    &--step {
+        min-width: $touch-target-min;
+        min-height: $touch-target-min;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-color: $color-border;
+        color: $color-ink;
+        font-size: $font-size-md;
+        line-height: 1;
+
+        &:hover:not(:disabled) {
+            border-color: $color-primary;
+            color: $color-ink;
+        }
+
+        &:disabled {
+            color: $color-text-disabled;
+            cursor: not-allowed;
+        }
+    }
+
+    &--link {
+        padding: 0;
+        color: $color-primary-text;
+        border-bottom: 1px solid $color-accent-soft;
+        white-space: nowrap;
+        font-size: 10.5px;
+        letter-spacing: $letter-spacing-wide;
+
+        &:hover:not(:disabled) {
+            color: $color-ink;
+            border-bottom-color: $color-primary;
+        }
+
+        &:disabled {
+            color: $color-text-disabled;
+            border-bottom-color: transparent;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.dayStrip {
+    display: flex;
+    gap: $spacing-xs;
+    overflow-x: auto;
+    padding-bottom: 6px;
+
+    &__day {
+        min-width: 66px;
+        padding: $spacing-sm 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-xxs;
+        border: 1px solid $color-border;
+        background: $color-surface;
+        color: $color-ink;
+        cursor: pointer;
+        transition:
+            border-color 0.3s ease,
+            background 0.3s ease;
+
+        &--closed {
+            background: $color-surface-muted;
+            color: $color-text-disabled;
+        }
+
+        &--active {
+            background: $color-ink;
+            border-color: $color-ink;
+            color: $color-on-dark;
+        }
+    }
+
+    &__dow {
+        font-size: $font-size-micro;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+        opacity: 0.75;
+    }
+
+    &__num {
+        font-family: $font-display;
+        font-size: 22px;
+    }
+
+    &__count {
+        font-size: 9.5px;
+        letter-spacing: $letter-spacing-tight;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+}
+
+.slotRow {
+    display: grid;
+    grid-template-columns: 150px 1fr auto auto;
+    gap: $spacing-md;
+    align-items: center;
+    padding: 14px 16px;
+    border: 1px solid $color-border;
+    background: $color-surface;
+
+    &--pending {
+        background: $color-surface-muted;
+    }
+
+    &--confirmed {
+        background: $color-status-confirmed-bg;
+    }
+
+    &--blocked {
+        background: $color-status-blocked-bg;
+    }
+
+    &__range {
+        font-size: 14px;
+        color: $color-ink;
+    }
+
+    &__who {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 14px;
+        color: $color-ink;
+    }
+
+    &__note {
+        font-size: $font-size-xs;
+        color: $color-text-secondary;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+        grid-template-columns: 1fr;
+        gap: $spacing-xs;
+    }
+}
+
+.blockForm {
+    background: $color-surface-muted;
+    border: 1px solid $color-border;
+    border-top: 0;
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+        gap: $spacing-sm;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    &__hint {
+        font-size: $font-size-xs;
+        color: $color-text-secondary;
+    }
+}
+
+.upcoming {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+    gap: $spacing-md;
+    align-items: center;
+    padding: $spacing-md 0;
+    border-bottom: 1px solid $color-border;
+
+    &__remove {
+        justify-self: end;
+    }
+}
+
+.gallery {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+
+    &__tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    // One surface for everything about the category: the cover it is represented
+    // by, what is in it, and how to add to it. Two cards side by side left the
+    // shorter one padded out with nothing.
+    &__top {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+        gap: $spacing-xl 48px;
+        align-items: stretch;
+        background: $color-surface-muted;
+        padding: 32px 36px;
+
+        &--wide {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: $breakpoint-desktop) {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: $breakpoint-mobile) {
+            padding: 24px;
+        }
+    }
+
+    // A hairline rather than a second box: the cover is part of this panel, not
+    // a card parked next to it.
+    &__main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+        gap: $spacing-lg 44px;
+        // The preview sets the height of the row; the drop area grows to meet it
+        // rather than leaving a strip of background under itself.
+        align-items: stretch;
+    }
+
+    &__coverCol {
+        padding-right: 48px;
+        border-right: 1px solid $color-border;
+
+        @media (max-width: $breakpoint-desktop) {
+            padding-right: 0;
+            padding-bottom: $spacing-lg;
+            border-right: 0;
+            border-bottom: 1px solid $color-border;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+        gap: $spacing-md;
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+        transition: transform $duration-fast $ease-out-expo;
+
+        &:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+
+            &:hover {
+                transform: none;
+            }
+        }
+
+        gap: 10px;
+        cursor: grab;
+        transition: opacity $duration-fast ease;
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        // The tile stays in place and fades; the surrounding tiles slide to show
+        // where it will land, which reads better than dragging a ghost around.
+        &--dragging {
+            opacity: 0.35;
+        }
+    }
+
+    &__frame {
+        @include photo-frame(math.div(3, 4));
+        position: relative;
+    }
+
+    // Sits on the photo itself: picking one out of a wall of them should not mean
+    // travelling to a column of boxes down the side.
+    &__pick {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: inline-flex;
+        cursor: pointer;
+
+        input {
+            position: absolute;
+            opacity: 0;
+            inset: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+    }
+
+    &__pick input {
+        // The box stays small, the thing you can actually hit does not.
+        min-width: $touch-target-min;
+        min-height: $touch-target-min;
+        top: -11px;
+        right: -11px;
+        left: auto;
+        bottom: auto;
+    }
+
+    &__pickBox {
+        width: 22px;
+        height: 22px;
+        border: 1px solid $color-on-dark;
+        background: rgba(19, 17, 15, 0.42);
+        transition:
+            background $duration-fast ease,
+            border-color $duration-fast ease;
+    }
+
+    &__pick input:checked + &__pickBox {
+        background: $color-primary-text;
+        border-color: $color-primary-text;
+    }
+
+    &__pick input:checked + &__pickBox::after {
+        content: '✓';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-size: 13px;
+        color: $color-on-dark;
+    }
+
+    &__pick input:focus-visible + &__pickBox {
+        outline: 2px solid $color-primary;
+        outline-offset: 2px;
+    }
+
+    &__item--selected &__frame {
+        outline: 2px solid $color-primary-text;
+        outline-offset: -2px;
+    }
+
+    &__grip {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        padding: 3px 7px;
+        background: rgba(19, 17, 15, 0.55);
+        color: $color-on-dark;
+        font-size: $font-size-sm;
+        line-height: 1;
+        letter-spacing: 0.08em;
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: $spacing-xs;
+        font-size: $font-size-xxs;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+        color: $color-text-secondary;
+    }
+
+    &__actions {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-sm;
+    }
+
+    &__empty {
+        padding: 64px;
+        background-image: repeating-linear-gradient(135deg, #f7f2eb 0 12px, #f1ebe3 12px 24px);
+        text-align: center;
+        font-family: $font-mono;
+        font-size: $font-size-xxs;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: $color-primary-text;
+    }
+
+    &__urlRow {
+        display: flex;
+        gap: 10px;
+    }
+
+    &__urlInput {
+        flex: 1;
+    }
+
+    &__file {
+        font-size: 14px;
+        color: $color-ink;
+    }
+}
+
+.users {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+
+    &__status {
+        min-height: 20px;
+        font-size: $font-size-sm;
+        color: $color-primary-text;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &__forms {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+        gap: $spacing-md;
+        margin-top: $spacing-md;
+    }
+}
+
+.userRow {
+    transition: background $duration-fast $ease-out-expo;
+
+    &:hover {
+        background: $color-surface-muted;
+    }
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+    border: 1px solid $color-border;
+    padding: $spacing-md 20px;
+    background: $color-surface;
+
+    &__who {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__name {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: $font-size-md;
+        color: $color-ink;
+    }
+
+    &__badge {
+        padding: 3px 9px;
+        background: $color-surface-muted;
+        font-size: $font-size-micro;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+        color: $color-primary-text;
+    }
+
+    &__meta {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    // The reset row carries a labelled field, so it aligns on the baseline of the
+    // input rather than centring the label against the buttons.
+    &__reset {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 10px;
+    }
+}
+
+.week {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    &__nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    &__range {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+        min-width: 22ch;
+        text-align: center;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 1px;
+        background: $color-border;
+        border: 1px solid $color-border;
+    }
+
+    &__day {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 10px 8px;
+        background: $color-surface;
+
+        &--today {
+            background: $color-surface-muted;
+        }
+    }
+
+    &__dayHead {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid $color-border;
+        margin-bottom: 4px;
+    }
+
+    &__dow {
+        font-size: $font-size-micro;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+        color: $color-text-secondary;
+    }
+
+    &__num {
+        font-family: $font-display;
+        font-size: $font-size-lg;
+        color: $color-ink;
+    }
+
+    &__closed {
+        font-size: $font-size-xs;
+        color: $color-text-secondary;
+    }
+
+    &__slot {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        padding: 5px 6px;
+        border-left: 1px solid transparent;
+
+        &--booked {
+            background: $color-status-confirmed-bg;
+        }
+    }
+
+    &__time {
+        font-size: $font-size-micro;
+        letter-spacing: $letter-spacing-tight;
+        color: $color-text-secondary;
+    }
+
+    &__free {
+        font-size: $font-size-micro;
+        color: $color-text-secondary;
+    }
+
+    &__who {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__name {
+        font-size: $font-size-xs;
+        line-height: 1.3;
+        color: $color-status-confirmed;
+    }
+
+    &__cat {
+        font-size: $font-size-micro;
+        color: $color-text-secondary;
+    }
+
+    // Seven columns stop being readable long before a phone; stack them instead.
+    @media (max-width: $breakpoint-tablet) {
+        &__grid {
+            grid-template-columns: 1fr;
+        }
+
+        &__dayHead {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.overlay {
+    @include keyframes-fade;
+    animation: jFade $duration-fast $ease-out-expo backwards;
+    position: fixed;
+    inset: 0;
+    z-index: $z-drawer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $layout-gutter;
+    background: rgba(19, 17, 15, 0.55);
+    overflow-y: auto;
+}
+
+.dialog {
+    @include keyframes-fade-up;
+    // backwards, so no transform is left behind once it settles — a transformed
+    // ancestor would become the containing block for anything fixed inside.
+    animation: jFadeUp $duration-base $ease-out-expo backwards;
+    width: 100%;
+    max-width: 520px;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    padding: 32px;
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
+    }
+
+    &__title {
+        font-family: $font-display;
+        font-size: 32px;
+        line-height: 1.1;
+        color: $color-ink;
+    }
+
+    &__note {
+        font-size: $font-size-sm;
+        line-height: 1.7;
+        color: $color-text-secondary;
+    }
+
+    &__slots {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-xs;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        border-top: 1px solid $color-border;
+        padding-top: $spacing-md;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+        padding: 24px;
+    }
+}
+
+.week {
+    &__jump {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+    }
+
+    &__jumpLabel {
+        font-size: $font-size-micro;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+        color: $color-text-secondary;
+    }
+}
+
+.dialog {
+    &__taken {
+        display: block;
+        margin-top: 2px;
+        font-size: $font-size-micro;
+        letter-spacing: 0;
+        text-transform: none;
+        color: $color-text-secondary;
+    }
+
+    &__slots {
+        .action--outline:disabled {
+            cursor: not-allowed;
+        }
+    }
+}
+
+.week {
+    // The popover escapes its cell, so nothing on the way out may clip it.
+    &__grid,
+    &__day {
+        overflow: visible;
+    }
+
+    &__slotWrap {
+        position: relative;
+    }
+
+    // The booked slot is a button now; it must not look like one.
+    @at-root button#{&}__slot,
+        #{&}__slotWrap > button {
+        width: 100%;
+        border: 0;
+        text-align: left;
+        font-family: $font-primary;
+        cursor: pointer;
+    }
+}
+
+.popover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: $z-header;
+    min-width: 230px;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: $spacing-sm 14px;
+    background: $color-ink;
+    color: $color-on-dark;
+    box-shadow: $shadow-dropdown;
+
+    &__name {
+        font-family: $font-display;
+        font-size: $font-size-lg;
+        line-height: 1.2;
+    }
+
+    &__row {
+        font-size: $font-size-xs;
+        color: $color-on-dark-muted;
+    }
+
+    &__link {
+        font-size: $font-size-sm;
+        color: $color-primary-light;
+        border-bottom: 1px solid rgba(198, 169, 123, 0.4);
+        align-self: flex-start;
+
+        &:hover {
+            color: $color-on-dark;
+            border-bottom-color: $color-on-dark;
+        }
+    }
+
+    &__note {
+        margin-top: 4px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(253, 252, 250, 0.16);
+        font-size: $font-size-micro;
+        line-height: 1.5;
+        color: $color-on-dark-faint;
+    }
+
+    // Near the right edge the card would run off the grid.
+    .week__day:nth-child(n + 6) & {
+        left: auto;
+        right: 0;
+    }
+}
+
+.popover {
+    &__action {
+        margin-top: 4px;
+        min-height: $touch-target-min;
+        border: 1px solid $color-on-dark-border;
+        background: none;
+        cursor: pointer;
+        padding: 0 14px;
+        font-family: $font-primary;
+        font-size: $font-size-xxs;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+        color: $color-on-dark;
+        transition:
+            background $duration-fast ease,
+            border-color $duration-fast ease;
+
+        &:hover {
+            background: rgba(253, 252, 250, 0.12);
+            border-color: $color-on-dark;
+        }
+    }
+}
+
+.slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 28px;
+}
+
+.slot {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: $color-surface-muted;
+    padding: 18px;
+
+    &__frame {
+        width: 100%;
+        flex: 1;
+        min-height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid $color-border;
+        background: $color-surface-placeholder;
+        padding: 10px;
+        cursor: pointer;
+        transition: border-color $duration-fast ease;
+
+        &:hover,
+        &:focus-visible {
+            border-color: $color-primary;
+        }
+
+        &--over {
+            border-color: $color-primary;
+            border-style: dashed;
+        }
+
+        &:disabled {
+            cursor: progress;
+        }
+    }
+
+    &__shot {
+        position: relative;
+        height: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        display: block;
+    }
+
+    // Sits inside the category header rather than in a grid of its own, so it
+    // drops its background and lays the preview out beside the text.
+    &--inline {
+        height: 100%;
+        flex-direction: row;
+        // Not stretch: the preview keeps the shape of the tile it stands for,
+        // so its height comes from the ratio rather than from the row.
+        align-items: flex-start;
+        gap: $spacing-lg;
+        background: none;
+        padding: 0;
+    }
+
+    // Shown at the shape the home page tile crops to, so the preview is what the
+    // collection will actually look like. Height is stated and the width follows
+    // from the ratio: deriving the height from the row instead would ask the row
+    // for a size the row is still getting from this element. The column is wide
+    // enough that the text beside it stays shorter than this, so the preview is
+    // what sets the row and it meets the padding top and bottom.
+    &--inline &__frame {
+        height: 300px;
+        width: auto;
+        flex: none;
+        min-height: 0;
+        padding: 0;
+    }
+
+    &--inline &__shot {
+        height: 100%;
+        width: auto;
+        max-width: none;
+    }
+
+    &--inline &__body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    // In a narrow column space-between throws the badge to the far edge and
+    // leaves a gap across the middle; it reads better right after the label.
+    &--inline &__heading {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 4px 12px;
+    }
+
+    // Side by side stops fitting long before the phone does.
+    @media (max-width: $breakpoint-mobile) {
+        &--inline {
+            flex-direction: column;
+        }
+
+        &--inline &__frame {
+            width: 100%;
+            max-width: none;
+            aspect-ratio: 3 / 2;
+            height: auto;
+        }
+
+        &--inline &__shot {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    // Hidden until the frame is hovered, focused or dragged over, so a wall of
+    // photos stays readable as photos rather than as a wall of instructions.
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: $spacing-md;
+        text-align: center;
+        background: rgba(19, 17, 15, 0.62);
+        color: $color-on-dark;
+        font-size: $font-size-xxs;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity $duration-fast ease;
+    }
+
+    &__frame:hover &__overlay,
+    &__frame:focus-visible &__overlay,
+    &__frame--over &__overlay,
+    &__frame:disabled &__overlay {
+        opacity: 1;
+    }
+
+    &__frame--over &__shot {
+        pointer-events: none;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: $spacing-sm;
+    }
+
+    &__label {
+        font-family: $font-display;
+        font-size: $font-size-lg;
+        color: $color-ink;
+    }
+
+    &__badge {
+        flex-shrink: 0;
+        font-size: $font-size-xxs;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: $color-text-secondary;
+
+        &--custom {
+            color: $color-primary-text;
+        }
+    }
+
+    &__hint {
+        font-size: $font-size-sm;
+        line-height: 1.6;
+        color: $color-text-secondary;
+    }
+
+    &__ratio {
+        font-family: $font-mono;
+        font-size: $font-size-xxs;
+        letter-spacing: 0.1em;
+        color: $color-text-secondary;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-xs;
+        margin-top: 6px;
+    }
+}
+
+.picker {
+    position: fixed;
+    inset: 0;
+    z-index: $z-drawer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-lg;
+    background: rgba(19, 17, 15, 0.58);
+
+    &__panel {
+        width: 100%;
+        max-width: 980px;
+        max-height: 86vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 28px;
+        background: $color-background;
+    }
+
+    &__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: $spacing-lg;
+    }
+
+    &__title {
+        font-family: $font-display;
+        font-size: $font-size-lg + 5px;
+        color: $color-ink;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+        gap: $spacing-sm;
+    }
+
+    &__tile {
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        border: 1px solid $color-border;
+        background: $color-surface-placeholder;
+        padding: 0;
+        cursor: pointer;
+        transition: border-color $duration-fast ease;
+
+        &:hover,
+        &:focus-visible {
+            border-color: $color-primary;
+        }
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+        padding: 0;
+
+        &__panel {
+            max-height: 100vh;
+            height: 100%;
+            padding: 20px;
+        }
+    }
+}
+
+.drop {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+    min-height: 180px;
+    padding: $spacing-lg;
+    cursor: pointer;
+    text-align: center;
+    border: 1px dashed $color-border-strong;
+    background: $color-background;
+    transition:
+        border-color $duration-fast ease,
+        background $duration-fast ease;
+
+    &__wrap {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        border-color: $color-primary;
+        background: $color-surface-muted;
+    }
+
+    &:hover:not(:disabled) &__pick {
+        border-color: $color-primary;
+        background: $color-background;
+    }
+
+    // Solid rather than dashed while a file is over it: the edge stops being an
+    // invitation and starts being a target.
+    &--over {
+        border-style: solid;
+        border-color: $color-primary;
+        background: $color-surface-placeholder;
+    }
+
+    &--busy {
+        cursor: progress;
+    }
+
+    &__title {
+        font-family: $font-display;
+        font-size: $font-size-lg;
+        color: $color-ink;
+        transition: color $duration-fast ease;
+    }
+
+    &__note {
+        max-width: 34ch;
+        font-size: $font-size-xs;
+        line-height: 1.6;
+        color: $color-text-secondary;
+    }
+
+    // Looks like a button but is a span: the whole area is already the button.
+    &__pick {
+        pointer-events: none;
+    }
+
+    &:disabled {
+        cursor: progress;
+    }
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.bulk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $spacing-sm $spacing-lg;
+    padding: $spacing-sm 0;
+    background: $color-background;
+    border-bottom: 1px solid $color-border;
+
+    // Sticky only while the photos are on screen, and offset by `top` rather
+    // than by a transform: a transform draws it below its own sticky slot, which
+    // is what had it sitting over the first row of photos.
+    &--stuck {
+        position: sticky;
+        top: var(--header-offset, $header-height);
+        z-index: $z-header - 1;
+    }
+
+    &__count {
+        margin-right: auto;
+        font-size: $font-size-xxs;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+        color: $color-text-secondary;
+    }
+}

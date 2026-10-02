@@ -2,9 +2,9 @@
 
 ## Stack
 
--   **Framework**: React (functional components, hooks only — no class components)
+-   **Framework**: Next.js App Router + React (functional components, hooks only — no class components). Server components by default; `'use client'` only where state, effects or event handlers are needed
 -   **Language**: TypeScript with strict mode enabled
--   **Styling**: LESS with global variables and nesting
+-   **Styling**: SCSS modules with global variables, mixins and nesting
 -   **State**: Redux Toolik if will be needed for complex state management, otherwise local component state with `useState`
 
 ---
@@ -16,13 +16,13 @@
 -   If a JSX block is used more than once — or could reasonably be used elsewhere — extract it into its own component immediately.
 -   A component should do **one thing**. If you find yourself describing a component with "and", split it.
 -   Keep components under ~150 lines. If a `.tsx` file is growing beyond that, treat it as a signal to refactor.
--   Co-locate component files: `ComponentName/index.tsx`, `ComponentName/ComponentName.module.less`, `ComponentName/ComponentName.helpers.ts`.
+-   Co-locate component files: `ComponentName/index.tsx`, `ComponentName/ComponentName.module.scss`, `ComponentName/ComponentName.helpers.ts`.
 
 ### Naming conventions
 
 -   Components: `PascalCase`
 -   Helper functions, hooks, utilities: `camelCase`
--   LESS variables: `@kebab-case`
+-   SCSS variables: `$kebab-case`
 -   Files: `PascalCase` for components, `camelCase` for helpers and hooks
 
 ### Named exports only
@@ -104,7 +104,7 @@ src/
   components/
     UserCard/
       UserCard.tsx       ← formatting, logic
-      UserCard.less
+      UserCard.module.scss
   hooks/
     useUserData.ts              ← data fetching logic
   utils/
@@ -114,15 +114,15 @@ src/
 
 ---
 
-## LESS / Styling Rules
+## SCSS / Styling Rules
 
-### Always use variables from `global.less`
+### Always use variables from `styles/_variables.scss`
 
 -   **Never hardcode** color values, font families, font sizes, border radii, spacing, or z-index values.
--   All design tokens must reference variables defined in `global.less`.
--   If a value is used more than once and doesn't have a variable, define one in `global.less`.
+-   All design tokens must reference variables defined in `styles/_variables.scss` (auto-injected into every module, together with `styles/_mixins.scss`).
+-   If a value is used more than once and doesn't have a variable, define one in `styles/_variables.scss`.
 
-```less
+```scss
 // ❌ avoid
 .card {
     background: #ffffff;
@@ -132,9 +132,9 @@ src/
 
 // ✅ correct
 .card {
-    background: @color-background;
-    font-family: @font-primary;
-    border-radius: @border-radius-md;
+    background: $color-background;
+    font-family: $font-primary;
+    border-radius: $border-radius-md;
 }
 ```
 
@@ -144,33 +144,33 @@ src/
 
 ### Always use nesting
 
--   LESS supports nesting — use it. Flat selectors are forbidden unless targeting a global reset or third-party override.
+-   SCSS supports nesting — use it. Flat selectors are forbidden unless targeting a global reset or third-party override.
 -   Nest pseudo-classes, pseudo-elements, modifiers, and child elements within the parent block.
 -   Use `&` for modifier classes and state variants.
 
-```less
+```scss
 // ✅ correct
 .card {
-    background: @color-surface;
-    padding: @spacing-md;
+    background: $color-surface;
+    padding: $spacing-md;
 
     &:hover {
-        background: @color-surface-hover;
+        background: $color-surface-hover;
     }
 
     &--active {
-        border: 1px solid @color-primary;
+        border: 1px solid $color-primary;
     }
 
     &__title {
-        font-size: @font-size-lg;
-        font-weight: @font-weight-bold;
-        color: @color-text-primary;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-bold;
+        color: $color-text-primary;
     }
 
     &__body {
-        color: @color-text-secondary;
-        margin-top: @spacing-sm;
+        color: $color-text-secondary;
+        margin-top: $spacing-sm;
     }
 }
 ```
@@ -189,7 +189,7 @@ When you encounter a large or complex file, proactively suggest or apply the fol
 1. **Extract repeated JSX** → new component
 2. **Extract logic from component body** → custom hook or helper file
 3. **Split a large component** → parent + focused child components
-4. **Inline styles or hardcoded values** → LESS variables
+4. **Inline styles or hardcoded values** → SCSS variables
 5. **Overloaded `useEffect`** → split into separate effects or dedicated hooks
 
 If a `.tsx` file exceeds ~150 lines, flag it and propose a refactoring plan before adding more code.
@@ -201,7 +201,7 @@ If a `.tsx` file exceeds ~150 lines, flag it and propose a refactoring plan befo
 -   Class components
 -   `any` type
 -   Hardcoded colors, fonts, or spacing values
--   Inline styles (use LESS classes)
+-   Inline styles (use SCSS classes)
 -   Direct DOM manipulation outside of refs
 -   Nested ternaries in JSX (extract to a variable or subcomponent)
 -   `useEffect` without dependency arrays
