@@ -74,6 +74,7 @@
 
     &__lead {
         max-width: 60ch;
+        text-wrap: pretty;
         font-size: clamp(15px, 1.2vw, 16px);
         line-height: 1.75;
         color: rgba(253, 252, 250, 0.92);

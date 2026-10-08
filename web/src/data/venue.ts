@@ -11,9 +11,9 @@ export const VENUE = {
 } as const;
 
 export const VENUE_HERO = {
-    kicker: `Svadobný priestor · ${VENUE.place}`,
-    title: 'Miesto, kde sa tie šaty konečne ukážu',
-    lead: 'Šaty u nás vyberiete, termín skúšky dohodnete po telefóne. A keď chcete, dohodnete aj sálu: K-centrum v Topoľnici je náš svadobný priestor, takže celý deň má jedného človeka, ktorému zavoláte.',
+    kicker: `Svadobná sála ${VENUE.name} · ${VENUE.place}`,
+    title: 'Miesto, kde oslávite svoje áno',
+    lead: `Po obrade príde to najkrajšie: prípitky, objatia a prvý tanec. ${VENUE.name} v Topoľnici je náš svadobný priestor s kuchyňou priamo v dome, v deň svadby len pre vás. A keďže šaty vyberáte u nás, šaty aj sálu dohodnete s jedným človekom.`,
 } as const;
 
 export interface VenueUsp {

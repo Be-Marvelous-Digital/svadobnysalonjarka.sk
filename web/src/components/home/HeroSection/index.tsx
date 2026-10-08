@@ -9,15 +9,15 @@ export const HeroSection = () => (
         <div className={styles.hero__scrim} />
         <div className={styles.hero__vignette} />
         <div className={styles.hero__copy} data-over-media="true">
-            <span className={styles.hero__kicker}>Svadobný salón · Galanta</span>
+            <span className={styles.hero__kicker}>Svadobný salón v Galante · od roku 2007</span>
             <h1 className={styles.hero__title}>
                 Šaty, v ktorých
                 <br />
-                vás poznajú znova
+                poviete áno
             </h1>
             <p className={styles.hero__lead}>
-                Skúšku venujeme len vám, v pokojnej atmosfére a bez zhonu. Nájdeme spolu šaty, v ktorých sa vo Váš výnimočný deň
-                budete cítiť naozaj sama sebou.
+                Svadobné a spoločenské šaty aj obleky pre ženíchov, na požičanie aj na predaj. Na skúške máte salón len pre seba,
+                aby ste si v pokoji a bez zhonu našli tie pravé.
             </p>
             <div className={styles.hero__actions}>
                 <ButtonLink to={ROUTES.reservation} variant="light">
