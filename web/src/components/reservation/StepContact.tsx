@@ -54,7 +54,7 @@ export const StepContact = ({ draft, valid, errors, onChange, onBack }: StepCont
         </div>
 
         <p className={styles.step__note}>
-            Na telefónne číslo vás zavoláme kvôli potvrdeniu termínu. Údaje použijeme len na dohodnutie skúšky.
+            Telefón alebo e-mail použijeme na potvrdenie termínu. Údaje použijeme len na dohodnutie skúšky.
         </p>
 
         <div className={styles.step__actions}>

@@ -23,8 +23,8 @@ const STEPS: Step[] = [
     {
         number: '02',
         icon: <PhoneIcon size={18} />,
-        title: 'Zavoláme vám',
-        body: 'Termín nie je potvrdený automaticky. Majiteľka vás do 24 hodín kontaktuje telefonicky, termín potvrdí, alebo navrhne iné voľné dátumy a časy.',
+        title: 'Ozveme sa vám',
+        body: 'Termín nie je potvrdený automaticky. Majiteľka vám do 24 hodín zavolá alebo napíše e-mail, termín potvrdí, alebo navrhne iné voľné dátumy a časy.',
     },
     {
         number: '03',

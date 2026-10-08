@@ -8,7 +8,7 @@ export const TermsPage = () => {
         <LegalPage
             kicker="Právne informácie"
             title="Zásady používania"
-            lead="Čo od tejto stránky čakať a čo nie. Najdôležitejšie: odoslaním formulára o termín žiadate, potvrdí ho až telefonát od majiteľky."
+            lead="Čo od tejto stránky čakať a čo nie. Najdôležitejšie: odoslaním formulára o termín žiadate, potvrdí ho až majiteľka telefonicky alebo e-mailom."
             sections={TERMS_SECTIONS}
             footnote={
                 <span>

@@ -30,8 +30,8 @@ export const ReservationPage = () => {
                     <span className={styles.reservation__kicker}>Rezervácia</span>
                     <h1 className={styles.reservation__title}>Termín skúšky</h1>
                     <p className={styles.reservation__lead}>
-                        Vyplnenie formulára trvá minútu. Rezervácia nie je potvrdená automaticky, majiteľka vás do 24 hodín
-                        kontaktuje telefonicky, termín potvrdí, alebo vám navrhne iné voľné dátumy a časy.
+                        Vyplnenie formulára trvá minútu. Rezervácia nie je potvrdená automaticky, majiteľka vám do 24 hodín zavolá
+                        alebo napíše e-mail, termín potvrdí, alebo vám navrhne iné voľné dátumy a časy.
                     </p>
                 </div>
 

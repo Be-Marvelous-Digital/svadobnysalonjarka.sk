@@ -11,8 +11,8 @@ export const CtaSection = () => (
             <span className={styles.cta__kicker}>Rezervácia</span>
             <h2 className={styles.cta__title}>Zajednajte si termín skúšky</h2>
             <p className={styles.cta__lead}>
-                Nechajte nám kontakt a termín, ktorý vám vyhovuje. Majiteľka vás do 24 hodín zavolá, termín potvrdí alebo vám
-                navrhne iné voľné možnosti.
+                Nechajte nám kontakt a termín, ktorý vám vyhovuje. Majiteľka vám do 24 hodín zavolá alebo napíše e-mail, termín
+                potvrdí alebo vám navrhne iné voľné možnosti.
             </p>
             <ButtonLink to={ROUTES.reservation} variant="dark">
                 <MailIcon /> Vyplniť rezerváciu

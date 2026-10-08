@@ -105,7 +105,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     {
         heading: 'Automatizované rozhodovanie a deti',
         paragraphs: [
-            'Nepoužívame automatizované rozhodovanie ani profilovanie s právnym účinkom podľa čl. 22 GDPR. Rezervácie potvrdzuje majiteľka osobne, telefonicky.',
+            'Nepoužívame automatizované rozhodovanie ani profilovanie s právnym účinkom podľa čl. 22 GDPR. Rezervácie potvrdzuje majiteľka osobne, telefonicky alebo e-mailom.',
             'Stránka nie je určená deťom mladším ako 16 rokov. Ak rezervujete šaty na prvé sväté prijímanie, formulár vypĺňa rodič alebo zákonný zástupca a uvádza svoje vlastné kontaktné údaje.',
         ],
     },
@@ -127,7 +127,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     {
         heading: 'Rezervácia termínu nie je záväzná objednávka',
         paragraphs: [
-            'Odoslaním formulára žiadate o termín. Rezervácia nevzniká automaticky a nie je potvrdená, kým vás majiteľka telefonicky nekontaktuje — spravidla do 24 hodín. Môže vám ponúknuť iný voľný dátum alebo čas.',
+            'Odoslaním formulára žiadate o termín. Rezervácia nevzniká automaticky a nie je potvrdená, kým vás majiteľka nekontaktuje telefonicky alebo e-mailom — spravidla do 24 hodín. Môže vám ponúknuť iný voľný dátum alebo čas.',
             'Termín si vyhradzujeme právo zrušiť alebo presunúť z prevádzkových dôvodov. Vždy vás o tom vopred informujeme na uvedené telefónne číslo.',
             'Ak sa na dohodnutý termín nemôžete dostaviť, dajte nám vedieť čo najskôr telefonicky.',
         ],

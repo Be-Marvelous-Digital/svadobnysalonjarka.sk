@@ -21,8 +21,8 @@ export const ReservationDone = ({ reservation, onReset }: ReservationDoneProps) 
                 Ďakujeme, {firstName}. Žiadosť o termín {formatLongDate(reservation.date)} o {reservation.time} je u nás.
             </p>
             <p className={styles.done__body}>
-                Termín ešte nie je potvrdený. Majiteľka vás do 24 hodín zavolá a termín potvrdí, prípadne vám navrhne iné voľné
-                dátumy a časy. Ak sa vám niečo zmení, zavolajte na {CONTACT.phone}.
+                Termín ešte nie je potvrdený. Majiteľka vám do 24 hodín zavolá alebo napíše e-mail a termín potvrdí, prípadne vám
+                navrhne iné voľné dátumy a časy. Ak sa vám niečo zmení, zavolajte na {CONTACT.phone}.
             </p>
             <div className={styles.done__actions}>
                 <ButtonLink to={ROUTES.home} variant="dark" size="sm">

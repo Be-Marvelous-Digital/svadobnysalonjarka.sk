@@ -41,8 +41,8 @@ export const StepReview = ({ draft, submitting, onBack }: StepReviewProps) => {
             <div className={styles.step__callout}>
                 <span className={styles.step__label}>Dôležité</span>
                 <p className={styles.step__note}>
-                    Odoslaním žiadate o termín. Majiteľka vás do 24 hodín zavolá a termín potvrdí, alebo vám ponúkne iné voľné
-                    dátumy a časy.
+                    Odoslaním žiadate o termín. Majiteľka vám do 24 hodín zavolá alebo napíše e-mail a termín potvrdí, alebo vám
+                    ponúkne iné voľné dátumy a časy.
                 </p>
             </div>
 
