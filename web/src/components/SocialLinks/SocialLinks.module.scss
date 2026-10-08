@@ -1,0 +1,9 @@
+.link {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    svg {
+        flex-shrink: 0;
+    }
+}

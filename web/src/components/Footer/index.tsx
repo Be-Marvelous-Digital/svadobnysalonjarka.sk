@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ConsentSettingsButton } from '@/components/ConsentSettingsButton';
 import { MailIcon, PhoneIcon, PinIcon } from '@/components/Icon';
+import { SocialLinks } from '@/components/SocialLinks';
 import { COLLECTIONS } from '@/data/collections';
 import { CONTACT, OPENING_SUMMARY } from '@/data/contact';
 import { collectionPath, ROUTES } from '@/utils/routes';
@@ -60,14 +61,7 @@ export const Footer = () => (
                     <a href={`mailto:${CONTACT.email}`} className={styles.footer__contactRow}>
                         <MailIcon /> {CONTACT.email}
                     </a>
-                    <div className={styles.footer__social}>
-                        <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer">
-                            Instagram
-                        </a>
-                        <a href={CONTACT.facebook} target="_blank" rel="noopener noreferrer">
-                            Facebook
-                        </a>
-                    </div>
+                    <SocialLinks className={styles.footer__social} />
                 </div>
             </div>
 

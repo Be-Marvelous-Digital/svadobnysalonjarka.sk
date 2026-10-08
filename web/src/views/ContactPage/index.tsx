@@ -1,6 +1,7 @@
 import { ButtonLink } from '@/components/Button';
 import { ConsentMap } from '@/components/ConsentMap';
 import { PhoneIcon } from '@/components/Icon';
+import { SocialLinks } from '@/components/SocialLinks';
 import { CONTACT, OPENING_ROWS } from '@/data/contact';
 import { ROUTES } from '@/utils/routes';
 import styles from './ContactPage.module.scss';
@@ -76,14 +77,7 @@ export const ContactPage = () => {
                         <a href={CONTACT.mapLink} target="_blank" rel="noopener noreferrer" className={styles.contact__mapLink}>
                             Otvoriť v Google Mapách ↗
                         </a>
-                        <div className={styles.contact__social}>
-                            <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer">
-                                Instagram
-                            </a>
-                            <a href={CONTACT.facebook} target="_blank" rel="noopener noreferrer">
-                                Facebook
-                            </a>
-                        </div>
+                        <SocialLinks className={styles.contact__social} />
                     </div>
                 </div>
             </div>

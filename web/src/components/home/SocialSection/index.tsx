@@ -1,5 +1,5 @@
 import { RevealSection } from '@/components/RevealSection';
-import { CONTACT } from '@/data/contact';
+import { SocialLinks } from '@/components/SocialLinks';
 import styles from './SocialSection.module.scss';
 import { thumbOf } from '@/utils/photos';
 
@@ -25,17 +25,10 @@ export const SocialSection = ({ photos }: SocialSectionProps) => {
             <div className={styles.social__inner}>
                 <div className={styles.social__top}>
                     <div className={styles.social__heading}>
-                        <span className={styles.social__kicker}>Instagram</span>
+                        <span className={styles.social__kicker}>Sociálne siete</span>
                         <h2 className={styles.social__handle}>@svadobnysalonjarka</h2>
                     </div>
-                    <div className={styles.social__links}>
-                        <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer">
-                            Instagram
-                        </a>
-                        <a href={CONTACT.facebook} target="_blank" rel="noopener noreferrer">
-                            Facebook
-                        </a>
-                    </div>
+                    <SocialLinks className={styles.social__links} />
                 </div>
 
                 <div className={styles.social__grid}>
